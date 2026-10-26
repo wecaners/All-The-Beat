@@ -292,6 +292,82 @@
   .checks .all { font-weight:700; border-bottom:1px solid var(--fill-2); padding-bottom:10px; margin-bottom:4px; }
   .checks span { color:var(--sub); margin-left:auto; text-decoration:underline; font-size:12px; }
 
+  /* 강사: 폼 */
+  .form { padding:4px 16px 0; }
+  .f-sec { padding:16px 0 4px; border-bottom:1px solid var(--fill-2); }
+  .f-sec:last-child { border-bottom:0; }
+  .f-label { font-size:13px; font-weight:700; margin-bottom:8px; display:flex; justify-content:space-between; align-items:baseline; }
+  .f-label em { font-style:normal; font-weight:500; color:var(--sub); font-size:12px; }
+  .f-label .req { color:var(--ink); }
+  .f-input { height:44px; border:1px solid var(--line); border-radius:10px; padding:0 12px; display:flex; align-items:center; gap:6px; font-size:14px; color:var(--sub); margin-bottom:8px; }
+  .f-input.filled { color:var(--ink); }
+  .f-input.focus { border-color:var(--ink); box-shadow:0 0 0 2px rgba(0,0,0,.08); }
+  .f-input .pre { color:var(--ink); font-weight:600; }
+  .f-input .tail { margin-left:auto; font-size:12px; color:var(--sub); }
+  .f-input.area { height:72px; align-items:flex-start; padding-top:10px; }
+  .f-row { display:flex; gap:8px; }
+  .f-row > * { flex:1; }
+  .f-hint { font-size:12px; color:var(--sub); margin:-2px 0 8px; }
+  .f-ok { font-size:12px; font-weight:600; margin:-2px 0 8px; }
+  .f-ok::before { content:"✓ "; }
+  .song-pick { display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 10px 0 4px; border:1.5px solid var(--ink); border-radius:999px; font-size:13px; font-weight:600; margin:0 6px 8px 0; }
+  .song-pick i { width:40px; height:24px; border-radius:14px; background:var(--fill-2); font-style:normal; }
+  .song-pick b { font-weight:500; color:var(--sub); margin-left:2px; }
+  .add-link { display:inline-block; font-size:13px; color:var(--sub); text-decoration:underline; text-underline-offset:2px; cursor:pointer; margin-bottom:8px; }
+  .seg-tabs.form-seg { margin:0 0 8px; }
+  .callout { margin:12px 16px 0; padding:12px 14px; border-radius:12px; background:var(--fill); font-size:13px; line-height:1.5; }
+  .callout b { display:block; font-size:14px; margin-bottom:2px; }
+  .callout.line { background:var(--paper); border:1.5px solid var(--ink); }
+  .copy-row { display:flex; gap:8px; overflow-x:auto; padding:2px 16px 4px; scrollbar-width:none; }
+  .copy-card { flex:none; width:170px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; font-size:12px; color:var(--sub); cursor:pointer; }
+  .copy-card b { display:block; color:var(--ink); font-size:13px; margin-bottom:2px; }
+  .more { margin:8px 0 0; font-size:13px; font-weight:600; cursor:pointer; padding:12px 0; display:flex; justify-content:space-between; }
+  .more-body { display:none; }
+  .more-open .more-body { display:block; }
+  .upload { height:88px; border:1.5px dashed var(--line); border-radius:10px; display:grid; place-items:center; font-size:12.5px; color:var(--sub); margin-bottom:8px; }
+
+  /* 강사: 신청 단계 */
+  .steps { margin:16px 16px 0; }
+  .step { display:flex; gap:12px; padding-bottom:18px; position:relative; }
+  .step::before { content:""; position:absolute; left:11px; top:24px; bottom:0; width:1.5px; background:var(--line); }
+  .step:last-child::before { display:none; }
+  .step i { width:24px; height:24px; border-radius:50%; border:1.5px solid var(--line); flex:none; display:grid; place-items:center; font-style:normal; font-size:12px; color:var(--sub); background:var(--paper); position:relative; }
+  .step.done i { background:var(--ink); border-color:var(--ink); color:#fff; }
+  .step.now i { border-color:var(--ink); color:var(--ink); font-weight:800; }
+  .step b { display:block; font-size:14px; }
+  .step span { font-size:12.5px; color:var(--sub); }
+  .code { display:flex; gap:6px; margin:4px 0 12px; }
+  .code i { flex:1; height:48px; border:1.5px solid var(--line); border-radius:10px; display:grid; place-items:center; font-style:normal; font-size:20px; font-weight:700; }
+  .code.filled i { border-color:var(--ink); }
+
+  /* 강사: 내 클래스 */
+  .alert-card { margin:12px 16px 0; padding:12px 14px; border-radius:12px; background:var(--ink); color:#fff; display:flex; align-items:center; gap:10px; cursor:pointer; }
+  .alert-card b { display:block; font-size:14px; }
+  .alert-card span { font-size:12px; opacity:.8; }
+  .alert-card .go { margin-left:auto; font-size:18px; opacity:1; }
+  .mc { padding:14px 16px; border-bottom:1px solid var(--fill-2); }
+  .mc-top { display:flex; gap:12px; align-items:flex-start; }
+  .mc-top .date { flex:none; width:46px; text-align:center; border-radius:8px; background:var(--fill); padding:6px 0; }
+  .mc-top .date b { display:block; font-size:18px; line-height:1; }
+  .mc-top .date span { font-size:10.5px; color:var(--sub); }
+  .mc-top .info { flex:1; min-width:0; }
+  .mc-top .t { font-weight:700; font-size:14px; }
+  .mc-top .m { font-size:12px; color:var(--sub); margin-top:2px; }
+  .mc-act { display:flex; gap:6px; margin-top:10px; padding-left:58px; flex-wrap:wrap; }
+  .mc-act .btn.sm { height:30px; font-size:12px; padding:0 10px; }
+  .stat-line { display:flex; gap:12px; font-size:12px; color:var(--sub); margin-top:6px; }
+  .stat-line b { color:var(--ink); }
+  .nums { display:flex; gap:8px; margin:14px 16px 0; }
+  .nums div { flex:1; padding:12px; border-radius:12px; border:1px solid var(--line); text-align:center; }
+  .nums b { display:block; font-size:24px; }
+  .nums span { font-size:11.5px; color:var(--sub); }
+  .nums .main { border:1.5px solid var(--ink); }
+  .review-only { display:none; }
+  .reviewing .review-only { display:flex; }
+  .reviewing .before-review { display:none; }
+  .reviewing .review-only.b { display:block; }
+  .resp { display:flex; flex-direction:column; gap:8px; margin:16px 16px 0; }
+
   /* 확인 창 */
   .dialog { position:absolute; left:28px; right:28px; top:50%; transform:translateY(-50%); background:var(--paper); border-radius:16px; padding:20px 18px 16px; z-index:11; display:none; text-align:center; }
   .dialog.open { display:block; }
@@ -323,7 +399,7 @@
 
 <header class="board-bar">
   <h1>올빗 와이어프레임</h1>
-  <span class="meta">v0.3 · 2026-10-26 · 기준: 03-기능명세서 v0.3, 04-IA v0.2, 05-유저플로우 v0.2, 06-음원API</span>
+  <span class="meta">v0.4 · 2026-10-26 · 기준: 03-기능명세서 v0.5, 04-IA v0.2, 05-유저플로우 v0.3, 06-음원API</span>
   <div class="proto-nav">
     <button class="icon ghost" id="back" title="뒤로">←</button>
     <select id="jump"></select>
@@ -721,7 +797,7 @@
           <button class="btn line" data-act="req">원하는 날짜·지역이 없나요? 추가요!</button>
         </div>
 
-        <div class="teacher-cta"><span class="tag">강사만</span><span>이 곡, 기다리는 사람이 있어요</span><span class="spacer"></span><button class="btn sm" data-go="T-02">클래스 열기</button></div>
+        <div class="teacher-cta"><span class="tag">강사만</span><span>이 곡, 기다리는 사람이 있어요</span><span class="spacer"></span><button class="btn sm" data-go="T-02a">클래스 열기</button></div>
         <div style="height:16px"></div>
       </div>
 
@@ -783,7 +859,7 @@
           <div class="empty"><b>아직 열린 클래스가 없어요</b>추가요가 쌓이면 강사님들이 보고<br>클래스를 열 수 있어요</div>
         </section>
 
-        <div class="teacher-cta"><span class="tag">강사만</span><span>23명이 기다리는 곡이에요</span><span class="spacer"></span><button class="btn sm" data-go="T-02">클래스 열기</button></div>
+        <div class="teacher-cta"><span class="tag">강사만</span><span>23명이 기다리는 곡이에요</span><span class="spacer"></span><button class="btn sm" data-go="T-02a">클래스 열기</button></div>
       </div>
 
       <div class="sticky-cta"><button class="btn" data-act="req">추가요! 이 곡 열어주세요</button></div>
@@ -1008,7 +1084,7 @@
     <ol class="notes">
       <li><b>취소는 막지 않는다.</b> [앵콜 완료 ✓ · 취소] → 확인 창 "취소하면 강사님이 보는 앵콜 인원에서 빠져요." 사실만 말하고 혜택 상실 같은 위협 문구는 쓰지 않는다 (프로토타입에서 눌러보기).</li>
       <li><b>취소해도 "검토 중"은 유지</b>되고 숫자만 실제대로 줄어든다. 상태는 뒤로 가지 않는다 (F-24, S-4).</li>
-      <li>강사 화면(T-03, 아직 안 그림)에는 "검토 시작 시점 14명 · 지금 13명 (취소 1)"과 "앵콜은 예약이 아니라 관심 표시예요" 안내가 고정으로 보인다.</li>
+      <li>강사 화면(T-03 B)에는 "검토 시작 시점 14명 · 지금 13명 (취소 1)"과 "앵콜은 예약이 아니라 관심 표시예요" 안내가 고정으로 보인다.</li>
       <li>열렸을 때 알려주는 곳은 MVP에선 <b>이 화면과 마이 &gt; 내 앵콜</b>뿐 (알림 F-20은 Should). "우선 예약" 같은 문구는 쓰지 않는다 (MVP 원칙 6).</li>
       <li><b>"검토 중" 문구는 강사가 [검토할게요]를 누른 뒤에만</b> 나온다 (F-24, 플로우 10). 기준 인원 도달만으로는 "전달됐어요"까지.</li>
       <li>이미 앵콜한 사용자에게는 버튼이 "앵콜 완료 ✓ · 취소"로 바뀐다.</li>
@@ -1142,7 +1218,7 @@
             <div class="quote">"킬링파트만이라도 배우고 싶어요"</div>
             <div class="quote">"입문반으로 열어주세요!"</div>
             <div class="quote">"주말 오후면 친구랑 갈게요"</div>
-            <button class="btn" data-go="T-02">이 곡으로 클래스 열기</button>
+            <button class="btn" data-go="T-02a">이 곡으로 클래스 열기</button>
           </div>
         </div>
         <div class="rk">
@@ -1158,7 +1234,7 @@
             <div class="barrow"><span>주말 낮</span><i style="width:40px"></i><span>4</span></div>
             <h5 style="margin-top:10px">한마디 (최근 3개)</h5>
             <div class="quote">"퇴근 후 클래스 있었으면"</div>
-            <button class="btn" data-go="T-02">이 곡으로 클래스 열기</button>
+            <button class="btn" data-go="T-02a">이 곡으로 클래스 열기</button>
           </div>
         </div>
         <div class="rk">
@@ -1171,7 +1247,7 @@
           <div class="rk-detail">
             <h5>희망 시간대</h5>
             <div class="barrow"><span>주말 저녁</span><i style="width:50px"></i><span>5</span></div>
-            <button class="btn" data-go="T-02">이 곡으로 클래스 열기</button>
+            <button class="btn" data-go="T-02a">이 곡으로 클래스 열기</button>
           </div>
         </div>
         <div style="height:12px"></div>
@@ -1270,7 +1346,7 @@
 
         <div class="promo">
           <div style="flex:1"><b>댄스 강사이신가요?</b>올빗에 클래스를 올리고 추가요 수요를 확인해보세요</div>
-          <button class="btn sm" data-go="T-01">강사 신청</button>
+          <button class="btn sm" data-go="T-01a">강사 신청</button>
         </div>
 
         <nav class="menu">
@@ -1295,7 +1371,7 @@
       <li><b>내 추가요 / 내 앵콜</b> 두 탭. 알림(F-20)이 없는 MVP에서는 <b>"열렸어요"를 확인하는 유일한 곳</b>이라 중요하다 (MVP 원칙 6).</li>
       <li>상태 배지: 추가요 = 대기중 · N명 / <b>열렸어요 ›</b>, 앵콜 = 모으는 중 N/M · 전달됨 · <b>검토 중</b> · 앵콜 오픈 › · 어려워요. "열렸어요"류는 검은 배지로 눈에 띄게, 위로 정렬.</li>
       <li>항목을 누르면 추가요 → 곡 상세, 앵콜 → 원 클래스 상세. 수정·취소는 그 화면에서 (여기서는 보기만).</li>
-      <li><b>강사 신청</b> 배너 → T-01 (아직 안 그림). 승인된 강사면 이 자리가 <b>[내 클래스 관리 · 앵콜 응답 필요 2]</b>로 바뀐다.</li>
+      <li><b>강사 신청</b> 배너 → T-01. 승인된 강사면 이 자리가 <b>[내 클래스 관리 · 앵콜 응답 필요 2]</b>로 바뀐다.</li>
       <li>닉네임은 카카오 닉네임 그대로 (MVP는 수정 없음) [가정].</li>
     </ol>
   </div>
@@ -1331,11 +1407,315 @@
     </ol>
   </div>
 
+  <!-- ═══════════════ T-01a 강사 신청: 폼 ═══════════════ -->
+  <div class="slot" data-screen="T-01a" data-title="강사 신청 · 입력">
+    <div class="slot-head"><span class="id">T-01</span><span class="name">강사 신청</span><span class="state">A. 입력</span></div>
+    <div class="phone">
+      <div class="scroll" style="padding-bottom:110px">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar"><button class="icon ghost" data-act="back">←</button><span style="font-weight:700">강사 신청</span></div>
+        <div class="callout">
+          <b>올빗에 클래스를 올려보세요</b>
+          무료예요. 예약은 지금 쓰는 네이버 예약·오픈채팅 그대로 받고, 올빗은 클래스를 찾는 사람들에게 보여주는 역할만 해요.
+        </div>
+        <div class="form">
+          <div class="f-sec">
+            <div class="f-label"><span>활동명 <span class="req">*</span></span><em>클래스에 표시돼요</em></div>
+            <div class="f-input filled">민지</div>
+          </div>
+          <div class="f-sec">
+            <div class="f-label"><span>인스타그램 계정 <span class="req">*</span></span><em>본인 확인에 써요</em></div>
+            <div class="f-input filled focus"><span class="pre">@</span>minji.dance</div>
+            <div class="f-hint">이 계정으로 인증 코드를 DM으로 보내드려요</div>
+          </div>
+          <div class="f-sec">
+            <div class="f-label"><span>주로 활동하는 지역 <span class="req">*</span></span><em>여러 개 선택</em></div>
+            <div class="chips"><span class="chip on">홍대·합정·신촌</span><span class="chip">강남·신논현·역삼</span><span class="chip on">건대·성수</span><span class="chip">잠실·송파</span><span class="chip">종로·을지로</span><span class="chip">신림·사당</span><span class="chip">노원·수유</span></div>
+            <div style="height:8px"></div>
+          </div>
+          <div class="f-sec">
+            <div class="f-label"><span>한 줄 소개</span><em>선택 · 50자</em></div>
+            <div class="f-input">예) 입문자도 1시간이면 완곡하는 K-pop 커버</div>
+          </div>
+        </div>
+      </div>
+      <div class="sticky-cta"><button class="btn" data-go="T-01b">신청하기</button></div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>마이의 "강사 신청" 배너에서 들어온다 (로그인 필요). 입력은 <b>필수 3개 + 선택 1개</b>로 최소화 (F-11).</li>
+      <li>맨 위 안내로 강사가 가장 걱정하는 것부터 답한다: <b>"예약은 지금 쓰던 그대로"</b>. 인스타를 떠나라는 서비스가 아니라는 메시지 (기획서 4절).</li>
+      <li>인스타 계정 = 신원. 다음 단계에서 이 계정으로 인증 코드를 보낸다.</li>
+      <li>이미 운영자가 같은 계정으로 대리 등록한 클래스가 있으면, 신청 후 "이미 올빗에 등록된 클래스가 N개 있어요 · 내 계정으로 가져오기"가 뜬다 (F-19 클레임, Should).</li>
+      <li>프로필 사진은 카카오 프로필을 그대로 쓰고 나중에 바꿀 수 있게 [가정].</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ T-01b 강사 신청: 인증·승인 대기 ═══════════════ -->
+  <div class="slot" data-screen="T-01b" data-title="강사 신청 · 인증·승인 대기">
+    <div class="slot-head"><span class="id">T-01</span><span class="name">강사 신청</span><span class="state">B. 인스타 인증 → 승인 대기</span></div>
+    <div class="phone">
+      <div class="scroll no-tab">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar"><button class="icon ghost" data-act="back">←</button><span style="font-weight:700">강사 신청</span></div>
+        <div class="steps">
+          <div class="step done"><i>✓</i><div><b>신청 완료</b><span>@minji.dance · 홍대·합정·신촌, 건대·성수</span></div></div>
+          <div class="step now" data-step-verify><i>2</i><div style="flex:1"><b>인스타그램 본인 인증</b><span>올빗 공식 계정 <b style="display:inline;font-size:12.5px">@allbeat.kr</b>이 6자리 코드를 DM으로 보내드려요. 보통 하루 안에 와요.</span>
+            <div class="code" data-code><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <button class="btn" data-act="verify">인증하기</button>
+            <div class="f-hint" style="margin-top:8px">DM이 안 왔나요? <u data-act="resend" style="cursor:pointer">다시 요청</u> · 코드는 24시간 동안 유효해요</div>
+          </div></div>
+          <div class="step" data-step-approve><i>3</i><div><b>운영자 승인</b><span data-approve-text>인증이 끝나면 확인 후 승인해드려요</span></div></div>
+        </div>
+        <div style="padding:0 16px"><button class="btn line" data-go="T-03a" data-approved style="display:none">내 클래스로 가기 (승인됐다고 가정)</button></div>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>3단계를 <b>지금 어디인지</b> 보이게. 강사는 언제 클래스를 올릴 수 있는지 궁금하다.</li>
+      <li>인증 코드는 <b>운영자가 수동으로 DM</b> (MVP). 그래서 "보통 하루 안에"라고 <b>시스템이 장담할 수 없는 시간은 "보통"</b>으로만 말한다 (MVP 원칙 6) [가정: 실제 처리 시간 보고 문구 확정].</li>
+      <li>프로토타입에서 [인증하기] → 코드 채워짐 → 3단계 "승인 대기"로 넘어간다. 승인되면 마이에 [내 클래스 관리]가 생긴다.</li>
+      <li>반려되면 이 화면에 사유 + [다시 신청하기]. 코드 만료 시 [다시 요청].</li>
+      <li class="q">결정 필요: 올빗 공식 인스타 계정(@allbeat.kr)은 아직 확보 전. 인증 DM을 보낼 계정이 먼저 있어야 한다.</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ T-02a 클래스 등록 ═══════════════ -->
+  <div class="slot" data-screen="T-02a" data-title="클래스 등록">
+    <div class="slot-head"><span class="id">T-02</span><span class="name">클래스 등록</span><span class="state">A. 랭킹에서 "이 곡으로 열기"</span></div>
+    <div class="phone">
+      <div class="scroll" style="padding-bottom:110px">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar"><button class="icon ghost" data-act="back">×</button><span style="font-weight:700">새 클래스</span><span class="spacer"></span><span style="font-size:12px;color:var(--sub)">필수 7개</span></div>
+
+        <div class="callout line"><b>23명이 기다리는 곡이에요</b>홍대·합정 11명 · 주말 낮을 가장 많이 원해요</div>
+
+        <div style="padding:14px 16px 6px;font-size:13px;font-weight:700">지난 클래스에서 가져오기</div>
+        <div class="copy-row">
+          <div class="copy-card" data-act="copy"><b>NEON 원데이</b>무브 스튜디오 2호점 · 35,000원</div>
+          <div class="copy-card" data-act="copy"><b>곡 제목 B 원데이</b>스튜디오 S · 40,000원</div>
+        </div>
+
+        <div class="form">
+          <div class="f-sec">
+            <div class="f-label"><span>곡 <span class="req">*</span></span><em>최대 3곡</em></div>
+            <span class="song-pick"><i></i>곡 제목 E <b>· 아티스트 E</b> ×</span>
+            <div><span class="add-link" data-act="add-song">+ 곡 추가</span></div>
+          </div>
+          <div class="f-sec">
+            <div class="f-label"><span>클래스 이름</span><em>선택 · 비우면 "곡 제목 E 원데이 클래스"</em></div>
+            <div class="f-input">예) 킬링파트부터 완곡까지</div>
+          </div>
+          <div class="f-sec">
+            <div class="f-label"><span>날짜·시간 <span class="req">*</span></span></div>
+            <div class="f-input filled" data-fill="date">11월 7일 (토)<span class="tail">달력</span></div>
+            <div class="f-row"><div class="f-input filled">14:00</div><div class="f-input filled">15:30<span class="tail">90분</span></div></div>
+          </div>
+          <div class="f-sec">
+            <div class="f-label"><span>장소 <span class="req">*</span></span><em>이전 장소</em></div>
+            <div class="chips" style="margin-bottom:8px"><span class="chip on" data-act="pick-place">무브 스튜디오 2호점</span><span class="chip" data-act="pick-place">스튜디오 S</span><span class="chip" data-act="pick-place">+ 새 장소</span></div>
+            <div class="f-input filled">서울 마포구 ○○로 12, 3층</div>
+            <div class="f-ok">권역: 홍대·합정 (주소로 자동 설정 · 바꾸기)</div>
+          </div>
+          <div class="f-sec">
+            <div class="f-row">
+              <div><div class="f-label"><span>가격 <span class="req">*</span></span></div><div class="f-input filled">35,000<span class="tail">원</span></div></div>
+              <div><div class="f-label"><span>정원</span><em>선택</em></div><div class="f-input filled">12<span class="tail">명</span></div></div>
+            </div>
+            <div class="f-label"><span>난이도 <span class="req">*</span></span></div>
+            <div class="seg-tabs form-seg"><a class="on" data-act="seg">입문</a><a data-act="seg">초급</a><a data-act="seg">중급 이상</a></div>
+          </div>
+          <div class="f-sec">
+            <div class="f-label"><span>예약 받는 링크 <span class="req">*</span></span><em>지금 쓰는 그대로</em></div>
+            <div class="f-input filled">naver.me/xYz123</div>
+            <div class="f-ok">네이버 예약으로 인식했어요</div>
+          </div>
+          <div class="f-sec" data-more>
+            <div class="more" data-act="more"><span>사진 · 소개 · 티저 영상 <em style="font-style:normal;font-weight:500;color:var(--sub)">선택</em></span><span data-more-arrow>펼치기 ▾</span></div>
+            <div class="more-body">
+              <div class="upload">+ 대표 사진 (없으면 곡 안무 영상 썸네일)</div>
+              <div class="f-input area">클래스 소개 · 준비물 (1,000자)</div>
+              <div class="f-input">티저 영상 YouTube 링크 (Should F-25)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sticky-cta"><button class="btn" data-act="publish">등록하고 바로 공개</button></div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li><b>목표 1분.</b> 한 화면, 필수 7개(곡·날짜·시간·장소·가격·난이도·예약 링크). 사진·소개·티저 영상은 접어둔다 (F-12).</li>
+      <li>랭킹·곡 상세의 [클래스 열기]로 들어오면 <b>곡이 미리 선택</b>되고, 맨 위에 "23명이 기다려요 · 홍대 11명 · 주말 낮" 수요를 다시 보여준다. 날짜·지역을 고를 때 근거가 된다.</li>
+      <li><b>"지난 클래스에서 가져오기"</b>: 장소·가격·예약 링크·소개를 복사 → 날짜와 곡만 바꾸면 끝. 반복 등록 강사의 핵심 시간 절약.</li>
+      <li>장소는 <b>이전 장소 칩</b> → 주소 → 권역 자동. 예약 링크는 URL로 유형 자동 인식 (네이버 예약 / 오픈채팅 / 구글폼 / 인스타 DM).</li>
+      <li><b>클래스 이름 필드를 새로 넣었다</b> (명세에 없던 것, 클래스 상세 U-05 제목). 선택 입력, 비우면 "곡명 원데이 클래스" 자동 → 03 명세 v0.5 반영.</li>
+      <li>[등록하고 바로 공개] → 승인된 강사는 검수 없이 즉시 공개 → 내가 만든 클래스 상세로 이동.</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ T-02b 앵콜 클래스 등록 ═══════════════ -->
+  <div class="slot" data-screen="T-02b" data-title="앵콜 클래스 등록">
+    <div class="slot-head"><span class="id">T-02</span><span class="name">클래스 등록</span><span class="state">B. 앵콜 클래스 열기 (복사됨)</span></div>
+    <div class="phone">
+      <div class="scroll" style="padding-bottom:110px">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar"><button class="icon ghost" data-act="back">×</button><span style="font-weight:700">앵콜 클래스</span></div>
+
+        <div class="callout line"><b>원래 클래스 정보를 그대로 가져왔어요</b>날짜와 시간만 고르면 돼요. 앵콜한 12명이 "앵콜 클래스가 열렸어요"를 보게 돼요.</div>
+
+        <div class="form">
+          <div class="f-sec">
+            <div class="f-label"><span>날짜·시간 <span class="req">*</span></span><em>앵콜 희망: 주말 낮 6 · 평일 저녁 4</em></div>
+            <div class="f-input focus">날짜를 골라주세요<span class="tail">달력</span></div>
+            <div class="f-row"><div class="f-input">시작</div><div class="f-input">종료</div></div>
+          </div>
+          <div class="f-sec">
+            <div class="f-label"><span>곡</span><em>복사됨</em></div>
+            <span class="song-pick"><i></i>NEON <b>· A2O LITE</b></span>
+          </div>
+          <div class="f-sec">
+            <div class="f-label"><span>클래스 이름</span><em>복사됨</em></div>
+            <div class="f-input filled">NEON 원데이 클래스 · 킬링파트 완곡까지 (앵콜)</div>
+          </div>
+          <div class="f-sec">
+            <div class="f-label"><span>장소 · 가격 · 난이도 · 예약 링크</span><em>복사됨 · 누르면 수정</em></div>
+            <div class="f-input filled">무브 스튜디오 2호점 · 35,000원 · 입문</div>
+            <div class="f-input filled">naver.me/xYz123</div>
+            <div class="f-hint">⚠ 예약 링크가 원래 회차와 같아요. 네이버 예약에 새 회차를 열었는지 확인해주세요</div>
+          </div>
+        </div>
+      </div>
+      <div class="sticky-cta"><button class="btn" data-act="publish">앵콜 클래스 공개</button></div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>내 클래스 → 앵콜 상세 → [앵콜 클래스 열기]로 들어온다. 원 클래스를 <b>통째로 복사</b>해서 강사는 <b>날짜·시간만</b> 고르면 된다 (F-24).</li>
+      <li>날짜 위에 <b>앵콜한 사람들의 희망 시간대</b>를 다시 보여준다.</li>
+      <li>공개하면 새 클래스에 "앵콜 클래스" 배지 + 원 클래스와 연결, 앵콜한 사람들 상태 → "앵콜 오픈".</li>
+      <li><b>예약 링크가 원래 회차와 같으면 경고</b>. 강사가 외부 예약 채널에 새 회차를 안 열고 옛 링크를 그대로 쓰는 실수 → 수강생 CS를 미리 막는다 (MVP 원칙 6과 같은 맥락).</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ T-03a 내 클래스 ═══════════════ -->
+  <div class="slot" data-screen="T-03a" data-title="내 클래스">
+    <div class="slot-head"><span class="id">T-03</span><span class="name">내 클래스</span><span class="state">A. 목록</span></div>
+    <div class="phone">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar"><button class="icon ghost" data-act="back">←</button><span style="font-weight:700">내 클래스</span><span class="spacer"></span><button class="btn sm" data-go="T-02a">+ 새 클래스</button></div>
+
+        <div class="alert-card" data-go="T-03b">
+          <div><b>앵콜 응답이 필요해요 · 1</b><span>NEON 원데이 (10/28) · 12명이 앵콜했어요</span></div><span class="go">›</span>
+        </div>
+
+        <div class="seg-tabs"><a class="on" data-act="my-tab">다가오는 3</a><a data-act="my-tab">지난 8</a></div>
+
+        <div class="my-panel on" style="padding:0">
+          <div class="mc">
+            <div class="mc-top">
+              <div class="date"><b>28</b><span>10월 · 수</span></div>
+              <div class="info"><div class="t">NEON 원데이 · 홍대·합정</div><div class="m">19:30–21:00 · 35,000원 · 입문</div>
+                <div class="stat-line"><span>조회 <b>214</b></span><span>예약 클릭 <b>38</b></span><span>앵콜 <b>12</b></span></div></div>
+              <span class="pill solid" data-status-pill>마감</span>
+            </div>
+            <div class="mc-act"><button class="btn line sm" data-act="status">상태 변경 ▾</button><button class="btn line sm" data-go="T-02b">앵콜 열기</button><button class="btn line sm" data-act="dup">복사</button></div>
+          </div>
+          <div class="mc">
+            <div class="mc-top">
+              <div class="date"><b>31</b><span>10월 · 토</span></div>
+              <div class="info"><div class="t">NEON 원데이 · 건대·성수</div><div class="m">14:00–15:30 · 35,000원 · 입문</div>
+                <div class="stat-line"><span>조회 <b>96</b></span><span>예약 클릭 <b>17</b></span></div></div>
+              <span class="pill" data-status-pill>모집중</span>
+            </div>
+            <div class="mc-act"><button class="btn line sm" data-act="status">상태 변경 ▾</button><button class="btn line sm" data-act="edit">수정</button><button class="btn line sm" data-act="dup">복사</button></div>
+          </div>
+          <div class="mc">
+            <div class="mc-top">
+              <div class="date"><b>7</b><span>11월 · 토</span></div>
+              <div class="info"><div class="t">곡 제목 E 원데이 · 홍대·합정</div><div class="m">14:00–15:30 · 35,000원 · 입문</div>
+                <div class="stat-line"><span>조회 <b>41</b></span><span>예약 클릭 <b>9</b></span><span>추가요에서 <b>✓</b></span></div></div>
+              <span class="pill" data-status-pill>모집중</span>
+            </div>
+            <div class="mc-act"><button class="btn line sm" data-act="status">상태 변경 ▾</button><button class="btn line sm" data-act="edit">수정</button><button class="btn line sm" data-act="dup">복사</button></div>
+          </div>
+        </div>
+        <div class="my-panel" style="padding:0">
+          <div class="mc"><div class="mc-top"><div class="date"><b>18</b><span>10월 · 토</span></div><div class="info"><div class="t">곡 제목 B 원데이 · 홍대·합정</div><div class="m">종료 · 예약 클릭 22</div></div><span class="pill soft">종료</span></div>
+            <div class="mc-act"><button class="btn line sm" data-act="dup">복사해서 다시 열기</button></div></div>
+        </div>
+        <div style="height:12px"></div>
+      </div>
+      <nav class="tabbar">
+        <a data-go="U-01"><i>⌂</i>홈</a>
+        <a data-go="U-02a"><i>⌕</i>찾기</a>
+        <a data-go="U-06b"><i>✋</i>추가요</a>
+        <a class="on" data-go="U-09b"><i>◯</i>마이</a>
+      </nav>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>마이에서 [내 클래스 관리]로 들어온다 (승인된 강사). <b>응답이 필요한 앵콜</b>을 맨 위 검은 카드로 (F-24).</li>
+      <li>클래스마다 <b>조회 · 예약 클릭 · 앵콜</b> 숫자. 강사에게 "올빗이 실제로 사람을 보내준다"는 증거 → 계속 쓸 이유 (F-06 클릭 기록 재사용).</li>
+      <li>[상태 변경]: 모집중 → 마감 임박 → 마감, 또는 취소(사유). <b>외부 예약이라 마감은 강사가 직접</b> 눌러야 한다 → 가장 자주 쓰는 버튼이라 맨 앞 (S-1).</li>
+      <li>[복사] → 클래스 등록 T-02에 복사된 폼. 지난 클래스는 [복사해서 다시 열기]만.</li>
+      <li>"추가요에서 ✓": 추가요를 보고 연 클래스 표시 → 요청→개설 전환 지표 (기획서 6절).</li>
+      <li class="q">결정 필요: 강사가 마감을 안 누르는 문제 (UF-3). 시작 24시간 전에 "아직 모집중이에요. 마감됐나요?" 확인을 MVP에 넣을까? (알림이 없으니 이 화면 배너로)</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ T-03b 앵콜 상세·응답 ═══════════════ -->
+  <div class="slot" data-screen="T-03b" data-title="앵콜 상세 · 강사 응답">
+    <div class="slot-head"><span class="id">T-03</span><span class="name">내 클래스</span><span class="state">B. 앵콜 상세 · 응답</span></div>
+    <div class="phone" data-review-root>
+      <div class="scroll no-tab">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar"><button class="icon ghost" data-act="back">←</button><span style="font-weight:700">앵콜 요청</span></div>
+
+        <div class="class-head" style="padding-top:4px">
+          <div class="badges"><span>마감</span><span class="soft" data-state-badge>전달됨 · 응답 대기</span></div>
+          <h1 style="font-size:18px">NEON 원데이 클래스<br><span style="font-size:13px;font-weight:500;color:var(--sub)">10월 28일 (수) 19:30 · 무브 스튜디오 2호점</span></h1>
+        </div>
+
+        <div class="nums before-review"><div class="main"><b>12</b><span>지금 앵콜한 사람</span></div></div>
+        <div class="nums review-only"><div class="main"><b>12</b><span>검토 시작 시점</span></div><div><b data-now>11</b><span>지금 (취소 <span data-canceled>1</span>)</span></div></div>
+
+        <div class="callout"><b>앵콜은 예약이 아니라 관심 표시예요</b>앵콜한 분 전원이 예약하지는 않을 수 있어요. 열 날짜를 정할 때 참고해주세요.</div>
+
+        <div class="rk-detail" style="display:block;margin:14px 16px 0">
+          <h5>희망 시간대</h5>
+          <div class="barrow"><span>주말 낮</span><i style="width:60px"></i><span>6</span></div>
+          <div class="barrow"><span>평일 저녁</span><i style="width:40px"></i><span>4</span></div>
+          <div class="barrow"><span>상관없음</span><i style="width:20px"></i><span>2</span></div>
+          <h5 style="margin-top:10px">한마디</h5>
+          <div class="quote">"이번엔 꼭 들을게요!"</div>
+          <div class="quote">"주말 오후면 좋겠어요"</div>
+        </div>
+
+        <div class="resp">
+          <button class="btn" data-go="T-02b">앵콜 클래스 열기</button>
+          <button class="btn line before-review" data-act="review">검토할게요</button>
+          <div class="f-ok review-only b" style="margin:0;text-align:center">검토 중으로 표시했어요 · 수강생에게 "강사님이 검토 중이에요"가 보여요</div>
+          <button class="btn line" data-act="decline" style="border-color:var(--line);color:var(--sub)">이번엔 어려워요</button>
+        </div>
+        <div style="height:24px"></div>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>응답 버튼 3개: <b>[앵콜 클래스 열기]</b>(→ T-02 B, 복사된 폼) / <b>[검토할게요]</b> / <b>[이번엔 어려워요]</b> (F-24, 플로우 10-2).</li>
+      <li>[검토할게요]를 누르기 전엔 숫자 1개, 누른 뒤엔 <b>"검토 시작 시점 12 · 지금 11 (취소 1)"</b> 두 숫자 (프로토타입에서 눌러보기). 상태는 뒤로 가지 않는다.</li>
+      <li><b>기대치 안내 고정</b>: "앵콜은 예약이 아니라 관심 표시예요". "12명이라더니 4명 왔다"는 강사 CS 방지.</li>
+      <li>[검토할게요]를 누르는 순간 수강생 화면(U-05 C)에 "검토 중"이 뜬다는 걸 바로 알려준다. 강사가 무슨 일이 일어나는지 알고 누르게.</li>
+      <li>[이번엔 어려워요] → 확인 후 앵콜한 사람들에게 "이번엔 어렵대요" + 같은 곡 다른 클래스 안내.</li>
+      <li>검토 중 14일 무응답이면 운영자에게 알림 → 운영자가 DM으로 확인 [가정].</li>
+    </ol>
+  </div>
+
 </main>
 
 <script>
   /* ── 아직 그리지 않은 화면 (링크를 누르면 안내만) ── */
-  const PENDING = { "T-01":"강사 신청", "T-02":"클래스 등록", "T-03":"내 클래스 관리" };
+  const PENDING = {};
 
   const slots = [...document.querySelectorAll(".slot")];
   const byId = id => slots.find(s => s.dataset.screen === id);
@@ -1544,6 +1924,55 @@
         break;
       case "logout": show("U-09a"); break;
       case "noop": toast(phone, "MVP에서는 단순 링크"); break;
+
+      // 강사 화면
+      case "verify": {
+        const code = phone.querySelector("[data-code]");
+        [..."482915"].forEach((d, i) => code.children[i].textContent = d);
+        code.classList.add("filled");
+        const v = phone.querySelector("[data-step-verify]"), a = phone.querySelector("[data-step-approve]");
+        v.classList.replace("now", "done"); v.querySelector("i").textContent = "✓";
+        el.style.display = "none";
+        a.classList.add("now");
+        phone.querySelector("[data-approve-text]").textContent = "승인 대기 중이에요. 확인 후 승인해드려요";
+        phone.querySelector("[data-approved]").style.display = "flex";
+        toast(phone, "인증 완료!");
+        break;
+      }
+      case "resend": toast(phone, "인증 코드 재요청을 운영자에게 보냈어요"); break;
+      case "copy": toast(phone, "장소·가격·예약 링크·소개를 가져왔어요. 날짜와 곡만 바꿔주세요"); break;
+      case "add-song": toast(phone, "곡 검색 자동완성 (F-13) · 없으면 새 곡 등록"); break;
+      case "pick-place":
+        el.parentElement.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === el));
+        toast(phone, el.textContent.startsWith("+") ? "주소 검색 (카카오 주소 API)" : "주소·권역을 채웠어요");
+        break;
+      case "seg": el.parentElement.querySelectorAll("a").forEach(a => a.classList.toggle("on", a === el)); break;
+      case "more": {
+        const sec = el.closest("[data-more]");
+        sec.classList.toggle("more-open");
+        sec.querySelector("[data-more-arrow]").textContent = sec.classList.contains("more-open") ? "접기 ▴" : "펼치기 ▾";
+        break;
+      }
+      case "publish":
+        toast(phone, "공개됐어요! 내 클래스 상세로 이동");
+        setTimeout(() => show("U-05a"), 900);
+        break;
+      case "status": {
+        const order = ["모집중", "마감 임박", "마감"];
+        const pill = el.closest(".mc").querySelector("[data-status-pill]");
+        const next = order[(order.indexOf(pill.textContent) + 1) % order.length];
+        pill.textContent = next; pill.classList.toggle("solid", next === "마감");
+        toast(phone, `상태를 '${next}'(으)로 바꿨어요 · 시트에서 취소도 가능`);
+        break;
+      }
+      case "dup": show("T-02a"); break;
+      case "edit": toast(phone, "수정 화면은 등록 폼과 같아요 (일시·장소 수정 시 '변경됨' 배지)"); break;
+      case "review":
+        phone.classList.add("reviewing");
+        phone.querySelector("[data-state-badge]").textContent = "검토 중";
+        toast(phone, "검토 중으로 표시했어요");
+        break;
+      case "decline": toast(phone, "확인 창 → 앵콜한 12명에게 '이번엔 어렵대요' 안내"); break;
       case "submit-new":
         openSheet(phone, false);
         toast(phone, "추가요 완료! 새 곡으로 등록됐어요 (운영자 검수 대기)");
