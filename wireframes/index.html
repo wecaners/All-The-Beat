@@ -184,6 +184,14 @@
   .banner small { display:block; font-weight:500; color:var(--sub); font-size:12px; margin-top:2px; }
   .linkline { display:block; text-align:center; margin:12px 16px 0; font-size:13px; color:var(--sub); text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
 
+  /* 확인 창 */
+  .dialog { position:absolute; left:28px; right:28px; top:50%; transform:translateY(-50%); background:var(--paper); border-radius:16px; padding:20px 18px 16px; z-index:11; display:none; text-align:center; }
+  .dialog.open { display:block; }
+  .dialog h4 { margin:0 0 6px; font-size:16px; }
+  .dialog p { margin:0 0 16px; font-size:13px; color:var(--sub); line-height:1.5; }
+  .dialog .row { display:flex; gap:8px; }
+  .dialog .btn { height:42px; font-size:14px; }
+
   /* 바텀시트 */
   .dim { position:absolute; inset:0; background:rgba(0,0,0,.4); display:none; z-index:10; }
   .sheet { position:absolute; left:0; right:0; bottom:0; background:var(--paper); border-radius:20px 20px 0 0; padding:10px 16px 28px; z-index:11; display:none; }
@@ -582,12 +590,12 @@
           <div class="song-chip" data-go="U-04a"><i></i>NEON · A2O LITE ›</div>
         </div>
 
-        <div class="banner">✦<div>많은 요청으로 강사님이 앵콜을 검토 중이에요!<small>14명이 앵콜했어요 · 나도 앵콜 완료 ✓</small></div></div>
+        <div class="banner">✦<div>많은 요청으로 강사님이 앵콜을 검토 중이에요!<small data-review-sub>14명이 앵콜했어요 · 나도 앵콜 완료 ✓</small></div></div>
 
         <div class="encore">
-          <div class="big"><b>14</b>명이 앵콜을 기다려요</div>
+          <div class="big"><b data-review-count>14</b>명이 앵콜을 기다려요</div>
           <div class="bar"><i style="width:100%"></i></div>
-          <div class="msg">강사님이 날짜를 고르는 중이에요. 열리면 알려드릴게요</div>
+          <div class="msg">강사님이 날짜를 고르는 중이에요. 열리면 이 화면과 마이 &gt; 내 앵콜에서 알려드려요</div>
           <button class="btn done" data-act="encore-cancel">앵콜 완료 ✓ · 취소</button>
         </div>
         <a class="linkline" data-go="U-04a">같은 곡 다른 클래스 보기 ›</a>
@@ -604,9 +612,23 @@
           <button class="btn" disabled>마감됐어요</button>
         </div>
       </div>
+
+      <div class="dim" data-act="dialog-keep"></div>
+      <div class="dialog">
+        <h4>앵콜을 취소할까요?</h4>
+        <p>취소하면 강사님이 보는<br>앵콜 인원에서 빠져요.</p>
+        <div class="row">
+          <button class="btn line" data-act="dialog-keep">계속 앵콜</button>
+          <button class="btn" data-act="dialog-cancel">취소할게요</button>
+        </div>
+      </div>
       <div class="toast"></div>
     </div>
     <ol class="notes">
+      <li><b>취소는 막지 않는다.</b> [앵콜 완료 ✓ · 취소] → 확인 창 "취소하면 강사님이 보는 앵콜 인원에서 빠져요." 사실만 말하고 혜택 상실 같은 위협 문구는 쓰지 않는다 (프로토타입에서 눌러보기).</li>
+      <li><b>취소해도 "검토 중"은 유지</b>되고 숫자만 실제대로 줄어든다. 상태는 뒤로 가지 않는다 (F-24, S-4).</li>
+      <li>강사 화면(T-03, 아직 안 그림)에는 "검토 시작 시점 14명 · 지금 13명 (취소 1)"과 "앵콜은 예약이 아니라 관심 표시예요" 안내가 고정으로 보인다.</li>
+      <li>열렸을 때 알려주는 곳은 MVP에선 <b>이 화면과 마이 &gt; 내 앵콜</b>뿐 (알림 F-20은 Should). "우선 예약" 같은 문구는 쓰지 않는다 (MVP 원칙 6).</li>
       <li><b>"검토 중" 문구는 강사가 [검토할게요]를 누른 뒤에만</b> 나온다 (F-24, 플로우 10). 기준 인원 도달만으로는 "전달됐어요"까지.</li>
       <li>이미 앵콜한 사용자에게는 버튼이 "앵콜 완료 ✓ · 취소"로 바뀐다.</li>
       <li>이후 상태 문구 (화면은 같고 배너만 바뀜):
@@ -729,6 +751,16 @@
     return n >= th;
   }
 
+  // 검토 중 화면(U-05c)에서 취소·재앵콜: 상태(배너)는 그대로, 숫자만 실제대로
+  function setReview(phone, canceled) {
+    const n = canceled ? 13 : 14;
+    phone.querySelector("[data-review-count]").textContent = n;
+    phone.querySelector("[data-review-sub]").textContent = `${n}명이 앵콜했어요` + (canceled ? "" : " · 나도 앵콜 완료 ✓");
+    const b = phone.querySelector('[data-act="encore-cancel"]');
+    b.textContent = canceled ? "앵콜!" : "앵콜 완료 ✓ · 취소";
+    b.classList.toggle("done", !canceled);
+  }
+
   document.addEventListener("click", e => {
     // 시트 안의 칩은 단일 선택 토글
     if (e.target.classList.contains("chip") && e.target.closest(".sheet")) {
@@ -765,7 +797,20 @@
         openSheet(phone, false);
         toast(phone, setEncore(phone, true) ? "앵콜 완료! 요청이 강사님께 전달됐어요" : "앵콜 완료! 조금만 더 모이면 전달돼요");
         break;
-      case "encore-cancel": toast(phone, "앵콜을 취소했어요 (숫자 -1)"); break;
+      case "encore-cancel":
+        if (el.classList.contains("done")) {
+          phone.querySelector(".dim").classList.add("open"); phone.querySelector(".dialog").classList.add("open");
+        } else {
+          setReview(phone, false); toast(phone, "다시 앵콜했어요");
+        }
+        break;
+      case "dialog-keep":
+        phone.querySelector(".dim").classList.remove("open"); phone.querySelector(".dialog").classList.remove("open");
+        break;
+      case "dialog-cancel":
+        phone.querySelector(".dim").classList.remove("open"); phone.querySelector(".dialog").classList.remove("open");
+        setReview(phone, true); toast(phone, "앵콜을 취소했어요");
+        break;
       case "close-static": break;
       case "book": toast(phone, "/go/{id} 클릭 기록 → 강사님의 네이버 예약으로 이동"); break;
       case "map": toast(phone, "네이버 지도 · 카카오맵 열기"); break;
