@@ -142,6 +142,48 @@
   .empty b { color:var(--ink); display:block; font-size:15px; margin-bottom:4px; }
   .sticky-cta { position:absolute; left:0; right:0; bottom:0; padding:12px 16px 28px; background:linear-gradient(to top, var(--paper) 75%, transparent); }
 
+  /* 클래스 상세 */
+  .cover { width:100%; aspect-ratio:4/3; }
+  .cover .tag { left:10px; top:10px; font-size:11px; font-weight:700; background:rgba(255,255,255,.9); border:1px solid var(--ink); border-radius:4px; padding:1px 6px; }
+  .class-head { padding:14px 16px 0; }
+  .class-head .badges { display:flex; gap:6px; margin-bottom:8px; }
+  .class-head .badges span { font-size:11px; font-weight:700; border:1.5px solid var(--ink); border-radius:6px; padding:1px 6px; }
+  .class-head .badges span.soft { border-color:var(--line); color:var(--sub); font-weight:500; }
+  .class-head h1 { font-size:21px; margin:0; line-height:1.3; }
+  .song-chip { display:inline-flex; align-items:center; gap:6px; margin-top:8px; padding:4px 10px 4px 4px; border:1px solid var(--line); border-radius:999px; font-size:12.5px; cursor:pointer; }
+  .song-chip i { width:28px; height:16px; border-radius:3px; background:var(--fill-2); font-style:normal; }
+  .kv { margin:16px 16px 0; border-top:1px solid var(--fill-2); }
+  .kv div { display:flex; gap:12px; padding:11px 0; border-bottom:1px solid var(--fill-2); font-size:13.5px; }
+  .kv dt, .kv b { flex:none; width:52px; color:var(--sub); font-weight:500; }
+  .kv span { flex:1; }
+  .kv a { color:var(--ink); font-weight:600; text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
+  .teacher { display:flex; align-items:center; gap:12px; margin:16px 16px 0; padding:12px; border:1px solid var(--line); border-radius:12px; }
+  .teacher .av { width:44px; height:44px; border-radius:50%; flex:none; }
+  .teacher .n { font-weight:700; font-size:14.5px; }
+  .teacher .h { font-size:12.5px; color:var(--sub); }
+  .desc { margin:16px 16px 0; font-size:13.5px; line-height:1.65; color:#3a3a3c; }
+  .desc h3 { font-size:14px; margin:0 0 6px; color:var(--ink); }
+  .should-box { margin:16px 16px 0; padding:12px; border:1.5px dashed #b0b0b6; border-radius:12px; font-size:12.5px; color:var(--sub); }
+  .bottom-bar { position:absolute; left:0; right:0; bottom:0; padding:10px 16px 28px; background:var(--paper); border-top:1px solid var(--line); }
+  .bottom-bar .via { font-size:11.5px; color:var(--sub); text-align:center; margin-bottom:8px; }
+  .bottom-bar .row { display:flex; align-items:center; gap:12px; }
+  .bottom-bar .price { flex:none; font-weight:800; font-size:17px; }
+  .bottom-bar .price small { display:block; font-size:11px; font-weight:500; color:var(--sub); }
+  .bottom-bar .btn { flex:1; }
+  .bottom-bar .btn[disabled] { background:var(--fill-2); border-color:var(--fill-2); color:var(--sub); cursor:default; }
+
+  /* 앵콜 */
+  .encore { margin:16px 16px 0; padding:16px; border-radius:14px; background:var(--fill); }
+  .encore .big { font-size:16px; font-weight:700; }
+  .encore .big b { font-size:22px; }
+  .encore .bar { height:8px; border-radius:4px; background:var(--fill-2); margin:12px 0 6px; overflow:hidden; }
+  .encore .bar i { display:block; height:100%; background:var(--ink); border-radius:4px; transition:width .3s; }
+  .encore .msg { font-size:12.5px; color:var(--sub); margin-bottom:14px; }
+  .encore .msg.hot { color:var(--ink); font-weight:700; }
+  .banner { margin:16px 16px 0; padding:12px 14px; border-radius:12px; border:1.5px solid var(--ink); font-size:13.5px; font-weight:700; display:flex; gap:8px; align-items:flex-start; }
+  .banner small { display:block; font-weight:500; color:var(--sub); font-size:12px; margin-top:2px; }
+  .linkline { display:block; text-align:center; margin:12px 16px 0; font-size:13px; color:var(--sub); text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
+
   /* 바텀시트 */
   .dim { position:absolute; inset:0; background:rgba(0,0,0,.4); display:none; z-index:10; }
   .sheet { position:absolute; left:0; right:0; bottom:0; background:var(--paper); border-radius:20px 20px 0 0; padding:10px 16px 28px; z-index:11; display:none; }
@@ -165,7 +207,7 @@
 
 <header class="board-bar">
   <h1>올빗 와이어프레임</h1>
-  <span class="meta">v0.2 · 2026-10-26 · 기준: 03-기능명세서 v0.3, 04-IA v0.2, 06-음원API</span>
+  <span class="meta">v0.3 · 2026-10-26 · 기준: 03-기능명세서 v0.3, 04-IA v0.2, 05-유저플로우 v0.2, 06-음원API</span>
   <div class="proto-nav">
     <button class="icon ghost" id="back" title="뒤로">←</button>
     <select id="jump"></select>
@@ -202,16 +244,16 @@
 
         <section class="sec">
           <div class="sec-h"><h2>다가오는 클래스</h2><a data-go="U-03">더보기 ›</a></div>
-          <div class="class-card" data-go="U-05">
+          <div class="class-card" data-go="U-05a">
             <div class="date"><b>28</b><span>수</span></div>
             <div class="info"><div class="t">NEON · A2O LITE</div><div class="m">19:30–21:00 · 홍대·합정</div><div class="m">35,000원 · 입문</div></div>
             <span class="badge">마감 임박</span>
           </div>
-          <div class="class-card" data-go="U-05">
+          <div class="class-card" data-go="U-05a">
             <div class="date"><b>29</b><span>목</span></div>
             <div class="info"><div class="t">곡 제목 B · 아티스트 B</div><div class="m">20:00–21:30 · 강남·신논현</div><div class="m">40,000원 · 초급</div></div>
           </div>
-          <div class="class-card" data-go="U-05">
+          <div class="class-card" data-go="U-05a">
             <div class="date"><b>31</b><span>토</span></div>
             <div class="info"><div class="t">NEON · A2O LITE</div><div class="m">14:00–15:30 · 건대·성수</div><div class="m">35,000원 · 입문</div></div>
           </div>
@@ -269,16 +311,16 @@
 
         <section class="sec">
           <div class="sec-h"><h2>다가오는 클래스 <span style="color:var(--sub);font-weight:500">3</span></h2></div>
-          <div class="class-card" data-go="U-05">
+          <div class="class-card" data-go="U-05a">
             <div class="date"><b>28</b><span>수</span></div>
             <div class="info"><div class="t">강사 민지</div><div class="m">19:30–21:00 · 홍대·합정</div><div class="m">35,000원 · 입문 · 정원 12</div></div>
             <span class="badge">마감 임박</span>
           </div>
-          <div class="class-card" data-go="U-05">
+          <div class="class-card" data-go="U-05a">
             <div class="date"><b>31</b><span>토</span></div>
             <div class="info"><div class="t">강사 하루</div><div class="m">14:00–15:30 · 건대·성수</div><div class="m">35,000원 · 입문</div></div>
           </div>
-          <div class="class-card" data-go="U-05">
+          <div class="class-card" data-go="U-05a">
             <div class="date"><b>2</b><span>11월 · 월</span></div>
             <div class="info"><div class="t">강사 도윤</div><div class="m">20:00–21:30 · 강남·신논현</div><div class="m">40,000원 · 초급</div></div>
           </div>
@@ -384,11 +426,233 @@
     </ol>
   </div>
 
+  <!-- ═══════════════ U-05a 클래스 상세: 모집중 ═══════════════ -->
+  <div class="slot" data-screen="U-05a" data-title="클래스 상세 · 모집중">
+    <div class="slot-head"><span class="id">U-05</span><span class="name">클래스 상세</span><span class="state">A. 모집중</span></div>
+    <div class="phone">
+      <div class="scroll" style="padding-bottom:150px">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar">
+          <button class="icon ghost" data-act="back">←</button>
+          <span class="logo" data-go="U-01" style="font-size:16px">올빗</span>
+          <span class="spacer"></span>
+          <button class="icon" data-act="share" title="공유">↗</button>
+        </div>
+
+        <div class="cover img thumb"><span class="tag">강사 제공 사진</span></div>
+
+        <div class="class-head">
+          <div class="badges"><span>마감 임박</span><span class="soft">입문</span></div>
+          <h1>NEON 원데이 클래스<br>킬링파트 완곡까지</h1>
+          <div class="song-chip" data-go="U-04a"><i></i>NEON · A2O LITE ›</div>
+        </div>
+
+        <dl class="kv">
+          <div><b>일시</b><span>10월 28일 (수) 19:30–21:00</span></div>
+          <div><b>장소</b><span>무브 스튜디오 2호점<br><a data-act="map">서울 마포구 ○○로 12 · 지도 열기</a></span></div>
+          <div><b>권역</b><span>홍대·합정</span></div>
+          <div><b>정원</b><span>12명</span></div>
+        </dl>
+
+        <div class="teacher">
+          <div class="av img"></div>
+          <div><div class="n">강사 민지</div><div class="h">@minji.dance · 인스타그램</div></div>
+          <span class="spacer"></span>
+          <button class="btn line sm" data-act="insta">인스타 보기</button>
+        </div>
+
+        <div class="desc">
+          <h3>클래스 소개</h3>
+          NEON 킬링파트부터 1절 완곡까지 배워요. 입문자도 따라올 수 있게 카운트 나눠서 진행합니다. 마지막 20분은 촬영 시간이에요.<br><br>
+          <b>준비물</b> 실내화, 편한 옷
+        </div>
+
+        <div class="should-box">Should F-25 · 강사 티저 영상이 있으면 이 자리(또는 맨 위 사진 대신)에 YouTube 임베드</div>
+      </div>
+
+      <div class="bottom-bar">
+        <div class="via">예약은 강사님의 <b>네이버 예약</b>에서 진행돼요</div>
+        <div class="row">
+          <div class="price">35,000원<small>1인 · 90분</small></div>
+          <button class="btn" data-act="book">예약하기</button>
+        </div>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>상단 이미지 우선순위: <b>강사 제공 사진</b> → 없으면 곡의 안무 영상 썸네일(YouTube 표시) → 없으면 기본 이미지 (06 문서 4.1).</li>
+      <li>제목은 강사가 쓴 클래스명. 그 아래 <b>곡 칩</b>을 누르면 곡 상세 U-04 (곡이 2~3개면 칩 여러 개).</li>
+      <li>일시·장소·권역·정원을 표로. 주소를 누르면 네이버 지도·카카오맵 열기.</li>
+      <li>강사 카드 → 인스타 프로필로 나감. 강사 프로필 페이지(F-21)는 Should.</li>
+      <li><b>하단 고정 바</b>: 가격 + [예약하기]. 버튼 바로 위에 "예약은 강사님의 OO에서 진행돼요"로 <b>외부로 나간다는 걸 미리 알린다</b> (F-05). 누르면 /go/{id}로 클릭 기록 후 외부 이동 (F-06).</li>
+      <li class="q">결정 필요: 남은 자리 수를 모르는데 "정원 12명"만 보여주는 게 오해를 부르지 않을까? (예약이 외부라 잔여석 정보 없음)</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-05b 클래스 상세: 마감 + 앵콜 모으는 중 ═══════════════ -->
+  <div class="slot" data-screen="U-05b" data-title="클래스 상세 · 마감 (앵콜 모으는 중)">
+    <div class="slot-head"><span class="id">U-05</span><span class="name">클래스 상세</span><span class="state">B. 마감 · 앵콜 모으는 중</span></div>
+    <div class="phone" data-encore="9" data-threshold="10">
+      <div class="scroll" style="padding-bottom:130px">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar">
+          <button class="icon ghost" data-act="back">←</button>
+          <span class="logo" data-go="U-01" style="font-size:16px">올빗</span>
+          <span class="spacer"></span>
+          <button class="icon" data-act="share" title="공유">↗</button>
+        </div>
+
+        <div class="cover img thumb"><span class="play"></span><span class="yt">YouTube</span><span class="tag">곡 안무 영상 썸네일</span></div>
+
+        <div class="class-head">
+          <div class="badges"><span>마감</span><span class="soft">입문</span></div>
+          <h1>NEON 원데이 클래스<br>킬링파트 완곡까지</h1>
+          <div class="song-chip" data-go="U-04a"><i></i>NEON · A2O LITE ›</div>
+        </div>
+
+        <div class="encore">
+          <div class="big">놓치셨나요? <b data-encore-count>9</b>명이 앵콜을 기다려요</div>
+          <div class="bar"><i data-encore-bar style="width:90%"></i></div>
+          <div class="msg" data-encore-msg>1명 더 모이면 강사님께 앵콜 요청이 전달돼요</div>
+          <button class="btn" data-act="encore">앵콜!</button>
+        </div>
+        <a class="linkline" data-go="U-04a">같은 곡 다른 클래스 보기 ›</a>
+
+        <dl class="kv">
+          <div><b>일시</b><span>10월 28일 (수) 19:30–21:00</span></div>
+          <div><b>장소</b><span>무브 스튜디오 2호점 · 홍대·합정</span></div>
+          <div><b>정원</b><span>12명</span></div>
+        </dl>
+
+        <div class="teacher">
+          <div class="av img"></div>
+          <div><div class="n">강사 민지</div><div class="h">@minji.dance · 인스타그램</div></div>
+          <span class="spacer"></span>
+          <button class="btn line sm" data-act="insta">인스타 보기</button>
+        </div>
+      </div>
+
+      <div class="bottom-bar">
+        <div class="row">
+          <div class="price">35,000원<small>1인 · 90분</small></div>
+          <button class="btn" disabled>마감됐어요</button>
+        </div>
+      </div>
+
+      <div class="dim" data-act="close"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3>앵콜!</h3>
+        <div class="sub">NEON 원데이 클래스 · 강사 민지<br>모이면 강사님께 전달하고, 열리면 알려드릴게요</div>
+        <div class="label">희망 시간대 <em>선택</em></div>
+        <div class="chips"><span class="chip">평일 저녁</span><span class="chip">주말 낮</span><span class="chip">주말 저녁</span><span class="chip on">상관없음</span></div>
+        <div class="label">한마디 <em>선택 · 강사님만 봐요</em></div>
+        <div class="field">이번엔 꼭 들을게요!</div>
+        <button class="btn" data-act="encore-submit">앵콜!</button>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>마감되면 화면의 주인공이 <b>앵콜</b>로 바뀐다. 예약 버튼은 비활성 "마감됐어요"로 남기고, 앵콜 블록을 제목 바로 아래로 올린다 (F-24).</li>
+      <li><b>진행 바</b>: 기준 인원(정원 30%, 최소 3명 → 여기선 10명 가정) 대비 현재 인원. "M명 더 모이면 전달돼요"로 <b>다음 단계와 남은 숫자</b>를 보여준다. 친구에게 공유할 이유가 된다.</li>
+      <li>프로토타입에서 [앵콜!] → 시트 → 제출하면 10/10이 되면서 문구가 <b>"앵콜 요청이 강사님께 전달됐어요!"</b>로 바뀐다. 이 시점엔 아직 "검토 중"이라고 말하지 않는다.</li>
+      <li>이 이미지는 강사 사진이 없어서 <b>곡 안무 영상 썸네일로 대체</b>된 경우 (YouTube 표시).</li>
+      <li>보조 링크 "같은 곡 다른 클래스 보기" → 곡 상세. 앵콜을 기다리기 싫은 사람의 탈출구.</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-05c 클래스 상세: 마감 + 강사 검토 중 ═══════════════ -->
+  <div class="slot" data-screen="U-05c" data-title="클래스 상세 · 마감 (강사 검토 중)">
+    <div class="slot-head"><span class="id">U-05</span><span class="name">클래스 상세</span><span class="state">C. 마감 · 강사 검토 중</span></div>
+    <div class="phone">
+      <div class="scroll" style="padding-bottom:130px">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar">
+          <button class="icon ghost" data-act="back">←</button>
+          <span class="logo" data-go="U-01" style="font-size:16px">올빗</span>
+          <span class="spacer"></span>
+          <button class="icon" data-act="share" title="공유">↗</button>
+        </div>
+
+        <div class="cover img thumb"><span class="tag">강사 제공 사진</span></div>
+
+        <div class="class-head">
+          <div class="badges"><span>마감</span><span class="soft">입문</span></div>
+          <h1>NEON 원데이 클래스<br>킬링파트 완곡까지</h1>
+          <div class="song-chip" data-go="U-04a"><i></i>NEON · A2O LITE ›</div>
+        </div>
+
+        <div class="banner">✦<div>많은 요청으로 강사님이 앵콜을 검토 중이에요!<small>14명이 앵콜했어요 · 나도 앵콜 완료 ✓</small></div></div>
+
+        <div class="encore">
+          <div class="big"><b>14</b>명이 앵콜을 기다려요</div>
+          <div class="bar"><i style="width:100%"></i></div>
+          <div class="msg">강사님이 날짜를 고르는 중이에요. 열리면 알려드릴게요</div>
+          <button class="btn done" data-act="encore-cancel">앵콜 완료 ✓ · 취소</button>
+        </div>
+        <a class="linkline" data-go="U-04a">같은 곡 다른 클래스 보기 ›</a>
+
+        <dl class="kv">
+          <div><b>일시</b><span>10월 28일 (수) 19:30–21:00</span></div>
+          <div><b>장소</b><span>무브 스튜디오 2호점 · 홍대·합정</span></div>
+        </dl>
+      </div>
+
+      <div class="bottom-bar">
+        <div class="row">
+          <div class="price">35,000원<small>1인 · 90분</small></div>
+          <button class="btn" disabled>마감됐어요</button>
+        </div>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li><b>"검토 중" 문구는 강사가 [검토할게요]를 누른 뒤에만</b> 나온다 (F-24, 플로우 10). 기준 인원 도달만으로는 "전달됐어요"까지.</li>
+      <li>이미 앵콜한 사용자에게는 버튼이 "앵콜 완료 ✓ · 취소"로 바뀐다.</li>
+      <li>이후 상태 문구 (화면은 같고 배너만 바뀜):
+        <br>· 앵콜 오픈 → "앵콜 클래스가 열렸어요!" + [앵콜 클래스 보기 ›] (새 클래스 U-05, "앵콜 클래스" 배지)
+        <br>· 어려워요 → "이번엔 앵콜이 어렵대요" + 같은 곡 다른 클래스 / [이 곡 추가요!]
+        <br>· 만료(종료 30일) → 앵콜 블록 숨김</li>
+      <li>내 앵콜 목록은 마이(U-09)에서 상태별로 본다.</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-10 앵콜 시트 ═══════════════ -->
+  <div class="slot" data-screen="U-10" data-title="앵콜 시트">
+    <div class="slot-head"><span class="id">U-10</span><span class="name">앵콜 시트</span><span class="state">U-05 마감 화면 위에 열림</span></div>
+    <div class="phone">
+      <div class="scroll no-tab">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="cover img"></div>
+        <div class="class-head"><h1>NEON 원데이 클래스</h1></div>
+      </div>
+      <div class="dim open" data-act="close-static"></div>
+      <div class="sheet open">
+        <div class="grab"></div>
+        <h3>앵콜!</h3>
+        <div class="sub">NEON 원데이 클래스 · 강사 민지<br>모이면 강사님께 전달하고, 열리면 알려드릴게요</div>
+        <div class="label">희망 시간대 <em>선택</em></div>
+        <div class="chips"><span class="chip">평일 저녁</span><span class="chip">주말 낮</span><span class="chip">주말 저녁</span><span class="chip on">상관없음</span></div>
+        <div class="label">한마디 <em>선택 · 강사님만 봐요</em></div>
+        <div class="field">이번엔 꼭 들을게요!</div>
+        <button class="btn" data-act="encore-submit">앵콜!</button>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li><b>추가요 시트보다 짧다.</b> 대상(강사·클래스)이 정해져 있어서 희망 지역이 필요 없다. 시간대·한마디는 선택이라 <b>바로 [앵콜!]만 눌러도 된다</b>.</li>
+      <li>비로그인이면 시트 전에 로그인 시트 → 복귀 후 이 시트 자동 오픈 (추가요와 같은 흐름, 플로우 10-1).</li>
+      <li>제출 후 토스트: 기준 미달이면 "앵콜 완료! M명 더 모이면 강사님께 전달돼요", 이번 제출로 도달하면 "앵콜 완료! 요청이 강사님께 전달됐어요".</li>
+      <li>희망 시간대·한마디는 <b>강사의 앵콜 상세</b>(내 클래스 T-03)에서만 보인다.</li>
+      <li class="q">결정 필요: 희망 시간대를 아예 빼고 원탭 앵콜로 만들까? (참여 장벽 vs 강사에게 주는 정보)</li>
+    </ol>
+  </div>
+
 </main>
 
 <script>
   /* ── 아직 그리지 않은 화면 (링크를 누르면 안내만) ── */
-  const PENDING = { "U-02":"검색", "U-03":"클래스 목록", "U-05":"클래스 상세", "U-06":"추가요 랭킹",
+  const PENDING = { "U-02":"검색", "U-03":"클래스 목록", "U-06":"추가요 랭킹", "U-09m":"마이 > 내 앵콜",
                     "U-09":"마이", "T-02":"클래스 등록" };
 
   const slots = [...document.querySelectorAll(".slot")];
@@ -450,16 +714,31 @@
     });
   }
 
-  document.addEventListener("click", e => {
-    const el = e.target.closest("[data-go], [data-act]");
-    if (!el) return;
-    const phone = el.closest(".phone");
+  // 앵콜 진행 상태 (U-05b)
+  function setEncore(phone, done) {
+    phone.dataset.encoreDone = done ? "1" : "";
+    const th = Number(phone.dataset.threshold), n = Number(phone.dataset.encore) + (done ? 1 : 0);
+    phone.querySelector("[data-encore-count]").textContent = n;
+    phone.querySelector("[data-encore-bar]").style.width = Math.min(100, n / th * 100) + "%";
+    const msg = phone.querySelector("[data-encore-msg]");
+    msg.textContent = n >= th ? "앵콜 요청이 강사님께 전달됐어요!" : `${th - n}명 더 모이면 강사님께 앵콜 요청이 전달돼요`;
+    msg.classList.toggle("hot", n >= th);
+    const b = phone.querySelector('[data-act="encore"]');
+    b.textContent = done ? "앵콜 완료 ✓ · 취소" : "앵콜!";
+    b.classList.toggle("done", done);
+    return n >= th;
+  }
 
+  document.addEventListener("click", e => {
     // 시트 안의 칩은 단일 선택 토글
     if (e.target.classList.contains("chip") && e.target.closest(".sheet")) {
       e.target.parentElement.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === e.target));
       return;
     }
+
+    const el = e.target.closest("[data-go], [data-act]");
+    if (!el) return;
+    const phone = el.closest(".phone");
 
     if (el.dataset.go) {
       if (!show(el.dataset.go) && phone) toast(phone, `${el.dataset.go} ${PENDING[el.dataset.go] || ""} — 아직 그리지 않은 화면`);
@@ -477,6 +756,20 @@
         break;
       case "close": openSheet(phone, false); break;
       case "share": toast(phone, "링크 복사 · 스토리 공유 이미지 (F-23)"); break;
+      case "encore":
+        if (phone.dataset.encoreDone) { setEncore(phone, false); toast(phone, "앵콜을 취소했어요"); }
+        else openSheet(phone, true);
+        break;
+      case "encore-submit":
+        if (!phone.dataset.encore) { toast(phone, "앵콜 완료! (U-05 B에서 진행 바 변화를 볼 수 있어요)"); break; }
+        openSheet(phone, false);
+        toast(phone, setEncore(phone, true) ? "앵콜 완료! 요청이 강사님께 전달됐어요" : "앵콜 완료! 조금만 더 모이면 전달돼요");
+        break;
+      case "encore-cancel": toast(phone, "앵콜을 취소했어요 (숫자 -1)"); break;
+      case "close-static": break;
+      case "book": toast(phone, "/go/{id} 클릭 기록 → 강사님의 네이버 예약으로 이동"); break;
+      case "map": toast(phone, "네이버 지도 · 카카오맵 열기"); break;
+      case "insta": toast(phone, "강사 인스타그램 프로필로 이동"); break;
       case "play": toast(phone, "YouTube 플레이어가 이 자리에서 재생돼요"); break;
       case "yt": toast(phone, "YouTube 앱/웹으로 이동"); break;
       case "back": stack.length ? show(stack.pop(), false) : show("U-01"); break;
