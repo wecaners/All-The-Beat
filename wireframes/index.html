@@ -184,6 +184,49 @@
   .banner small { display:block; font-weight:500; color:var(--sub); font-size:12px; margin-top:2px; }
   .linkline { display:block; text-align:center; margin:12px 16px 0; font-size:13px; color:var(--sub); text-decoration:underline; text-underline-offset:2px; cursor:pointer; }
 
+  /* 검색 */
+  .search-bar { display:flex; align-items:center; gap:8px; height:56px; padding:0 12px 0 8px; }
+  .search-bar .box { flex:1; height:42px; border-radius:12px; background:var(--fill); display:flex; align-items:center; gap:8px; padding:0 12px; font-size:15px; }
+  .search-bar .box .ph { color:var(--sub); }
+  .search-bar .box .caret { width:1.5px; height:18px; background:var(--ink); animation:blink 1s step-end infinite; }
+  .search-bar .box .x { margin-left:auto; width:18px; height:18px; border-radius:50%; background:#c7c7cc; color:#fff; font-size:11px; display:grid; place-items:center; cursor:pointer; }
+  @keyframes blink { 50% { opacity:0; } }
+  .s-sec { padding:14px 16px 4px; }
+  .s-sec h3 { font-size:14px; margin:0 0 10px; display:flex; justify-content:space-between; }
+  .s-sec h3 a { font-size:12px; font-weight:500; color:var(--sub); cursor:pointer; }
+  .chips .chip[data-go], .chips .chip[data-act] { cursor:pointer; }
+  .pop-row { display:flex; align-items:center; gap:10px; padding:9px 0; cursor:pointer; }
+  .pop-row .n { width:16px; font-weight:800; text-align:center; font-size:14px; }
+  .pop-row .img { width:56px; height:32px; border-radius:5px; flex:none; }
+  .pop-row .t { font-weight:600; font-size:14px; }
+  .pop-row .m { font-size:12px; color:var(--sub); }
+  .ac-label { font-size:12px; font-weight:700; color:var(--sub); padding:14px 16px 6px; }
+  .ac-row { display:flex; align-items:center; gap:10px; padding:9px 16px; cursor:pointer; }
+  .ac-row:hover { background:var(--fill); }
+  .ac-row .img { width:56px; height:32px; border-radius:5px; flex:none; }
+  .ac-row .img.round { width:36px; height:36px; border-radius:50%; }
+  .ac-row .t { font-size:14px; font-weight:600; }
+  .ac-row mark { background:none; color:var(--ink); font-weight:700; text-decoration:underline; text-underline-offset:3px; }
+  .ac-row .m { font-size:12px; color:var(--sub); }
+  .ac-row .go { margin-left:auto; color:var(--sub); font-size:13px; }
+  .ac-all { margin:10px 16px 0; padding:12px; border-radius:10px; background:var(--fill); font-size:13.5px; font-weight:600; text-align:center; cursor:pointer; }
+
+  /* 클래스 목록 */
+  .filters { display:flex; gap:6px; overflow-x:auto; padding:2px 16px 10px; scrollbar-width:none; border-bottom:1px solid var(--fill-2); }
+  .filters .chip { flex:none; cursor:pointer; padding:6px 12px; font-size:12.5px; }
+  .filters .chip.drop::after { content:" ▾"; font-size:10px; }
+  .filters .sep { flex:none; width:1px; background:var(--line); margin:4px 2px; }
+  .list-meta { display:flex; align-items:center; justify-content:space-between; padding:12px 16px 4px; font-size:12.5px; color:var(--sub); }
+  .switch { display:flex; align-items:center; gap:6px; cursor:pointer; }
+  .switch i { width:30px; height:18px; border-radius:9px; background:var(--line); position:relative; transition:.2s; }
+  .switch i::after { content:""; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:#fff; transition:.2s; }
+  .switch.on i { background:var(--ink); }
+  .switch.on i::after { left:14px; }
+  .day-h { font-size:13px; font-weight:700; padding:14px 16px 8px; }
+  .list-body { padding:0 16px; }
+  .class-card.closed { opacity:.55; display:none; }
+  .show-closed .class-card.closed { display:flex; }
+
   /* 확인 창 */
   .dialog { position:absolute; left:28px; right:28px; top:50%; transform:translateY(-50%); background:var(--paper); border-radius:16px; padding:20px 18px 16px; z-index:11; display:none; text-align:center; }
   .dialog.open { display:block; }
@@ -238,10 +281,10 @@
           <span class="logo">올빗<small>All the Beat</small></span>
         </div>
 
-        <div class="search sticky" data-go="U-02">⌕ 추고 싶은 곡이나 아티스트</div>
+        <div class="search sticky" data-go="U-02a">⌕ 추고 싶은 곡이나 아티스트</div>
 
         <section class="sec">
-          <div class="sec-h"><h2>이번 주 핫한 곡</h2><a data-go="U-03">전체 ›</a></div>
+          <div class="sec-h"><h2>이번 주 핫한 곡</h2><a data-go="U-03a">전체 ›</a></div>
           <div class="hscroll">
             <div class="song-card" data-go="U-04a"><div class="img thumb"><span class="play"></span><span class="yt">YouTube</span></div><div class="t">NEON</div><div class="a">A2O LITE</div><span class="c">클래스 5개</span></div>
             <div class="song-card" data-go="U-04a"><div class="img thumb"><span class="play"></span><span class="yt">YouTube</span></div><div class="t">곡 제목 B</div><div class="a">아티스트 B</div><span class="c">클래스 4개</span></div>
@@ -251,7 +294,7 @@
         </section>
 
         <section class="sec">
-          <div class="sec-h"><h2>다가오는 클래스</h2><a data-go="U-03">더보기 ›</a></div>
+          <div class="sec-h"><h2>다가오는 클래스</h2><a data-go="U-03a">더보기 ›</a></div>
           <div class="class-card" data-go="U-05a">
             <div class="date"><b>28</b><span>수</span></div>
             <div class="info"><div class="t">NEON · A2O LITE</div><div class="m">19:30–21:00 · 홍대·합정</div><div class="m">35,000원 · 입문</div></div>
@@ -277,7 +320,7 @@
 
       <nav class="tabbar">
         <a class="on" data-go="U-01"><i>⌂</i>홈</a>
-        <a data-go="U-02"><i>⌕</i>찾기</a>
+        <a data-go="U-02a"><i>⌕</i>찾기</a>
         <a data-go="U-06"><i>✋</i>추가요</a>
         <a data-go="U-09"><i>◯</i>마이</a>
       </nav>
@@ -290,6 +333,279 @@
       <li><b>추가요 TOP 5</b>: 최근 30일 기준. [나도 추가요!]는 비로그인이면 로그인 시트 → 복귀 후 추가요 시트.</li>
       <li>데이터가 0개인 섹션은 통째로 숨긴다. 검색창과 추가요 섹션은 항상 보인다.</li>
       <li><b>곡 카드 이미지 = 안무 영상 썸네일</b> (16:9, 왼쪽 아래 YouTube 표시). 앨범 커버는 쓰지 않는다 (06 문서). 영상이 없는 곡은 이니셜 + 그라데이션.</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-02a 검색: 입력 전 ═══════════════ -->
+  <div class="slot" data-screen="U-02a" data-title="검색 · 입력 전">
+    <div class="slot-head"><span class="id">U-02</span><span class="name">검색</span><span class="state">A. 입력 전</span></div>
+    <div class="phone">
+      <div class="scroll no-tab">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="search-bar">
+          <button class="icon ghost" data-act="back">←</button>
+          <div class="box" data-go="U-02b"><span class="caret"></span><span class="ph">추고 싶은 곡이나 아티스트</span></div>
+        </div>
+
+        <div class="s-sec">
+          <h3>최근 검색 <a data-act="clear-recent">전체 삭제</a></h3>
+          <div class="chips">
+            <span class="chip" data-go="U-03a">NEON ×</span>
+            <span class="chip" data-go="U-03a">A2O LITE ×</span>
+            <span class="chip" data-go="U-03a">홍대 주말 ×</span>
+          </div>
+        </div>
+
+        <div class="s-sec">
+          <h3>이번 주 많이 찾는 곡</h3>
+          <div class="pop-row" data-go="U-04a"><span class="n">1</span><div class="img"></div><div><div class="t">NEON</div><div class="m">A2O LITE · 클래스 5개</div></div></div>
+          <div class="pop-row" data-go="U-04a"><span class="n">2</span><div class="img"></div><div><div class="t">곡 제목 B</div><div class="m">아티스트 B · 클래스 4개</div></div></div>
+          <div class="pop-row" data-go="U-04b"><span class="n">3</span><div class="img"></div><div><div class="t">곡 제목 E</div><div class="m">아티스트 E · 클래스 없음 · 23명 추가요</div></div></div>
+          <div class="pop-row" data-go="U-04a"><span class="n">4</span><div class="img"></div><div><div class="t">곡 제목 C</div><div class="m">아티스트 C · 클래스 3개</div></div></div>
+          <div class="pop-row" data-go="U-04a"><span class="n">5</span><div class="img"></div><div><div class="t">곡 제목 D</div><div class="m">아티스트 D · 클래스 2개</div></div></div>
+        </div>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>홈 검색창·찾기 탭에서 들어오면 <b>바로 키보드가 올라온 상태</b>. 입력 중에는 탭바를 숨긴다 (IA 1절).</li>
+      <li><b>최근 검색</b>: 이 기기에만 저장 (로그인 불필요). 누르면 그 검색어로 클래스 목록 U-03.</li>
+      <li><b>이번 주 많이 찾는 곡</b>: 최근 7일 곡 상세 조회 수 기준. 누르면 곡 상세. 클래스가 없는 곡도 보여주고 "23명 추가요"처럼 수요를 같이 표시.</li>
+      <li>썸네일은 곡의 안무 영상 썸네일 (작아서 YouTube 표시는 생략, 곡 상세에서 표시) <span class="q">← 정책 확인 필요</span>.</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-02b 검색: 자동완성 ═══════════════ -->
+  <div class="slot" data-screen="U-02b" data-title="검색 · 자동완성">
+    <div class="slot-head"><span class="id">U-02</span><span class="name">검색</span><span class="state">B. 입력 중 · 자동완성</span></div>
+    <div class="phone">
+      <div class="scroll no-tab">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="search-bar">
+          <button class="icon ghost" data-act="back">←</button>
+          <div class="box"><span>네온</span><span class="caret"></span><span class="x" data-go="U-02a">×</span></div>
+        </div>
+
+        <div class="ac-label">곡</div>
+        <div class="ac-row" data-go="U-04a"><div class="img"></div><div><div class="t">NEON</div><div class="m">A2O LITE · 별칭 '<mark>네온</mark>'으로 찾음 · 클래스 5개</div></div><span class="go">›</span></div>
+        <div class="ac-row" data-go="U-04b"><div class="img"></div><div><div class="t"><mark>네온</mark> 사인</div><div class="m">아티스트 G · 클래스 없음</div></div><span class="go">›</span></div>
+
+        <div class="ac-label">아티스트</div>
+        <div class="ac-row" data-go="U-03a"><div class="img round"></div><div><div class="t">A2O LITE</div><div class="m">별칭 '에이투오 라이트' · 클래스 7개</div></div><span class="go">›</span></div>
+
+        <div class="ac-label">강사</div>
+        <div class="ac-row" data-go="U-03a"><div class="img round"></div><div><div class="t">강사 <mark>네온</mark>댄스</div><div class="m">@neon.dance · 다가오는 클래스 2개</div></div><span class="go">›</span></div>
+
+        <div class="ac-all" data-go="U-03a">'네온' 클래스 전체 보기 ›</div>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>입력할 때마다 <b>곡 최대 5 · 아티스트 최대 3 · 강사 최대 3</b>을 그룹으로 (F-02).</li>
+      <li><b>별칭 검색</b>: "네온" → NEON. 왜 이 결과가 나왔는지 "별칭 '네온'으로 찾음"을 작게 보여준다. 대소문자·띄어쓰기 무시.</li>
+      <li>곡 → 곡 상세 / 아티스트 → 그 아티스트 곡의 클래스 목록 / 강사 → 그 강사 클래스 목록 (강사 프로필 F-21은 Should).</li>
+      <li>키보드 [검색] 또는 맨 아래 "클래스 전체 보기" → 클래스 목록 U-03 (검색어 적용).</li>
+      <li>그룹에 결과가 없으면 그 그룹 제목째 숨긴다. 전부 없으면 U-02 C.</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-02c 검색: 결과 없음 ═══════════════ -->
+  <div class="slot" data-screen="U-02c" data-title="검색 · 결과 없음">
+    <div class="slot-head"><span class="id">U-02</span><span class="name">검색</span><span class="state">C. 결과 없음 → 추가요</span></div>
+    <div class="phone" data-song="곡 제목 Z" data-count="0">
+      <div class="scroll no-tab">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="search-bar">
+          <button class="icon ghost" data-act="back">←</button>
+          <div class="box"><span>곡 제목 Z</span><span class="caret"></span><span class="x" data-go="U-02a">×</span></div>
+        </div>
+
+        <div class="sec">
+          <div class="empty"><b>아직 '곡 제목 Z' 클래스가 없어요</b>올빗에 아직 없는 곡이에요.<br>추가요를 남기면 강사님들이 볼 수 있어요</div>
+          <div style="height:14px"></div>
+          <button class="btn" data-act="req">추가요! 이 곡 열어주세요</button>
+          <div style="height:22px"></div>
+          <h2 style="font-size:15px;margin:0 0 10px">이런 곡은 어때요?</h2>
+          <div class="pop-row" data-go="U-04a"><div class="img"></div><div><div class="t">NEON</div><div class="m">A2O LITE · 클래스 5개</div></div></div>
+          <div class="pop-row" data-go="U-04a"><div class="img"></div><div><div class="t">곡 제목 B</div><div class="m">아티스트 B · 클래스 4개</div></div></div>
+        </div>
+      </div>
+
+      <div class="dim" data-act="close"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3>새 곡 추가요!</h3>
+        <div class="sub">올빗에 없는 곡이라 곡 정보를 같이 받아요</div>
+        <div class="label">곡 이름</div>
+        <div class="field" style="color:var(--ink)">곡 제목 Z</div>
+        <div class="label">아티스트</div>
+        <div class="field">아티스트 이름 (자동완성)</div>
+        <div class="label">희망 지역</div>
+        <div class="chips"><span class="chip on">홍대·합정</span><span class="chip">강남·신논현</span><span class="chip">건대·성수</span><span class="chip">어디든 좋아요</span></div>
+        <button class="btn" data-act="submit-new">추가요!</button>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li><b>막다른 길 금지</b>: 결과가 없으면 바로 [추가요!]. 검색어가 등록된 곡과 안 맞으면 <b>신규 곡 등록</b>이 추가요 시트 안에서 같이 일어난다 (F-13).</li>
+      <li>시트 순서: 곡 이름(검색어로 미리 채움) → 아티스트(기존 아티스트 자동완성) → 희망 지역. 시간대·한마디는 신규 곡에서는 생략해 짧게 [가정].</li>
+      <li>등록된 곡은 운영자 <b>검수 대기</b>로 쌓이고 (F-16), 사용자에게는 바로 곡 상세(추가요 1명)가 생긴다.</li>
+      <li>"이런 곡은 어때요?": 이번 주 많이 찾는 곡 2~3개. 원하는 게 없어도 둘러볼 거리.</li>
+      <li class="q">결정 필요: 오타("네언")일 때 "혹시 NEON?" 제안을 MVP에 넣을까? (별칭으로 어느 정도 커버)</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-03a 클래스 목록: 기본 ═══════════════ -->
+  <div class="slot" data-screen="U-03a" data-title="클래스 목록">
+    <div class="slot-head"><span class="id">U-03</span><span class="name">클래스 목록</span><span class="state">A. 검색어 + 필터</span></div>
+    <div class="phone">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="search-bar">
+          <button class="icon ghost" data-act="back">←</button>
+          <div class="box" data-go="U-02b"><span>네온</span><span class="x" data-go="U-02a">×</span></div>
+        </div>
+
+        <div class="filters" data-group="date">
+          <span class="chip" data-act="filter">오늘</span>
+          <span class="chip on" data-act="filter">이번 주</span>
+          <span class="chip" data-act="filter">이번 주말</span>
+          <span class="chip drop" data-act="date-pick">날짜 선택</span>
+          <span class="sep"></span>
+          <span class="chip drop" data-act="region" data-region-label>권역</span>
+          <span class="chip drop" data-act="level">난이도</span>
+        </div>
+
+        <div class="list-meta">
+          <span><b style="color:var(--ink)">5개</b> 클래스 · 가까운 날짜순</span>
+          <span class="switch" data-act="show-closed"><i></i>마감 포함</span>
+        </div>
+
+        <div class="day-h">10월 28일 (수)</div>
+        <div class="list-body">
+          <div class="class-card" data-go="U-05a">
+            <div class="date"><b>28</b><span>수</span></div>
+            <div class="info"><div class="t">NEON · A2O LITE</div><div class="m">19:30–21:00 · 홍대·합정 · 강사 민지</div><div class="m">35,000원 · 입문</div></div>
+            <span class="badge">마감 임박</span>
+          </div>
+          <div class="class-card closed" data-go="U-05b">
+            <div class="date"><b>28</b><span>수</span></div>
+            <div class="info"><div class="t">NEON · A2O LITE</div><div class="m">14:00–15:30 · 강남·신논현 · 강사 리아</div><div class="m">35,000원 · 입문</div></div>
+            <span class="badge soft">마감 · 앵콜 9</span>
+          </div>
+        </div>
+
+        <div class="day-h">10월 31일 (토)</div>
+        <div class="list-body">
+          <div class="class-card" data-go="U-05a">
+            <div class="date"><b>31</b><span>토</span></div>
+            <div class="info"><div class="t">NEON · A2O LITE</div><div class="m">14:00–15:30 · 건대·성수 · 강사 하루</div><div class="m">35,000원 · 입문</div></div>
+          </div>
+          <div class="class-card" data-go="U-05a">
+            <div class="date"><b>31</b><span>토</span></div>
+            <div class="info"><div class="t">NEON · A2O LITE</div><div class="m">17:00–18:30 · 홍대·합정 · 강사 네온댄스</div><div class="m">30,000원 · 초급</div></div>
+          </div>
+        </div>
+
+        <div class="day-h">11월 2일 (월)</div>
+        <div class="list-body">
+          <div class="class-card" data-go="U-05a">
+            <div class="date"><b>2</b><span>월</span></div>
+            <div class="info"><div class="t">NEON · A2O LITE</div><div class="m">20:00–21:30 · 강남·신논현 · 강사 도윤</div><div class="m">40,000원 · 초급</div></div>
+          </div>
+          <div class="class-card" data-go="U-05a">
+            <div class="date"><b>2</b><span>월</span></div>
+            <div class="info"><div class="t">네온 사인 · 아티스트 G</div><div class="m">19:00–20:30 · 종로·을지로 · 강사 소이</div><div class="m">35,000원 · 입문</div></div>
+          </div>
+        </div>
+        <div style="height:16px"></div>
+      </div>
+
+      <nav class="tabbar">
+        <a data-go="U-01"><i>⌂</i>홈</a>
+        <a class="on" data-go="U-02a"><i>⌕</i>찾기</a>
+        <a data-go="U-06"><i>✋</i>추가요</a>
+        <a data-go="U-09"><i>◯</i>마이</a>
+      </nav>
+
+      <div class="dim" data-act="close"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3>권역</h3>
+        <div class="sub">여러 곳을 고를 수 있어요</div>
+        <div class="chips" data-multi>
+          <span class="chip">홍대·합정·신촌</span><span class="chip">강남·신논현·역삼</span><span class="chip">건대·성수</span><span class="chip">잠실·송파</span>
+          <span class="chip">종로·을지로</span><span class="chip">신림·사당</span><span class="chip">노원·수유</span><span class="chip">기타 서울</span>
+        </div>
+        <button class="btn" data-act="region-apply">적용</button>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>검색어("네온")는 곡·아티스트·강사·<b>별칭</b>까지 걸린다 → NEON 클래스와 "네온 사인", 강사 "네온댄스"가 함께 나온다.</li>
+      <li><b>필터</b>: 날짜(오늘 / 이번 주 / 이번 주말 / 날짜 선택) · 권역(여러 개, 시트) · 난이도. 필터 상태는 URL에 남아 공유하면 같은 결과 (F-03).</li>
+      <li><b>날짜별로 묶어서</b> 보여준다. 원데이 클래스는 "언제"가 가장 큰 기준이라 날짜 헤더가 훑어보기 쉽다.</li>
+      <li>기본은 모집중·마감 임박만. <b>[마감 포함]</b>을 켜면 마감 클래스가 흐리게 + "앵콜 9" 표시 → 누르면 앵콜 화면 (프로토타입에서 켜보기).</li>
+      <li>정렬은 가까운 날짜순 하나 (MVP). 한 번에 20개, 무한 스크롤.</li>
+      <li class="q">결정 필요: 목록 카드에 안무 영상 썸네일을 넣을까? (같은 곡이 반복되는 검색 결과에선 정보 대비 공간 낭비 → 지금은 뺌)</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-03b 클래스 목록: 결과 없음 ═══════════════ -->
+  <div class="slot" data-screen="U-03b" data-title="클래스 목록 · 결과 없음">
+    <div class="slot-head"><span class="id">U-03</span><span class="name">클래스 목록</span><span class="state">B. 필터 결과 없음</span></div>
+    <div class="phone" data-song="NEON" data-count="12">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="search-bar">
+          <button class="icon ghost" data-act="back">←</button>
+          <div class="box" data-go="U-02b"><span>NEON</span><span class="x" data-go="U-02a">×</span></div>
+        </div>
+        <div class="filters">
+          <span class="chip on">오늘</span>
+          <span class="chip">이번 주</span>
+          <span class="chip">이번 주말</span>
+          <span class="chip drop">날짜 선택</span>
+          <span class="sep"></span>
+          <span class="chip drop on">노원·수유</span>
+          <span class="chip drop">난이도</span>
+        </div>
+
+        <div class="sec">
+          <div class="empty"><b>조건에 맞는 클래스가 없어요</b>오늘 · 노원·수유에는 NEON 클래스가 없어요</div>
+          <div style="height:14px"></div>
+          <button class="btn line" data-go="U-03a">필터 초기화</button>
+          <div style="height:10px"></div>
+          <button class="btn" data-act="req">이 날짜·지역에 NEON 추가요!</button>
+          <div class="hint" style="font-size:12px;color:var(--sub);text-align:center;margin-top:8px">조건을 넓히면 NEON 클래스 5개가 있어요 · <a data-go="U-04a" style="color:var(--ink);text-decoration:underline;cursor:pointer">곡 보기</a></div>
+        </div>
+      </div>
+
+      <nav class="tabbar">
+        <a data-go="U-01"><i>⌂</i>홈</a>
+        <a class="on" data-go="U-02a"><i>⌕</i>찾기</a>
+        <a data-go="U-06"><i>✋</i>추가요</a>
+        <a data-go="U-09"><i>◯</i>마이</a>
+      </nav>
+
+      <div class="dim" data-act="close"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3>NEON 추가요!</h3>
+        <div class="sub">이 곡 클래스가 열리면 알려드릴게요</div>
+        <div class="label">희망 지역</div>
+        <div class="chips"><span class="chip">홍대·합정</span><span class="chip">강남·신논현</span><span class="chip on">노원·수유</span><span class="chip">어디든 좋아요</span></div>
+        <div class="label">희망 시간대 <em>선택</em></div>
+        <div class="chips"><span class="chip">평일 저녁</span><span class="chip">주말 낮</span><span class="chip">주말 저녁</span><span class="chip on">상관없음</span></div>
+        <button class="btn" data-act="submit">추가요!</button>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>필터 때문에 0개일 때. [필터 초기화]가 1순위, 그래도 그 조건을 원하면 <b>[추가요!]</b>.</li>
+      <li>추가요 시트의 <b>희망 지역은 현재 권역 필터로 미리 선택</b> ("노원·수유"). 사용자가 원하는 조건을 그대로 수요 데이터로 남긴다.</li>
+      <li>필터를 풀면 몇 개가 있는지 알려준다 ("조건을 넓히면 5개").</li>
+      <li>검색어가 곡과 정확히 일치할 때만 추가요 버튼을 보여준다. 강사명·일반 단어 검색이면 [필터 초기화]만.</li>
     </ol>
   </div>
 
@@ -674,7 +990,7 @@
 
 <script>
   /* ── 아직 그리지 않은 화면 (링크를 누르면 안내만) ── */
-  const PENDING = { "U-02":"검색", "U-03":"클래스 목록", "U-06":"추가요 랭킹", "U-09m":"마이 > 내 앵콜",
+  const PENDING = { "U-06":"추가요 랭킹",
                     "U-09":"마이", "T-02":"클래스 등록" };
 
   const slots = [...document.querySelectorAll(".slot")];
@@ -762,9 +1078,10 @@
   }
 
   document.addEventListener("click", e => {
-    // 시트 안의 칩은 단일 선택 토글
+    // 시트 안의 칩: 기본은 단일 선택, data-multi 묶음은 여러 개 선택
     if (e.target.classList.contains("chip") && e.target.closest(".sheet")) {
-      e.target.parentElement.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === e.target));
+      if (e.target.parentElement.hasAttribute("data-multi")) e.target.classList.toggle("on");
+      else e.target.parentElement.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === e.target));
       return;
     }
 
@@ -812,6 +1129,30 @@
         setReview(phone, true); toast(phone, "앵콜을 취소했어요");
         break;
       case "close-static": break;
+      case "filter":
+        el.parentElement.querySelectorAll('[data-act="filter"]').forEach(c => c.classList.toggle("on", c === el));
+        toast(phone, `날짜 필터: ${el.textContent}`);
+        break;
+      case "date-pick": toast(phone, "달력 시트에서 날짜 선택"); break;
+      case "level": toast(phone, "입문 / 초급 / 중급 이상 선택"); break;
+      case "region": openSheet(phone, true); break;
+      case "region-apply": {
+        const on = [...phone.querySelectorAll(".sheet [data-multi] .chip.on")];
+        const label = phone.querySelector("[data-region-label]");
+        label.textContent = on.length === 0 ? "권역" : on.length === 1 ? on[0].textContent : `${on[0].textContent} 외 ${on.length - 1}`;
+        label.classList.toggle("on", on.length > 0);
+        openSheet(phone, false);
+        break;
+      }
+      case "show-closed":
+        el.classList.toggle("on");
+        phone.classList.toggle("show-closed", el.classList.contains("on"));
+        break;
+      case "clear-recent": toast(phone, "최근 검색을 지웠어요"); break;
+      case "submit-new":
+        openSheet(phone, false);
+        toast(phone, "추가요 완료! 새 곡으로 등록됐어요 (운영자 검수 대기)");
+        break;
       case "book": toast(phone, "/go/{id} 클릭 기록 → 강사님의 네이버 예약으로 이동"); break;
       case "map": toast(phone, "네이버 지도 · 카카오맵 열기"); break;
       case "insta": toast(phone, "강사 인스타그램 프로필로 이동"); break;
