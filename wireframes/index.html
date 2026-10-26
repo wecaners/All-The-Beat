@@ -227,6 +227,71 @@
   .class-card.closed { opacity:.55; display:none; }
   .show-closed .class-card.closed { display:flex; }
 
+  /* 추가요 랭킹 */
+  .page-h { padding:6px 16px 0; }
+  .page-h h1 { font-size:24px; margin:0; }
+  .page-h p { margin:4px 0 0; font-size:12.5px; color:var(--sub); }
+  .seg-tabs { display:flex; margin:14px 16px 0; background:var(--fill); border-radius:10px; padding:3px; }
+  .seg-tabs a { flex:1; text-align:center; padding:7px 0; font-size:13px; border-radius:8px; color:var(--sub); cursor:pointer; text-decoration:none; }
+  .seg-tabs a.on { background:var(--paper); color:var(--ink); font-weight:700; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .region-row { display:none; gap:6px; overflow-x:auto; padding:10px 16px 0; scrollbar-width:none; }
+  .region-row .chip { flex:none; cursor:pointer; }
+  .by-region .region-row { display:flex; }
+  .search-nudge { display:flex; align-items:center; gap:8px; margin:12px 16px 0; padding:10px 12px; border:1px dashed var(--line); border-radius:10px; font-size:12.5px; color:var(--sub); cursor:pointer; }
+  .search-nudge b { color:var(--ink); }
+  .rk { padding:12px 16px; border-bottom:1px solid var(--fill-2); }
+  .rk-main { display:flex; align-items:center; gap:10px; }
+  .rk-main .n { width:22px; text-align:center; flex:none; }
+  .rk-main .n b { display:block; font-size:16px; font-weight:800; }
+  .rk-main .n small { display:block; font-size:10px; color:var(--sub); }
+  .rk-main .img { width:64px; height:36px; border-radius:6px; flex:none; cursor:pointer; }
+  .rk-main .info { flex:1; min-width:0; cursor:pointer; }
+  .rk-main .t { font-weight:700; font-size:14px; }
+  .rk-main .m { font-size:12px; color:var(--sub); margin-top:2px; }
+  .rk-main .m b { color:var(--ink); }
+  .rk-main .st { font-size:11px; margin-top:4px; display:inline-block; border:1px solid var(--line); border-radius:4px; padding:0 5px; color:var(--sub); }
+  .rk-main .st.open { border-color:var(--ink); color:var(--ink); font-weight:600; }
+  .rk-detail { display:none; margin:12px 0 0 32px; padding:12px; border-radius:10px; background:var(--fill); font-size:12.5px; }
+  .rk.open .rk-detail { display:block; }
+  .rk-detail h5 { margin:0 0 6px; font-size:12px; color:var(--sub); font-weight:600; }
+  .rk-detail .barrow { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+  .rk-detail .barrow span:first-child { width:72px; flex:none; }
+  .rk-detail .barrow i { height:8px; background:var(--ink); border-radius:4px; display:block; }
+  .rk-detail .barrow span:last-child { color:var(--sub); }
+  .rk-detail .quote { background:var(--paper); border-radius:8px; padding:6px 8px; margin-bottom:4px; }
+  .rk-detail .btn { margin-top:10px; height:40px; font-size:13.5px; }
+  .teacher-flag { margin:10px 16px 0; font-size:11.5px; font-weight:700; display:inline-block; background:var(--ink); color:#fff; border-radius:4px; padding:2px 6px; }
+
+  /* 마이 */
+  .my-head { display:flex; align-items:center; gap:12px; padding:8px 16px 0; }
+  .my-head .av { width:52px; height:52px; border-radius:50%; flex:none; }
+  .my-head .n { font-weight:800; font-size:18px; }
+  .my-head .m { font-size:12px; color:var(--sub); }
+  .guest { margin:16px; padding:24px 16px; border-radius:14px; background:var(--fill); text-align:center; }
+  .guest b { display:block; font-size:16px; margin-bottom:6px; }
+  .guest p { margin:0 0 16px; font-size:13px; color:var(--sub); line-height:1.5; }
+  .my-panel { display:none; padding:4px 16px 0; }
+  .my-panel.on { display:block; }
+  .my-item { display:flex; align-items:center; gap:10px; padding:12px 0; border-bottom:1px solid var(--fill-2); cursor:pointer; }
+  .my-item .img { width:56px; height:32px; border-radius:5px; flex:none; }
+  .my-item .info { flex:1; min-width:0; }
+  .my-item .t { font-weight:700; font-size:14px; }
+  .my-item .m { font-size:12px; color:var(--sub); margin-top:2px; }
+  .pill { flex:none; font-size:11px; font-weight:700; border:1.5px solid var(--ink); border-radius:999px; padding:2px 8px; }
+  .pill.soft { border-color:var(--line); color:var(--sub); font-weight:500; }
+  .pill.solid { background:var(--ink); color:#fff; }
+  .menu { margin:20px 16px 0; border-top:1px solid var(--fill-2); }
+  .menu a { display:flex; justify-content:space-between; padding:14px 2px; border-bottom:1px solid var(--fill-2); font-size:14px; color:var(--ink); text-decoration:none; cursor:pointer; }
+  .menu a span { color:var(--sub); }
+  .promo { margin:18px 16px 0; padding:14px; border:1.5px solid var(--ink); border-radius:12px; display:flex; align-items:center; gap:10px; font-size:13px; }
+  .promo b { display:block; font-size:14px; margin-bottom:2px; }
+  .kakao { background:#fee500; border-color:#fee500; color:#191919; }
+  .checks { margin-top:14px; font-size:13px; }
+  .checks div { display:flex; align-items:center; gap:8px; padding:6px 0; }
+  .checks i { width:18px; height:18px; border:1.5px solid var(--ink); border-radius:4px; font-style:normal; font-size:11px; display:grid; place-items:center; }
+  .checks .all { font-weight:700; border-bottom:1px solid var(--fill-2); padding-bottom:10px; margin-bottom:4px; }
+  .checks span { color:var(--sub); margin-left:auto; text-decoration:underline; font-size:12px; }
+
   /* 확인 창 */
   .dialog { position:absolute; left:28px; right:28px; top:50%; transform:translateY(-50%); background:var(--paper); border-radius:16px; padding:20px 18px 16px; z-index:11; display:none; text-align:center; }
   .dialog.open { display:block; }
@@ -311,7 +376,7 @@
         </section>
 
         <section class="sec">
-          <div class="sec-h"><h2>추가요 TOP 5</h2><a data-go="U-06">랭킹 ›</a></div>
+          <div class="sec-h"><h2>추가요 TOP 5</h2><a data-go="U-06a">랭킹 ›</a></div>
           <div class="rank-row"><span class="n">1</span><div class="img" data-go="U-04b"></div><div class="info" data-go="U-04b"><div class="t">곡 제목 E</div><div class="m">아티스트 E · 23명이 기다려요</div></div><button class="btn line sm" data-act="req">나도 추가요!</button></div>
           <div class="rank-row"><span class="n">2</span><div class="img" data-go="U-04b"></div><div class="info" data-go="U-04b"><div class="t">곡 제목 F</div><div class="m">아티스트 F · 17명이 기다려요</div></div><button class="btn line sm" data-act="req">나도 추가요!</button></div>
           <div class="rank-row"><span class="n">3</span><div class="img" data-go="U-04a"></div><div class="info" data-go="U-04a"><div class="t">NEON</div><div class="m">A2O LITE · 12명이 기다려요</div></div><button class="btn line sm" data-act="req">나도 추가요!</button></div>
@@ -321,8 +386,8 @@
       <nav class="tabbar">
         <a class="on" data-go="U-01"><i>⌂</i>홈</a>
         <a data-go="U-02a"><i>⌕</i>찾기</a>
-        <a data-go="U-06"><i>✋</i>추가요</a>
-        <a data-go="U-09"><i>◯</i>마이</a>
+        <a data-go="U-06a"><i>✋</i>추가요</a>
+        <a data-go="U-09a"><i>◯</i>마이</a>
       </nav>
       <div class="toast"></div>
     </div>
@@ -524,8 +589,8 @@
       <nav class="tabbar">
         <a data-go="U-01"><i>⌂</i>홈</a>
         <a class="on" data-go="U-02a"><i>⌕</i>찾기</a>
-        <a data-go="U-06"><i>✋</i>추가요</a>
-        <a data-go="U-09"><i>◯</i>마이</a>
+        <a data-go="U-06a"><i>✋</i>추가요</a>
+        <a data-go="U-09a"><i>◯</i>마이</a>
       </nav>
 
       <div class="dim" data-act="close"></div>
@@ -584,8 +649,8 @@
       <nav class="tabbar">
         <a data-go="U-01"><i>⌂</i>홈</a>
         <a class="on" data-go="U-02a"><i>⌕</i>찾기</a>
-        <a data-go="U-06"><i>✋</i>추가요</a>
-        <a data-go="U-09"><i>◯</i>마이</a>
+        <a data-go="U-06a"><i>✋</i>추가요</a>
+        <a data-go="U-09a"><i>◯</i>마이</a>
       </nav>
 
       <div class="dim" data-act="close"></div>
@@ -955,6 +1020,286 @@
     </ol>
   </div>
 
+  <!-- ═══════════════ U-06a 추가요 랭킹: 수강생 ═══════════════ -->
+  <div class="slot" data-screen="U-06a" data-title="추가요 랭킹 · 수강생">
+    <div class="slot-head"><span class="id">U-06</span><span class="name">추가요 랭킹</span><span class="state">A. 수강생으로 볼 때</span></div>
+    <div class="phone">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="page-h">
+          <h1>추가요 랭킹</h1>
+          <p>최근 30일 동안 사람들이 가장 기다린 곡</p>
+        </div>
+        <div class="seg-tabs"><a class="on" data-act="rank-tab">전체</a><a data-act="rank-tab">권역별</a></div>
+        <div class="region-row">
+          <span class="chip on" data-act="rank-region">홍대·합정</span><span class="chip" data-act="rank-region">강남·신논현</span><span class="chip" data-act="rank-region">건대·성수</span><span class="chip" data-act="rank-region">잠실·송파</span><span class="chip" data-act="rank-region">종로·을지로</span>
+        </div>
+        <div class="search-nudge" data-go="U-02a">⌕ <span>원하는 곡이 없나요? <b>검색해서 추가요</b></span></div>
+
+        <div class="rk" data-song-name="곡 제목 E">
+          <div class="rk-main">
+            <div class="n"><b>1</b><small>–</small></div>
+            <div class="img" data-go="U-04b"></div>
+            <div class="info" data-go="U-04b"><div class="t">곡 제목 E</div><div class="m">아티스트 E · <b data-rk-count>23</b>명 · 이번 주 ▲6</div><span class="st">아직 클래스 없음</span></div>
+            <button class="btn line sm" data-act="rank-req">나도 추가요!</button>
+          </div>
+        </div>
+        <div class="rk" data-song-name="곡 제목 F">
+          <div class="rk-main">
+            <div class="n"><b>2</b><small>▲1</small></div>
+            <div class="img" data-go="U-04b"></div>
+            <div class="info" data-go="U-04b"><div class="t">곡 제목 F</div><div class="m">아티스트 F · <b data-rk-count>17</b>명 · 이번 주 ▲4</div><span class="st">아직 클래스 없음</span></div>
+            <button class="btn line sm" data-act="rank-req">나도 추가요!</button>
+          </div>
+        </div>
+        <div class="rk" data-song-name="NEON">
+          <div class="rk-main">
+            <div class="n"><b>3</b><small>▼1</small></div>
+            <div class="img" data-go="U-04a"></div>
+            <div class="info" data-go="U-04a"><div class="t">NEON</div><div class="m">A2O LITE · <b data-rk-count>12</b>명 · 이번 주 ▲2</div><span class="st open">클래스 5개 열림</span></div>
+            <button class="btn line sm" data-act="rank-req">나도 추가요!</button>
+          </div>
+        </div>
+        <div class="rk" data-song-name="곡 제목 H">
+          <div class="rk-main">
+            <div class="n"><b>4</b><small>NEW</small></div>
+            <div class="img" data-go="U-04b"></div>
+            <div class="info" data-go="U-04b"><div class="t">곡 제목 H</div><div class="m">아티스트 H · <b data-rk-count>9</b>명 · 이번 주 ▲9</div><span class="st">아직 클래스 없음</span></div>
+            <button class="btn line sm" data-act="rank-req">나도 추가요!</button>
+          </div>
+        </div>
+        <div class="rk" data-song-name="곡 제목 I">
+          <div class="rk-main">
+            <div class="n"><b>5</b><small>▼2</small></div>
+            <div class="img" data-go="U-04a"></div>
+            <div class="info" data-go="U-04a"><div class="t">곡 제목 I</div><div class="m">아티스트 I · <b data-rk-count>6</b>명</div><span class="st open">클래스 1개 열림</span></div>
+            <button class="btn line sm" data-act="rank-req">나도 추가요!</button>
+          </div>
+        </div>
+        <div style="height:12px"></div>
+      </div>
+
+      <nav class="tabbar">
+        <a data-go="U-01"><i>⌂</i>홈</a>
+        <a data-go="U-02a"><i>⌕</i>찾기</a>
+        <a class="on" data-go="U-06a"><i>✋</i>추가요</a>
+        <a data-go="U-09a"><i>◯</i>마이</a>
+      </nav>
+
+      <div class="dim" data-act="close"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3 data-sheet-title>추가요!</h3>
+        <div class="sub">이 곡 클래스가 열리면 알려드릴게요</div>
+        <div class="label">희망 지역</div>
+        <div class="chips"><span class="chip on">홍대·합정</span><span class="chip">강남·신논현</span><span class="chip">건대·성수</span><span class="chip">잠실·송파</span><span class="chip">어디든 좋아요</span></div>
+        <div class="label">희망 시간대 <em>선택</em></div>
+        <div class="chips"><span class="chip">평일 저녁</span><span class="chip">주말 낮</span><span class="chip">주말 저녁</span><span class="chip on">상관없음</span></div>
+        <button class="btn" data-act="rank-submit">추가요!</button>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>하단 탭 <b>추가요</b>. 서비스 정체성 탭이라 항상 보인다 (IA 1절).</li>
+      <li>기간은 <b>최근 30일</b> 고정. 순위 옆 ▲▼NEW는 지난주 대비. 추가요 3명 미만인 곡은 안 보인다. 최대 50위 (F-08).</li>
+      <li>[권역별] 탭 → 권역 칩 한 개 선택. 그 권역 추가요만 다시 센다 (프로토타입에서 눌러보기).</li>
+      <li>상태 라벨: <b>"아직 클래스 없음"</b>은 강사에게 기회, <b>"클래스 N개 열림"</b>은 수강생에게 바로 갈 곳. 곡을 누르면 곡 상세.</li>
+      <li>[나도 추가요!] → 추가요 시트 (지역 필수). 제출하면 숫자 +1, 버튼 "추가요 완료 ✓". 비로그인이면 로그인 시트 먼저.</li>
+      <li>맨 위 "원하는 곡이 없나요? 검색해서 추가요" → 검색. 랭킹에 없는 곡도 여기서 시작할 수 있게.</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-06b 추가요 랭킹: 강사 ═══════════════ -->
+  <div class="slot" data-screen="U-06b" data-title="추가요 랭킹 · 강사">
+    <div class="slot-head"><span class="id">U-06</span><span class="name">추가요 랭킹</span><span class="state">B. 강사로 볼 때 · 수요 대시보드</span></div>
+    <div class="phone">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="page-h">
+          <h1>추가요 랭킹</h1>
+          <p>최근 30일 동안 사람들이 가장 기다린 곡</p>
+        </div>
+        <span class="teacher-flag">강사로 보는 중 · 상세 수요가 보여요</span>
+        <div class="seg-tabs by-region-tabs"><a data-act="rank-tab">전체</a><a class="on" data-act="rank-tab">권역별</a></div>
+        <div class="region-row" style="display:flex">
+          <span class="chip on" data-act="rank-region">홍대·합정</span><span class="chip" data-act="rank-region">강남·신논현</span><span class="chip" data-act="rank-region">건대·성수</span><span class="chip" data-act="rank-region">잠실·송파</span>
+        </div>
+
+        <div class="rk open">
+          <div class="rk-main">
+            <div class="n"><b>1</b><small>–</small></div>
+            <div class="img" data-go="U-04b"></div>
+            <div class="info" data-go="U-04b"><div class="t">곡 제목 E</div><div class="m">아티스트 E · 홍대·합정 <b>11</b>명 · 전체 23명</div><span class="st">아직 클래스 없음</span></div>
+            <button class="btn line sm" data-act="expand">접기 ▴</button>
+          </div>
+          <div class="rk-detail">
+            <h5>희망 시간대</h5>
+            <div class="barrow"><span>주말 낮</span><i style="width:90px"></i><span>9</span></div>
+            <div class="barrow"><span>평일 저녁</span><i style="width:60px"></i><span>6</span></div>
+            <div class="barrow"><span>주말 저녁</span><i style="width:30px"></i><span>3</span></div>
+            <div class="barrow"><span>상관없음</span><i style="width:50px"></i><span>5</span></div>
+            <h5 style="margin-top:10px">한마디 (최근 3개)</h5>
+            <div class="quote">"킬링파트만이라도 배우고 싶어요"</div>
+            <div class="quote">"입문반으로 열어주세요!"</div>
+            <div class="quote">"주말 오후면 친구랑 갈게요"</div>
+            <button class="btn" data-go="T-02">이 곡으로 클래스 열기</button>
+          </div>
+        </div>
+        <div class="rk">
+          <div class="rk-main">
+            <div class="n"><b>2</b><small>▲1</small></div>
+            <div class="img" data-go="U-04b"></div>
+            <div class="info" data-go="U-04b"><div class="t">곡 제목 F</div><div class="m">아티스트 F · 홍대·합정 <b>7</b>명 · 전체 17명</div><span class="st">아직 클래스 없음</span></div>
+            <button class="btn line sm" data-act="expand">펼치기 ▾</button>
+          </div>
+          <div class="rk-detail">
+            <h5>희망 시간대</h5>
+            <div class="barrow"><span>평일 저녁</span><i style="width:70px"></i><span>7</span></div>
+            <div class="barrow"><span>주말 낮</span><i style="width:40px"></i><span>4</span></div>
+            <h5 style="margin-top:10px">한마디 (최근 3개)</h5>
+            <div class="quote">"퇴근 후 클래스 있었으면"</div>
+            <button class="btn" data-go="T-02">이 곡으로 클래스 열기</button>
+          </div>
+        </div>
+        <div class="rk">
+          <div class="rk-main">
+            <div class="n"><b>3</b><small>▼1</small></div>
+            <div class="img" data-go="U-04a"></div>
+            <div class="info" data-go="U-04a"><div class="t">NEON</div><div class="m">A2O LITE · 홍대·합정 <b>5</b>명 · 전체 12명</div><span class="st open">홍대권 클래스 1개 · 전체 5개</span></div>
+            <button class="btn line sm" data-act="expand">펼치기 ▾</button>
+          </div>
+          <div class="rk-detail">
+            <h5>희망 시간대</h5>
+            <div class="barrow"><span>주말 저녁</span><i style="width:50px"></i><span>5</span></div>
+            <button class="btn" data-go="T-02">이 곡으로 클래스 열기</button>
+          </div>
+        </div>
+        <div style="height:12px"></div>
+      </div>
+
+      <nav class="tabbar">
+        <a data-go="U-01"><i>⌂</i>홈</a>
+        <a data-go="U-02a"><i>⌕</i>찾기</a>
+        <a class="on" data-go="U-06b"><i>✋</i>추가요</a>
+        <a data-go="U-09b"><i>◯</i>마이</a>
+      </nav>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li><b>같은 화면, 강사에게만 더 보인다</b> (IA 원칙 3). 강사 전용 탭을 따로 두지 않는다.</li>
+      <li>강사는 보통 <b>자기 활동 권역</b>으로 본다 → 강사 프로필의 주 활동 권역을 기본 선택 [가정].</li>
+      <li>행을 펼치면 <b>희망 시간대 분포 + 한마디 최근 3개</b> + [이 곡으로 클래스 열기] → 클래스 등록 T-02 (곡 미리 선택). 플로우 5.</li>
+      <li>이미 클래스가 있는 곡도 "홍대권 1개 · 전체 5개"로 보여준다. 같은 권역 경쟁이 적으면 열 만하다는 판단 근거.</li>
+      <li>누가 추가요했는지(개인)는 강사에게도 안 보인다. 숫자·분포·한마디만.</li>
+      <li class="q">결정 필요: 초기엔 강사가 랭킹을 보러 오지 않는다 → 운영자가 이 화면을 캡처해 주 1회 강사에게 DM (기획서 리스크 대응). 이 DM용 "공유 이미지" 버튼을 둘까?</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-09a 마이: 비로그인 + 로그인 시트 ═══════════════ -->
+  <div class="slot" data-screen="U-09a" data-title="마이 · 비로그인 (로그인 시트)">
+    <div class="slot-head"><span class="id">U-09</span><span class="name">마이</span><span class="state">A. 비로그인 · U-08 로그인 시트</span></div>
+    <div class="phone">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="page-h"><h1>마이</h1></div>
+        <div class="guest">
+          <b>로그인하고 추가요·앵콜을 남겨보세요</b>
+          <p>보고 싶은 곡을 요청하고,<br>마감된 클래스는 앵콜할 수 있어요.<br>둘러보기는 로그인 없이도 돼요.</p>
+          <button class="btn kakao" data-act="login">카카오로 시작하기</button>
+        </div>
+        <nav class="menu">
+          <a data-act="noop">이용약관 <span>›</span></a>
+          <a data-act="noop">개인정보처리방침 <span>›</span></a>
+          <a data-act="noop">문의하기 <span>›</span></a>
+        </nav>
+      </div>
+
+      <nav class="tabbar">
+        <a data-go="U-01"><i>⌂</i>홈</a>
+        <a data-go="U-02a"><i>⌕</i>찾기</a>
+        <a data-go="U-06a"><i>✋</i>추가요</a>
+        <a class="on" data-go="U-09a"><i>◯</i>마이</a>
+      </nav>
+
+      <div class="dim" data-act="close"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3>올빗 시작하기</h3>
+        <div class="sub">처음이시군요! 약관에 동의하면 바로 시작돼요</div>
+        <div class="checks">
+          <div class="all"><i>✓</i>전체 동의</div>
+          <div><i>✓</i>(필수) 이용약관 동의 <span>보기</span></div>
+          <div><i>✓</i>(필수) 개인정보 수집·이용 동의 <span>보기</span></div>
+          <div><i></i>(선택) 새 클래스·이벤트 소식 받기</div>
+        </div>
+        <button class="btn kakao" data-act="kakao">동의하고 카카오로 시작</button>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>마이 탭은 비로그인도 들어올 수 있다. <b>로그인을 강요하지 않고</b> 무엇을 할 수 있는지 먼저 말한다 (MVP 원칙 5).</li>
+      <li><b>U-08 로그인 시트</b>는 화면이 아니라 바텀시트. 마이·추가요·앵콜·강사 신청 어디서 눌러도 같은 시트가 뜬다 (프로토타입에서 눌러보기).</li>
+      <li>카카오 로그인 단일. 받는 정보: 카카오 ID·닉네임 (이메일·전화번호 안 받음). 약관 동의는 <b>첫 로그인 때만</b> (F-09).</li>
+      <li>로그인 후 <b>원래 있던 화면으로 복귀</b> + 하려던 일(추가요 시트 등) 자동으로 열기. 인앱 브라우저 리다이렉트 검증 필요 (UF-1).</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-09b 마이: 로그인 ═══════════════ -->
+  <div class="slot" data-screen="U-09b" data-title="마이 · 로그인">
+    <div class="slot-head"><span class="id">U-09</span><span class="name">마이</span><span class="state">B. 로그인 · 내 추가요 / 내 앵콜</span></div>
+    <div class="phone">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="page-h"><h1>마이</h1></div>
+        <div class="my-head">
+          <div class="av img"></div>
+          <div><div class="n">춤추는 고양이</div><div class="m">카카오 로그인</div></div>
+        </div>
+
+        <div class="seg-tabs"><a class="on" data-act="my-tab">내 추가요 3</a><a data-act="my-tab">내 앵콜 2</a></div>
+
+        <div class="my-panel on">
+          <div class="my-item" data-go="U-04a"><div class="img"></div><div class="info"><div class="t">NEON</div><div class="m">A2O LITE · 홍대·합정 · 10월 12일</div></div><span class="pill solid">열렸어요 ›</span></div>
+          <div class="my-item" data-go="U-04b"><div class="img"></div><div class="info"><div class="t">곡 제목 E</div><div class="m">아티스트 E · 어디든 · 10월 20일</div></div><span class="pill soft">대기중 · 23명</span></div>
+          <div class="my-item" data-go="U-04b"><div class="img"></div><div class="info"><div class="t">곡 제목 Z</div><div class="m">아티스트 Z · 강남·신논현 · 오늘</div></div><span class="pill soft">대기중 · 1명</span></div>
+        </div>
+        <div class="my-panel">
+          <div class="my-item" data-go="U-05c"><div class="img"></div><div class="info"><div class="t">NEON 원데이 · 강사 민지</div><div class="m">10월 28일 마감 클래스</div></div><span class="pill">검토 중</span></div>
+          <div class="my-item" data-go="U-05b"><div class="img"></div><div class="info"><div class="t">곡 제목 B 원데이 · 강사 리아</div><div class="m">10월 25일 마감 클래스</div></div><span class="pill soft">모으는 중 9/10</span></div>
+        </div>
+
+        <div class="promo">
+          <div style="flex:1"><b>댄스 강사이신가요?</b>올빗에 클래스를 올리고 추가요 수요를 확인해보세요</div>
+          <button class="btn sm" data-go="T-01">강사 신청</button>
+        </div>
+
+        <nav class="menu">
+          <a data-act="noop">알림 설정 <span>Should ›</span></a>
+          <a data-act="noop">이용약관 · 개인정보처리방침 <span>›</span></a>
+          <a data-act="noop">문의하기 <span>›</span></a>
+          <a data-act="logout">로그아웃 <span>›</span></a>
+          <a data-act="noop" style="color:var(--sub)">회원 탈퇴 <span>›</span></a>
+        </nav>
+        <div style="height:12px"></div>
+      </div>
+
+      <nav class="tabbar">
+        <a data-go="U-01"><i>⌂</i>홈</a>
+        <a data-go="U-02a"><i>⌕</i>찾기</a>
+        <a data-go="U-06a"><i>✋</i>추가요</a>
+        <a class="on" data-go="U-09b"><i>◯</i>마이</a>
+      </nav>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li><b>내 추가요 / 내 앵콜</b> 두 탭. 알림(F-20)이 없는 MVP에서는 <b>"열렸어요"를 확인하는 유일한 곳</b>이라 중요하다 (MVP 원칙 6).</li>
+      <li>상태 배지: 추가요 = 대기중 · N명 / <b>열렸어요 ›</b>, 앵콜 = 모으는 중 N/M · 전달됨 · <b>검토 중</b> · 앵콜 오픈 › · 어려워요. "열렸어요"류는 검은 배지로 눈에 띄게, 위로 정렬.</li>
+      <li>항목을 누르면 추가요 → 곡 상세, 앵콜 → 원 클래스 상세. 수정·취소는 그 화면에서 (여기서는 보기만).</li>
+      <li><b>강사 신청</b> 배너 → T-01 (아직 안 그림). 승인된 강사면 이 자리가 <b>[내 클래스 관리 · 앵콜 응답 필요 2]</b>로 바뀐다.</li>
+      <li>닉네임은 카카오 닉네임 그대로 (MVP는 수정 없음) [가정].</li>
+    </ol>
+  </div>
+
   <!-- ═══════════════ U-10 앵콜 시트 ═══════════════ -->
   <div class="slot" data-screen="U-10" data-title="앵콜 시트">
     <div class="slot-head"><span class="id">U-10</span><span class="name">앵콜 시트</span><span class="state">U-05 마감 화면 위에 열림</span></div>
@@ -990,8 +1335,7 @@
 
 <script>
   /* ── 아직 그리지 않은 화면 (링크를 누르면 안내만) ── */
-  const PENDING = { "U-06":"추가요 랭킹",
-                    "U-09":"마이", "T-02":"클래스 등록" };
+  const PENDING = { "T-01":"강사 신청", "T-02":"클래스 등록", "T-03":"내 클래스 관리" };
 
   const slots = [...document.querySelectorAll(".slot")];
   const byId = id => slots.find(s => s.dataset.screen === id);
@@ -1149,6 +1493,57 @@
         phone.classList.toggle("show-closed", el.classList.contains("on"));
         break;
       case "clear-recent": toast(phone, "최근 검색을 지웠어요"); break;
+      case "rank-tab": {
+        const tabs = [...el.parentElement.children];
+        tabs.forEach(t => t.classList.toggle("on", t === el));
+        phone.classList.toggle("by-region", tabs.indexOf(el) === 1);
+        break;
+      }
+      case "rank-region":
+        el.parentElement.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === el));
+        toast(phone, `${el.textContent} 추가요만 다시 세요`);
+        break;
+      case "rank-req": {
+        const row = el.closest(".rk"), cnt = row.querySelector("[data-rk-count]");
+        if (el.classList.contains("done")) {
+          cnt.textContent = Number(cnt.textContent) - 1;
+          el.textContent = "나도 추가요!"; el.classList.remove("done");
+          toast(phone, "추가요를 취소했어요");
+        } else {
+          phone._row = row;
+          phone.querySelector("[data-sheet-title]").textContent = `${row.dataset.songName} 추가요!`;
+          openSheet(phone, true);
+        }
+        break;
+      }
+      case "rank-submit": {
+        openSheet(phone, false);
+        const row = phone._row, cnt = row.querySelector("[data-rk-count]"), b = row.querySelector('[data-act="rank-req"]');
+        cnt.textContent = Number(cnt.textContent) + 1;
+        b.textContent = "추가요 완료 ✓"; b.classList.add("done");
+        toast(phone, `${row.dataset.songName} 추가요 완료!`);
+        break;
+      }
+      case "expand": {
+        const row = el.closest(".rk");
+        row.classList.toggle("open");
+        el.textContent = row.classList.contains("open") ? "접기 ▴" : "펼치기 ▾";
+        break;
+      }
+      case "my-tab": {
+        const tabs = [...el.parentElement.children], i = tabs.indexOf(el);
+        tabs.forEach(t => t.classList.toggle("on", t === el));
+        phone.querySelectorAll(".my-panel").forEach((p, k) => p.classList.toggle("on", k === i));
+        break;
+      }
+      case "login": openSheet(phone, true); break;
+      case "kakao":
+        openSheet(phone, false);
+        toast(phone, "카카오 로그인 완료 → 원래 화면으로 복귀");
+        setTimeout(() => show("U-09b"), 900);
+        break;
+      case "logout": show("U-09a"); break;
+      case "noop": toast(phone, "MVP에서는 단순 링크"); break;
       case "submit-new":
         openSheet(phone, false);
         toast(phone, "추가요 완료! 새 곡으로 등록됐어요 (운영자 검수 대기)");
