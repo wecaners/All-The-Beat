@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>올빗 와이어프레임</title>
+<style>
+  /* ── 와이어프레임 팔레트: 흑백 + 강조 1색 ───────────────────── */
+  :root {
+    --page:#ececee; --paper:#fff; --ink:#1d1d1f; --sub:#6e6e73; --line:#d2d2d7;
+    --fill:#f2f2f4; --fill-2:#e3e3e6; --accent:#1d1d1f; --note:#fff7d6; --note-line:#e3c75b;
+    --frame-w:375px; --frame-h:812px;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--page); color:var(--ink);
+         font-family:-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif; }
+  button { font:inherit; color:inherit; }
+
+  /* ── 보드 상단 바 ─────────────────────────────────────────── */
+  .board-bar { position:sticky; top:0; z-index:20; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+               padding:12px 24px; background:var(--paper); border-bottom:1px solid var(--line); }
+  .board-bar h1 { font-size:16px; margin:0; }
+  .board-bar .meta { font-size:12px; color:var(--sub); }
+  .seg { margin-left:auto; display:flex; border:1px solid var(--line); border-radius:8px; overflow:hidden; }
+  .seg button { border:0; background:none; padding:6px 12px; font-size:13px; cursor:pointer; }
+  .seg button.on { background:var(--ink); color:#fff; }
+  .proto-nav { display:none; gap:6px; align-items:center; font-size:13px; }
+  .proto-nav select { font:inherit; padding:4px 6px; }
+  body.proto .proto-nav { display:flex; }
+
+  /* ── 보드: 화면을 가로로 나열 ─────────────────────────────── */
+  .board { display:flex; gap:40px; padding:32px 24px 64px; overflow-x:auto; align-items:flex-start; }
+  .slot { flex:none; width:var(--frame-w); }
+  .slot-head { display:flex; align-items:baseline; gap:8px; margin-bottom:10px; }
+  .slot-head .id { font:600 12px ui-monospace, Menlo, monospace; background:var(--ink); color:#fff; padding:2px 6px; border-radius:4px; }
+  .slot-head .name { font-weight:700; font-size:15px; }
+  .slot-head .state { font-size:12px; color:var(--sub); }
+  .notes { margin-top:14px; background:var(--note); border:1px solid var(--note-line); border-radius:8px; padding:10px 12px 10px 30px; font-size:12.5px; line-height:1.55; }
+  .notes li { margin-bottom:4px; }
+  .notes .q { color:#9a6b00; font-weight:600; }
+
+  /* 프로토타입 모드: 현재 화면 하나만 가운데 */
+  body.proto .board { justify-content:center; }
+  body.proto .slot { display:none; }
+  body.proto .slot.current { display:block; }
+  body.proto .notes { display:none; }
+  .flash { animation:flash 1.2s ease; }
+  @keyframes flash { 0%,60% { box-shadow:0 0 0 4px #ffb800; } 100% { box-shadow:0 0 0 0 transparent; } }
+
+  /* ── 폰 프레임 ───────────────────────────────────────────── */
+  .phone { position:relative; width:var(--frame-w); height:var(--frame-h); background:var(--paper);
+           border:1px solid var(--line); border-radius:28px; overflow:hidden; box-shadow:0 4px 18px rgba(0,0,0,.08); }
+  .scroll { position:absolute; inset:0; overflow-y:auto; padding-bottom:84px; }
+  .scroll.no-tab { padding-bottom:24px; }
+  .status { height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; font-size:12px; font-weight:600; }
+
+  /* 공통 UI 조각 */
+  .topbar { display:flex; align-items:center; gap:10px; height:48px; padding:0 16px; }
+  .logo { font-weight:800; font-size:20px; letter-spacing:-.5px; }
+  .logo small { font-weight:600; font-size:10px; color:var(--sub); margin-left:4px; letter-spacing:0; }
+  .icon { width:28px; height:28px; border:1.5px solid var(--ink); border-radius:6px; display:grid; place-items:center; font-size:13px; cursor:pointer; background:none; }
+  .icon.ghost { border-color:transparent; font-size:18px; }
+  .spacer { flex:1; }
+
+  .search { margin:4px 16px 8px; height:44px; border-radius:12px; background:var(--fill); display:flex; align-items:center; gap:8px; padding:0 14px; color:var(--sub); font-size:14px; cursor:pointer; }
+  .search.sticky { position:sticky; top:0; z-index:2; box-shadow:0 0 0 8px var(--paper); }
+
+  .sec { padding:18px 16px 6px; }
+  .sec-h { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; }
+  .sec-h h2 { font-size:17px; margin:0; }
+  .sec-h a { font-size:12.5px; color:var(--sub); cursor:pointer; text-decoration:none; }
+
+  .img { background:var(--fill-2); position:relative; overflow:hidden; }
+  .img::before, .img::after { content:""; position:absolute; inset:0;
+    background:linear-gradient(to top right, transparent calc(50% - .5px), #c7c7cc 50%, transparent calc(50% + .5px)); }
+  .img::after { transform:scaleX(-1); }
+
+  .hscroll { display:flex; gap:12px; overflow-x:auto; padding-bottom:6px; margin:0 -16px; padding-left:16px; padding-right:16px; scrollbar-width:none; }
+  .song-card { flex:none; width:200px; cursor:pointer; }
+  .song-card .img { width:200px; height:112px; border-radius:10px; }
+
+  /* YouTube 썸네일·영상 */
+  .thumb > * { position:absolute; z-index:1; }
+  .play { inset:0; display:grid; place-items:center; }
+  .play::before { content:"▶"; width:36px; height:36px; border-radius:50%; background:rgba(0,0,0,.65); color:#fff; display:grid; place-items:center; font-size:13px; padding-left:2px; }
+  .yt { left:6px; bottom:6px; font-size:10px; font-weight:700; background:#fff; border:1px solid var(--ink); border-radius:4px; padding:0 4px; }
+  .video { position:relative; width:100%; aspect-ratio:16/9; }
+  .video .play::before { width:52px; height:52px; font-size:18px; }
+  .video .vlabel { left:10px; top:10px; font-size:11px; font-weight:700; background:rgba(0,0,0,.65); color:#fff; border-radius:4px; padding:2px 6px; }
+  .video .yt { left:10px; bottom:10px; font-size:11px; }
+  .video-meta { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 16px 0; font-size:12px; color:var(--sub); }
+  .video-meta a { color:var(--ink); font-weight:600; text-decoration:none; white-space:nowrap; cursor:pointer; }
+  .no-video { width:100%; aspect-ratio:16/9; background:linear-gradient(135deg, #d9d9de, #f2f2f4); display:grid; place-items:center; font-size:44px; font-weight:800; color:#b0b0b6; }
+  .song-card .t { font-weight:700; font-size:14px; margin-top:8px; }
+  .song-card .a { font-size:12.5px; color:var(--sub); }
+  .song-card .c { display:inline-block; margin-top:6px; font-size:11.5px; border:1px solid var(--line); border-radius:999px; padding:2px 8px; }
+
+  .class-card { display:flex; gap:12px; align-items:stretch; padding:12px; border:1px solid var(--line); border-radius:12px; margin-bottom:10px; cursor:pointer; position:relative; }
+  .class-card .date { flex:none; width:52px; border-radius:8px; background:var(--fill); display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .class-card .date b { font-size:20px; line-height:1; }
+  .class-card .date span { font-size:11px; color:var(--sub); margin-top:4px; }
+  .class-card .info { min-width:0; }
+  .class-card .t { font-weight:700; font-size:14.5px; }
+  .class-card .m { font-size:12.5px; color:var(--sub); margin-top:3px; }
+  .badge { position:absolute; top:10px; right:10px; font-size:11px; font-weight:600; border:1.5px solid var(--ink); border-radius:6px; padding:1px 6px; }
+  .badge.soft { border-color:var(--line); color:var(--sub); font-weight:500; }
+
+  .rank-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--fill-2); }
+  .rank-row:last-child { border-bottom:0; }
+  .rank-row .n { width:18px; font-weight:800; text-align:center; }
+  .rank-row .img { width:64px; height:36px; border-radius:6px; flex:none; cursor:pointer; }
+  .rank-row .info { flex:1; min-width:0; cursor:pointer; }
+  .rank-row .t { font-weight:700; font-size:14px; }
+  .rank-row .m { font-size:12px; color:var(--sub); }
+
+  .btn { display:flex; align-items:center; justify-content:center; height:48px; border-radius:12px; font-weight:700; font-size:15px; cursor:pointer; border:1.5px solid var(--ink); background:var(--ink); color:#fff; width:100%; }
+  .btn.line { background:var(--paper); color:var(--ink); }
+  .btn.sm { height:32px; width:auto; padding:0 12px; font-size:12.5px; border-radius:8px; }
+  .btn.done { background:var(--fill); color:var(--ink); border-color:var(--line); }
+
+  .chips { display:flex; gap:6px; flex-wrap:wrap; }
+  .chip { font-size:12px; border:1px solid var(--line); border-radius:999px; padding:4px 10px; background:var(--paper); }
+  .chip.on { border-color:var(--ink); font-weight:600; }
+
+  .tabbar { position:absolute; left:0; right:0; bottom:0; height:76px; padding-bottom:20px; background:var(--paper); border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(4,1fr); }
+  .tabbar a { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; font-size:11px; color:var(--sub); cursor:pointer; text-decoration:none; }
+  .tabbar a i { width:22px; height:22px; border:1.5px solid currentColor; border-radius:6px; font-style:normal; display:grid; place-items:center; font-size:11px; }
+  .tabbar a.on { color:var(--ink); font-weight:700; }
+
+  /* 곡 상세 */
+  .song-title { padding:14px 16px 0; }
+  .song-title h1 { font-size:24px; margin:0; }
+  .song-title .a { color:var(--sub); font-size:14px; margin-top:4px; }
+  .demand { margin:18px 16px 0; padding:16px; border-radius:14px; background:var(--fill); }
+  .demand .big { font-size:16px; font-weight:700; }
+  .demand .big b { font-size:22px; }
+  .demand .chips { margin:10px 0 14px; }
+  .demand .hint { font-size:12px; color:var(--sub); margin-top:8px; text-align:center; }
+  .teacher-cta { margin:10px 16px 0; padding:12px 14px; border:1.5px dashed var(--ink); border-radius:12px; display:flex; align-items:center; gap:10px; font-size:13px; }
+  .teacher-cta .tag { font-size:10.5px; font-weight:700; background:var(--ink); color:#fff; border-radius:4px; padding:1px 5px; }
+  .empty { margin:6px 0 0; padding:28px 16px; text-align:center; border:1px dashed var(--line); border-radius:12px; color:var(--sub); font-size:13.5px; line-height:1.6; }
+  .empty b { color:var(--ink); display:block; font-size:15px; margin-bottom:4px; }
+  .sticky-cta { position:absolute; left:0; right:0; bottom:0; padding:12px 16px 28px; background:linear-gradient(to top, var(--paper) 75%, transparent); }
+
+  /* 바텀시트 */
+  .dim { position:absolute; inset:0; background:rgba(0,0,0,.4); display:none; z-index:10; }
+  .sheet { position:absolute; left:0; right:0; bottom:0; background:var(--paper); border-radius:20px 20px 0 0; padding:10px 16px 28px; z-index:11; display:none; }
+  .sheet.open, .dim.open { display:block; }
+  .sheet .grab { width:40px; height:4px; border-radius:2px; background:var(--line); margin:0 auto 14px; }
+  .sheet h3 { margin:0 0 4px; font-size:18px; }
+  .sheet .sub { color:var(--sub); font-size:13px; margin-bottom:16px; }
+  .sheet .label { font-size:13px; font-weight:700; margin:14px 0 8px; }
+  .sheet .label em { font-style:normal; font-weight:500; color:var(--sub); }
+  .sheet .field { height:44px; border:1px solid var(--line); border-radius:10px; padding:0 12px; display:flex; align-items:center; color:var(--sub); font-size:13px; }
+  .sheet .chip { cursor:pointer; }
+  .sheet .btn { margin-top:20px; }
+
+  .toast { position:absolute; left:16px; right:16px; bottom:96px; background:var(--ink); color:#fff; font-size:13px; border-radius:10px; padding:12px 14px; z-index:12; opacity:0; transform:translateY(8px); transition:.2s; pointer-events:none; }
+  .toast.show { opacity:1; transform:none; }
+
+  [data-go] { cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header class="board-bar">
+  <h1>올빗 와이어프레임</h1>
+  <span class="meta">v0.2 · 2026-10-26 · 기준: 03-기능명세서 v0.3, 04-IA v0.2, 06-음원API</span>
+  <div class="proto-nav">
+    <button class="icon ghost" id="back" title="뒤로">←</button>
+    <select id="jump"></select>
+  </div>
+  <div class="seg">
+    <button id="mode-board" class="on">보드</button>
+    <button id="mode-proto">프로토타입</button>
+  </div>
+</header>
+
+<main class="board">
+
+  <!-- ═══════════════ U-01 홈 ═══════════════ -->
+  <div class="slot" data-screen="U-01" data-title="홈">
+    <div class="slot-head"><span class="id">U-01</span><span class="name">홈</span><span class="state">기본</span></div>
+    <div class="phone">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar">
+          <span class="logo">올빗<small>All the Beat</small></span>
+        </div>
+
+        <div class="search sticky" data-go="U-02">⌕ 추고 싶은 곡이나 아티스트</div>
+
+        <section class="sec">
+          <div class="sec-h"><h2>이번 주 핫한 곡</h2><a data-go="U-03">전체 ›</a></div>
+          <div class="hscroll">
+            <div class="song-card" data-go="U-04a"><div class="img thumb"><span class="play"></span><span class="yt">YouTube</span></div><div class="t">NEON</div><div class="a">A2O LITE</div><span class="c">클래스 5개</span></div>
+            <div class="song-card" data-go="U-04a"><div class="img thumb"><span class="play"></span><span class="yt">YouTube</span></div><div class="t">곡 제목 B</div><div class="a">아티스트 B</div><span class="c">클래스 4개</span></div>
+            <div class="song-card" data-go="U-04a"><div class="img thumb"><span class="play"></span><span class="yt">YouTube</span></div><div class="t">곡 제목 C</div><div class="a">아티스트 C</div><span class="c">클래스 3개</span></div>
+            <div class="song-card" data-go="U-04a"><div class="img thumb"><span class="play"></span><span class="yt">YouTube</span></div><div class="t">곡 제목 D</div><div class="a">아티스트 D</div><span class="c">클래스 2개</span></div>
+          </div>
+        </section>
+
+        <section class="sec">
+          <div class="sec-h"><h2>다가오는 클래스</h2><a data-go="U-03">더보기 ›</a></div>
+          <div class="class-card" data-go="U-05">
+            <div class="date"><b>28</b><span>수</span></div>
+            <div class="info"><div class="t">NEON · A2O LITE</div><div class="m">19:30–21:00 · 홍대·합정</div><div class="m">35,000원 · 입문</div></div>
+            <span class="badge">마감 임박</span>
+          </div>
+          <div class="class-card" data-go="U-05">
+            <div class="date"><b>29</b><span>목</span></div>
+            <div class="info"><div class="t">곡 제목 B · 아티스트 B</div><div class="m">20:00–21:30 · 강남·신논현</div><div class="m">40,000원 · 초급</div></div>
+          </div>
+          <div class="class-card" data-go="U-05">
+            <div class="date"><b>31</b><span>토</span></div>
+            <div class="info"><div class="t">NEON · A2O LITE</div><div class="m">14:00–15:30 · 건대·성수</div><div class="m">35,000원 · 입문</div></div>
+          </div>
+        </section>
+
+        <section class="sec">
+          <div class="sec-h"><h2>추가요 TOP 5</h2><a data-go="U-06">랭킹 ›</a></div>
+          <div class="rank-row"><span class="n">1</span><div class="img" data-go="U-04b"></div><div class="info" data-go="U-04b"><div class="t">곡 제목 E</div><div class="m">아티스트 E · 23명이 기다려요</div></div><button class="btn line sm" data-act="req">나도 추가요!</button></div>
+          <div class="rank-row"><span class="n">2</span><div class="img" data-go="U-04b"></div><div class="info" data-go="U-04b"><div class="t">곡 제목 F</div><div class="m">아티스트 F · 17명이 기다려요</div></div><button class="btn line sm" data-act="req">나도 추가요!</button></div>
+          <div class="rank-row"><span class="n">3</span><div class="img" data-go="U-04a"></div><div class="info" data-go="U-04a"><div class="t">NEON</div><div class="m">A2O LITE · 12명이 기다려요</div></div><button class="btn line sm" data-act="req">나도 추가요!</button></div>
+        </section>
+      </div>
+
+      <nav class="tabbar">
+        <a class="on" data-go="U-01"><i>⌂</i>홈</a>
+        <a data-go="U-02"><i>⌕</i>찾기</a>
+        <a data-go="U-06"><i>✋</i>추가요</a>
+        <a data-go="U-09"><i>◯</i>마이</a>
+      </nav>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>검색창은 스크롤해도 상단에 붙어 있다 (F-01, F-02). 탭하면 검색 화면 U-02.</li>
+      <li><b>핫한 곡</b>: 오늘~7일 안에 클래스가 있는 곡을 클래스 수 순으로 최대 10개. 탭 → 곡 상세. 곡이 주인공이라는 대전제가 첫 화면에서 보이게 맨 위에 둠.</li>
+      <li><b>다가오는 클래스</b>: 카드 공통 정보 = 날짜·요일 / 곡·아티스트 / 시간·권역 / 가격·난이도 / 상태 배지. 최대 10개.</li>
+      <li><b>추가요 TOP 5</b>: 최근 30일 기준. [나도 추가요!]는 비로그인이면 로그인 시트 → 복귀 후 추가요 시트.</li>
+      <li>데이터가 0개인 섹션은 통째로 숨긴다. 검색창과 추가요 섹션은 항상 보인다.</li>
+      <li><b>곡 카드 이미지 = 안무 영상 썸네일</b> (16:9, 왼쪽 아래 YouTube 표시). 앨범 커버는 쓰지 않는다 (06 문서). 영상이 없는 곡은 이니셜 + 그라데이션.</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-04a 곡 상세: 클래스 있음 ═══════════════ -->
+  <div class="slot" data-screen="U-04a" data-title="곡 상세 · 클래스 있음">
+    <div class="slot-head"><span class="id">U-04</span><span class="name">곡 상세</span><span class="state">A. 클래스 있음</span></div>
+    <div class="phone" data-song="NEON" data-count="12">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar">
+          <button class="icon ghost" data-act="back">←</button>
+          <span class="logo" data-go="U-01" style="font-size:16px">올빗</span>
+          <span class="spacer"></span>
+          <button class="icon" data-act="share" title="공유">↗</button>
+        </div>
+
+        <div class="video img thumb" data-act="play">
+          <span class="vlabel">안무 연습 영상</span>
+          <span class="play"></span>
+          <span class="yt">YouTube</span>
+        </div>
+        <div class="video-meta"><span>A2O LITE 'NEON' Dance Practice · 공식 채널</span><a data-act="yt">YouTube에서 보기 ›</a></div>
+        <div class="song-title">
+          <h1>NEON</h1>
+          <div class="a">A2O LITE · 2026.10.13 발매</div>
+        </div>
+
+        <section class="sec">
+          <div class="sec-h"><h2>다가오는 클래스 <span style="color:var(--sub);font-weight:500">3</span></h2></div>
+          <div class="class-card" data-go="U-05">
+            <div class="date"><b>28</b><span>수</span></div>
+            <div class="info"><div class="t">강사 민지</div><div class="m">19:30–21:00 · 홍대·합정</div><div class="m">35,000원 · 입문 · 정원 12</div></div>
+            <span class="badge">마감 임박</span>
+          </div>
+          <div class="class-card" data-go="U-05">
+            <div class="date"><b>31</b><span>토</span></div>
+            <div class="info"><div class="t">강사 하루</div><div class="m">14:00–15:30 · 건대·성수</div><div class="m">35,000원 · 입문</div></div>
+          </div>
+          <div class="class-card" data-go="U-05">
+            <div class="date"><b>2</b><span>11월 · 월</span></div>
+            <div class="info"><div class="t">강사 도윤</div><div class="m">20:00–21:30 · 강남·신논현</div><div class="m">40,000원 · 초급</div></div>
+          </div>
+        </section>
+
+        <div class="demand">
+          <div class="big"><b data-count-label>12</b>명이 이 곡 클래스를 더 기다려요</div>
+          <div class="chips"><span class="chip">홍대·합정 5</span><span class="chip">강남·신논현 4</span><span class="chip">건대·성수 2</span></div>
+          <button class="btn line" data-act="req">원하는 날짜·지역이 없나요? 추가요!</button>
+        </div>
+
+        <div class="teacher-cta"><span class="tag">강사만</span><span>이 곡, 기다리는 사람이 있어요</span><span class="spacer"></span><button class="btn sm" data-go="T-02">클래스 열기</button></div>
+        <div style="height:16px"></div>
+      </div>
+
+      <div class="dim" data-act="close"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3>NEON 추가요!</h3>
+        <div class="sub">이 곡 클래스가 열리면 알려드릴게요</div>
+        <div class="label">희망 지역</div>
+        <div class="chips">
+          <span class="chip on">홍대·합정</span><span class="chip">강남·신논현</span><span class="chip">건대·성수</span><span class="chip">잠실·송파</span><span class="chip">종로·을지로</span><span class="chip">어디든 좋아요</span>
+        </div>
+        <div class="label">희망 시간대 <em>선택</em></div>
+        <div class="chips"><span class="chip">평일 저녁</span><span class="chip">주말 낮</span><span class="chip">주말 저녁</span><span class="chip on">상관없음</span></div>
+        <div class="label">한마디 <em>선택 · 강사님만 봐요</em></div>
+        <div class="field">킬링파트만이라도!</div>
+        <button class="btn" data-act="submit">추가요!</button>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li><b>곡 상세는 허브</b> (IA 1절). 인스타·카톡 공유로 바로 들어오는 화면이라 탭바가 없다. 대신 상단 <b>올빗 로고 → 홈</b>.</li>
+      <li><b>맨 위는 안무 영상</b> (YouTube 공식 임베드, 자동재생 끔). 들어오자마자 "이 춤을 배우는구나"가 보이게. 왼쪽 위에 영상 유형(안무 연습 / 퍼포먼스 / MV), 아래에 영상 제목·채널과 [YouTube에서 보기].</li>
+      <li>클래스가 있을 때는 <b>클래스 목록이 먼저</b>, 추가요는 그 아래 보조 버튼(외곽선). 이 화면에 온 사람의 1순위 목적은 예약이기 때문.</li>
+      <li>곡 상세 안의 클래스 카드는 곡명을 빼고 <b>강사 이름</b>을 제목으로 쓴다 (곡은 이미 화면 제목).</li>
+      <li>추가요 수 = 최근 90일, 권역 상위 3개 (F-04). 이미 추가요한 사람에게는 "추가요 완료 ✓ · 취소" (프로토타입에서 눌러보기).</li>
+      <li>점선 박스 <b>[강사만]</b> 영역은 승인된 강사 로그인 시에만 보인다 → 클래스 등록 T-02 (곡 미리 선택).</li>
+      <li>↗ 공유: 링크 복사 / 인스타 스토리 공유 이미지(F-23, Should).</li>
+      <li class="q">결정 필요: 추가요 블록을 클래스 목록 위로 올릴까? (수요 숫자가 강사 유입에는 더 강한 신호)</li>
+    </ol>
+  </div>
+
+  <!-- ═══════════════ U-04b 곡 상세: 클래스 없음 ═══════════════ -->
+  <div class="slot" data-screen="U-04b" data-title="곡 상세 · 클래스 없음">
+    <div class="slot-head"><span class="id">U-04</span><span class="name">곡 상세</span><span class="state">B. 클래스 없음</span></div>
+    <div class="phone" data-song="곡 제목 E" data-count="23">
+      <div class="scroll" style="padding-bottom:110px">
+        <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="topbar">
+          <button class="icon ghost" data-act="back">←</button>
+          <span class="logo" data-go="U-01" style="font-size:16px">올빗</span>
+          <span class="spacer"></span>
+          <button class="icon" data-act="share" title="공유">↗</button>
+        </div>
+
+        <div class="no-video">E</div>
+        <div class="song-title">
+          <h1>곡 제목 E</h1>
+          <div class="a">아티스트 E</div>
+        </div>
+
+        <div class="demand">
+          <div class="big"><b data-count-label>23</b>명이 이 곡 클래스를 기다려요</div>
+          <div class="chips"><span class="chip">홍대·합정 11</span><span class="chip">강남·신논현 7</span><span class="chip">어디든 3</span></div>
+          <div class="hint">추가요 1위 · 이번 주 ▲6</div>
+        </div>
+
+        <section class="sec">
+          <div class="empty"><b>아직 열린 클래스가 없어요</b>추가요가 쌓이면 강사님들이 보고<br>클래스를 열 수 있어요</div>
+        </section>
+
+        <div class="teacher-cta"><span class="tag">강사만</span><span>23명이 기다리는 곡이에요</span><span class="spacer"></span><button class="btn sm" data-go="T-02">클래스 열기</button></div>
+      </div>
+
+      <div class="sticky-cta"><button class="btn" data-act="req">추가요! 이 곡 열어주세요</button></div>
+
+      <div class="dim" data-act="close"></div>
+      <div class="sheet">
+        <div class="grab"></div>
+        <h3>곡 제목 E 추가요!</h3>
+        <div class="sub">이 곡 클래스가 열리면 알려드릴게요</div>
+        <div class="label">희망 지역</div>
+        <div class="chips">
+          <span class="chip on">홍대·합정</span><span class="chip">강남·신논현</span><span class="chip">건대·성수</span><span class="chip">잠실·송파</span><span class="chip">종로·을지로</span><span class="chip">어디든 좋아요</span>
+        </div>
+        <div class="label">희망 시간대 <em>선택</em></div>
+        <div class="chips"><span class="chip">평일 저녁</span><span class="chip">주말 낮</span><span class="chip">주말 저녁</span><span class="chip on">상관없음</span></div>
+        <div class="label">한마디 <em>선택 · 강사님만 봐요</em></div>
+        <div class="field">킬링파트만이라도!</div>
+        <button class="btn" data-act="submit">추가요!</button>
+      </div>
+      <div class="toast"></div>
+    </div>
+    <ol class="notes">
+      <li>이 곡은 <b>대표 영상이 아직 없는 상태</b>를 함께 보여준다: 영상 자리에 아티스트 이니셜 + 그라데이션. 운영자가 영상을 등록하면 U-04 A처럼 바뀐다.</li>
+      <li>클래스가 0개면 <b>추가요가 주인공</b>. 수요 블록을 위로 올리고, [추가요!]를 화면 하단에 고정한다.</li>
+      <li>빈 상태 문구는 "없다"에서 끝내지 않고 <b>추가요가 왜 의미 있는지</b>를 말한다 (막다른 길 금지, 플로우 1).</li>
+      <li>"추가요 1위 · 이번 주 ▲6" 같은 순위·증가 정보로 지금 뜨는 곡이라는 느낌을 준다 (F-08 데이터 재사용).</li>
+      <li>검색 결과 없음(U-02)에서 신규 곡을 등록하면 이 화면으로 온다. 그때는 숫자가 0 → "첫 번째로 추가요 해보세요".</li>
+      <li class="q">결정 필요: 추가요 0명일 때 숫자를 숨길까, "0명"을 보여줄까?</li>
+    </ol>
+  </div>
+
+</main>
+
+<script>
+  /* ── 아직 그리지 않은 화면 (링크를 누르면 안내만) ── */
+  const PENDING = { "U-02":"검색", "U-03":"클래스 목록", "U-05":"클래스 상세", "U-06":"추가요 랭킹",
+                    "U-09":"마이", "T-02":"클래스 등록" };
+
+  const slots = [...document.querySelectorAll(".slot")];
+  const byId = id => slots.find(s => s.dataset.screen === id);
+  const stack = [];
+  let current = slots[0].dataset.screen;
+
+  // 화면 이동 셀렉트
+  const jump = document.getElementById("jump");
+  slots.forEach(s => jump.add(new Option(`${s.dataset.screen} ${s.dataset.title}`, s.dataset.screen)));
+
+  function toast(phone, msg) {
+    const t = phone.querySelector(".toast");
+    t.textContent = msg; t.classList.add("show");
+    clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 1800);
+  }
+
+  function show(id, push = true) {
+    const target = byId(id);
+    if (!target) return false;
+    if (document.body.classList.contains("proto")) {
+      if (push && current !== id) stack.push(current);
+      slots.forEach(s => s.classList.toggle("current", s === target));
+      target.querySelector(".scroll").scrollTop = 0;
+    } else {
+      target.scrollIntoView({ behavior:"smooth", inline:"center", block:"nearest" });
+      const ph = target.querySelector(".phone");
+      ph.classList.remove("flash"); void ph.offsetWidth; ph.classList.add("flash");
+    }
+    current = id; jump.value = id;
+    return true;
+  }
+
+  function setMode(proto) {
+    document.body.classList.toggle("proto", proto);
+    document.getElementById("mode-board").classList.toggle("on", !proto);
+    document.getElementById("mode-proto").classList.toggle("on", proto);
+    stack.length = 0;
+    show(current, false);
+  }
+  document.getElementById("mode-board").onclick = () => setMode(false);
+  document.getElementById("mode-proto").onclick = () => setMode(true);
+  jump.onchange = () => show(jump.value);
+  document.getElementById("back").onclick = () => stack.length && show(stack.pop(), false);
+
+  // 추가요 시트·상태 토글
+  function openSheet(phone, open) {
+    phone.querySelector(".dim")?.classList.toggle("open", open);
+    phone.querySelector(".sheet")?.classList.toggle("open", open);
+  }
+  function setRequested(phone, done) {
+    phone.dataset.done = done ? "1" : "";
+    const base = Number(phone.dataset.count);
+    phone.querySelectorAll("[data-count-label]").forEach(el => el.textContent = base + (done ? 1 : 0));
+    phone.querySelectorAll('[data-act="req"]').forEach(b => {
+      if (!b._label) b._label = b.textContent;
+      b.textContent = done ? "추가요 완료 ✓ · 취소" : b._label;
+      b.classList.toggle("done", done);
+    });
+  }
+
+  document.addEventListener("click", e => {
+    const el = e.target.closest("[data-go], [data-act]");
+    if (!el) return;
+    const phone = el.closest(".phone");
+
+    // 시트 안의 칩은 단일 선택 토글
+    if (e.target.classList.contains("chip") && e.target.closest(".sheet")) {
+      e.target.parentElement.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === e.target));
+      return;
+    }
+
+    if (el.dataset.go) {
+      if (!show(el.dataset.go) && phone) toast(phone, `${el.dataset.go} ${PENDING[el.dataset.go] || ""} — 아직 그리지 않은 화면`);
+      return;
+    }
+    switch (el.dataset.act) {
+      case "req":
+        if (!phone.dataset.song) { toast(phone, "곡 상세에서 추가요 시트가 열려요"); break; }
+        if (phone.dataset.done) { setRequested(phone, false); toast(phone, "추가요를 취소했어요"); }
+        else openSheet(phone, true);
+        break;
+      case "submit":
+        openSheet(phone, false); setRequested(phone, true);
+        toast(phone, "추가요 완료! 이 곡 클래스가 열리면 알려드릴게요");
+        break;
+      case "close": openSheet(phone, false); break;
+      case "share": toast(phone, "링크 복사 · 스토리 공유 이미지 (F-23)"); break;
+      case "play": toast(phone, "YouTube 플레이어가 이 자리에서 재생돼요"); break;
+      case "yt": toast(phone, "YouTube 앱/웹으로 이동"); break;
+      case "back": stack.length ? show(stack.pop(), false) : show("U-01"); break;
+    }
+  });
+</script>
+</body>
+</html>
