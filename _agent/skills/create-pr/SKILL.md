@@ -12,7 +12,7 @@ description: 올빗(All the Beat) 저장소에서 현재 브랜치로 GitHub PR�
 이 Mac의 gh 기본 계정은 **회사 계정(`wade-readypost`)**이고, 이 저장소는 **개인 계정(`wecaners/All-The-Beat`)** 것이다. 그냥 gh를 부르면 회사 계정 이름으로 PR이 올라가거나 권한 오류가 난다. 기본 계정을 바꾸면(gh auth switch) 회사 작업이 깨지므로, 모든 gh 호출은 개인 토큰을 명령 단위로 넘기는 스크립트로 한다:
 
 ```bash
-.claude/skills/create-pr/scripts/gh-personal.sh <gh 인자...>
+_agent/skills/create-pr/scripts/gh-personal.sh <gh 인자...>
 ```
 
 이하 `ghp`는 이 스크립트를 뜻한다. git push는 SSH 별칭(`github.com-wecaners`) 원격을 쓰므로 그대로 `git push`하면 된다.
