@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
@@ -35,6 +36,7 @@ export default function SpikeSongPage() {
 
 // 서버(쿠키)에서 세션이 보이는지 따로 확인한다. 브라우저만 로그인되고 서버는 모르면 실제 서비스에서 문제가 된다
 async function ServerSession() {
+  await connection(); // getClaims가 현재 시각을 쓰므로 요청 시점에
   const supabase = await createClient();
   const { data } = await supabase.auth.getClaims();
   const claims = data?.claims;

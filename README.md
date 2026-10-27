@@ -37,6 +37,7 @@ DB (Drizzle, 스키마는 `app/src/db/schema/`)
 pnpm db:check      # 접속 확인
 pnpm db:generate   # 스키마 코드 → 마이그레이션 SQL
 pnpm db:migrate    # dev DB에 적용
+pnpm db:seed:dev   # dev DB에 샘플 곡 넣기 (A2O LITE - NEON → /song/a2o-lite-neon)
 pnpm db:studio     # DB 내용 보기
 ```
 
