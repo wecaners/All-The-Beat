@@ -13,6 +13,8 @@
 | [05 유저 플로우](docs/05-유저플로우.md) | 플로우 10개, 상태 다이어그램 |
 | [06 음원 API 조사](docs/06-음원API_이미지조사.md) | 앨범 커버·곡 정보 API 비교, 이미지 사용 조건 |
 | [07 기술 스택](docs/07-기술스택.md) | Next.js 풀스택 + Supabase, 무료 티어 제약, 먼저 할 기술 검증 |
+| [08 시스템 아키텍처](docs/08-시스템아키텍처.md) | 구성도, 핵심 요청 흐름 5개, 보안·환경·배치 |
+| [09 ERD](docs/09-ERD.md) | 테이블 16개 정의, 관계도, 인덱스, 주요 쿼리 |
 | [서비스명](docs/naming-서비스명_브레인스토밍.md) | 네이밍 과정, 도메인·상표 확인 |
 
 02 인터뷰 질문지는 나중에 작성.
@@ -38,7 +40,7 @@
 
 ## 다이어그램 보기
 
-IA와 유저 플로우의 Mermaid 다이어그램은 [docs/diagrams.html](docs/diagrams.html)을 브라우저로 열면 그림으로 볼 수 있다. 문서를 고친 뒤에는 다시 생성한다.
+IA·유저 플로우·아키텍처·ERD의 Mermaid 다이어그램은 [docs/diagrams.html](docs/diagrams.html)을 브라우저로 열면 그림으로 볼 수 있다. 문서를 고친 뒤에는 다시 생성한다.
 
 ```bash
 python3 scripts/build_diagrams.py

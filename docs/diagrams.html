@@ -39,7 +39,7 @@
 </head>
 <body>
 <header>
-  <h1>올빗 · IA & 유저 플로우</h1>
+  <h1>올빗 · 다이어그램 (IA · 유저 플로우 · 아키텍처 · ERD)</h1>
   <label>확대 <input id="zoom" type="range" min="50" max="200" value="100" step="10"> <span id="zv">100%</span></label>
 </header>
 <div class="layout">
@@ -63,6 +63,16 @@
 <li><a href="#d15">S-2. 추가요 상태</a></li>
 <li><a href="#d16">S-3. 강사 프로필 상태</a></li>
 <li><a href="#d17">S-4. 앵콜 상태 (클래스 1개 기준)</a></li>
+<li class="doc">08. 시스템 아키텍처 — 올빗 MVP</li>
+<li><a href="#d18">1. 전체 구성</a></li>
+<li><a href="#d19">2.1 인스타 공유 링크로 곡 페이지 진입 (서버 렌더링 + OG)</a></li>
+<li><a href="#d20">2.2 로그인 → 원래 화면 복귀 → 추가요 (플로우 3)</a></li>
+<li><a href="#d21">2.3 예약하기 클릭 (F-06)</a></li>
+<li><a href="#d22">2.4 하루 1회 배치 (매일 04:00 KST)</a></li>
+<li><a href="#d23">2.5 대표 영상 등록 (운영자, F-16)</a></li>
+<li class="doc">09. ERD (데이터 설계) — 올빗 MVP</li>
+<li><a href="#d24">1.1 곡·클래스·강사 (콘텐츠)</a></li>
+<li><a href="#d25">1.2 사용자 행동 (추가요·앵콜·이벤트)</a></li>
   </ul></nav>
   <main>
 <section id="d1"><h2>2. 사이트맵 — 수강생·강사 영역</h2><p class="src">04-IA.md</p><div class="canvas"><pre class="mermaid">flowchart TD
@@ -535,6 +545,264 @@
 
     note right of 검토중 : 14일 무응답 시 운영자 알림
     note left of 전달됨 : 수강생 문구는 &quot;전달됐어요&quot;까지만
+</pre></div></section>
+<section id="d18"><h2>1. 전체 구성</h2><p class="src">08-시스템아키텍처.md</p><div class="canvas"><pre class="mermaid">flowchart LR
+    subgraph Client[&quot;사용자 기기&quot;]
+        B[&quot;모바일 웹&lt;br/&gt;Safari · Chrome&lt;br/&gt;인스타·카톡 인앱 브라우저&quot;]
+    end
+
+    subgraph Vercel[&quot;Vercel&quot;]
+        direction TB
+        MW[&quot;Middleware&lt;br/&gt;세션 갱신 · /admin 보호&quot;]
+        RSC[&quot;페이지 서버 렌더링&lt;br/&gt;곡·클래스 OG 태그&quot;]
+        SA[&quot;서버 액션&lt;br/&gt;추가요 · 앵콜 · 클래스 등록&quot;]
+        RH[&quot;Route Handlers&lt;br/&gt;/go/id · /auth/callback · /api/cron&quot;]
+        SRV[&quot;src/server&lt;br/&gt;비즈니스 로직 (순수 TS)&quot;]
+        CRON((&quot;Vercel Cron&lt;br/&gt;하루 1회&quot;))
+        MW --&gt; RSC
+        RSC --&gt; SRV
+        SA --&gt; SRV
+        RH --&gt; SRV
+        CRON --&gt; RH
+    end
+
+    subgraph Supabase[&quot;Supabase&quot;]
+        AUTH[&quot;Auth&lt;br/&gt;Kakao · 운영자 이메일&quot;]
+        DB[(&quot;Postgres&lt;br/&gt;Drizzle ORM&quot;)]
+        ST[&quot;Storage&lt;br/&gt;클래스 사진&quot;]
+    end
+
+    subgraph External[&quot;외부 서비스&quot;]
+        KAKAO[&quot;카카오 로그인&quot;]
+        YT[&quot;YouTube&lt;br/&gt;Data API · 임베드&quot;]
+        POST[&quot;다음 우편번호&quot;]
+        BOOK[&quot;강사 예약 채널&lt;br/&gt;네이버 예약 · 오픈채팅&quot;]
+        SENTRY[&quot;Sentry&quot;]
+    end
+
+    B --&gt;|HTTPS| MW
+    SRV --&gt; DB
+    SRV --&gt; ST
+    SRV --&gt;|videos.list| YT
+    AUTH &lt;--&gt; KAKAO
+    B --&gt;|OAuth 리다이렉트| AUTH
+    B --&gt;|임베드 재생| YT
+    B --&gt;|주소 검색 팝업| POST
+    RH --&gt;|302 리다이렉트| BOOK
+    Vercel -.-&gt; SENTRY
+
+    classDef ext fill:#fde2e2,stroke:#d14a4a,color:#222;
+    classDef core fill:#ffe9a8,stroke:#d4a100,color:#222;
+    class KAKAO,YT,POST,BOOK,SENTRY ext;
+    class SRV core;
+</pre></div></section>
+<section id="d19"><h2>2.1 인스타 공유 링크로 곡 페이지 진입 (서버 렌더링 + OG)</h2><p class="src">08-시스템아키텍처.md</p><div class="canvas"><pre class="mermaid">sequenceDiagram
+    autonumber
+    actor U as 사용자 (인스타 인앱)
+    participant IG as 인스타 미리보기 봇
+    participant N as Next.js (Vercel)
+    participant S as src/server
+    participant DB as Postgres
+
+    IG-&gt;&gt;N: GET /song/a2o-lite-neon (미리보기 생성)
+    N-&gt;&gt;S: getSongPage(slug)
+    S-&gt;&gt;DB: 곡 + 다가오는 클래스 + 추가요 집계
+    N--&gt;&gt;IG: HTML + og:title · og:image(올빗 생성 이미지)
+    U-&gt;&gt;N: 링크 탭 → GET /song/a2o-lite-neon
+    N-&gt;&gt;S: getSongPage(slug)
+    N--&gt;&gt;U: 서버 렌더링 HTML (영상은 YouTube 임베드)
+    N-&gt;&gt;S: recordEvent(song_view)
+</pre></div></section>
+<section id="d20"><h2>2.2 로그인 → 원래 화면 복귀 → 추가요 (플로우 3)</h2><p class="src">08-시스템아키텍처.md</p><div class="canvas"><pre class="mermaid">sequenceDiagram
+    autonumber
+    actor U as 사용자
+    participant N as Next.js
+    participant A as Supabase Auth
+    participant K as 카카오
+    participant S as src/server
+
+    U-&gt;&gt;N: 곡 상세에서 [추가요!] (비로그인)
+    N--&gt;&gt;U: 로그인 시트
+    U-&gt;&gt;A: signInWithOAuth(kakao, redirectTo=/auth/callback?returnTo=/song/neon&amp;request=open)
+    A-&gt;&gt;K: 카카오 동의 화면
+    K--&gt;&gt;A: 인가 코드
+    A--&gt;&gt;N: /auth/callback?code=...
+    N-&gt;&gt;A: 코드 → 세션 교환 (쿠키 저장)
+    N-&gt;&gt;S: ensureProfile(user) 첫 로그인이면 profiles 생성
+    alt 첫 로그인 (약관 미동의)
+        N--&gt;&gt;U: 약관 동의 시트 → 동의 저장
+    end
+    N--&gt;&gt;U: 302 → /song/neon?request=open
+    U-&gt;&gt;N: 추가요 시트 자동 오픈 → 제출 (서버 액션)
+    N-&gt;&gt;S: addRequest(user, song, region, timePref, message)
+</pre></div></section>
+<section id="d21"><h2>2.3 예약하기 클릭 (F-06)</h2><p class="src">08-시스템아키텍처.md</p><div class="canvas"><pre class="mermaid">sequenceDiagram
+    autonumber
+    actor U as 사용자
+    participant N as Next.js /go/[id]
+    participant S as src/server
+    participant DB as Postgres
+    participant X as 강사 예약 채널
+
+    U-&gt;&gt;N: GET /go/123
+    N-&gt;&gt;S: recordBookingClick(classId, userId?, sessionId, referrer)
+    S-&gt;&gt;DB: 같은 사용자·클래스 10분 내 중복이면 건너뜀, 아니면 events 저장
+    S-&gt;&gt;DB: classes.booking_url 조회
+    N--&gt;&gt;U: 302 → booking_url (DB에 저장된 값만)
+    U-&gt;&gt;X: 네이버 예약 등
+</pre></div></section>
+<section id="d22"><h2>2.4 하루 1회 배치 (매일 04:00 KST)</h2><p class="src">08-시스템아키텍처.md</p><div class="canvas"><pre class="mermaid">flowchart TD
+    CRON((&quot;Vercel Cron&lt;br/&gt;매일 19:00 UTC&lt;br/&gt;= 04:00 KST&quot;)) --&gt; AUTHZ{&quot;CRON_SECRET&lt;br/&gt;헤더 확인&quot;}
+    AUTHZ -- 실패 --&gt; X[&quot;401&quot;]
+    AUTHZ -- 성공 --&gt; J1[&quot;① 종료 시각 지난 클래스 → 종료&quot;]
+    J1 --&gt; J2[&quot;② 마감·종료 클래스의 앵콜 라운드 생성&lt;br/&gt;종료 30일 지난 라운드 → 만료&quot;]
+    J2 --&gt; J3[&quot;③ 검토 중 14일 무응답 → 운영자 확인 목록&quot;]
+    J3 --&gt; J4[&quot;④ 동기화 30일 지난 YouTube 영상 정보 갱신&lt;br/&gt;삭제·비공개·임베드 차단 → 영상 교체 필요&quot;]
+    J4 --&gt; J5[&quot;⑤ 결과 요약 로그 · 실패 시 Sentry&quot;]
+</pre></div></section>
+<section id="d23"><h2>2.5 대표 영상 등록 (운영자, F-16)</h2><p class="src">08-시스템아키텍처.md</p><div class="canvas"><pre class="mermaid">sequenceDiagram
+    autonumber
+    actor O as 운영자
+    participant N as Next.js /admin
+    participant S as src/server
+    participant YT as YouTube Data API
+    participant DB as Postgres
+
+    O-&gt;&gt;N: YouTube 링크 붙여넣기
+    N-&gt;&gt;S: setSongVideo(songId, url)
+    S-&gt;&gt;S: URL에서 영상 ID 추출 (youtu.be, watch?v=, shorts/)
+    S-&gt;&gt;YT: videos.list(id, part=snippet,status)
+    YT--&gt;&gt;S: 제목 · 채널 · 썸네일 · embeddable
+    alt 임베드 불가
+        S--&gt;&gt;N: 오류 &quot;임베드가 막힌 영상이에요&quot;
+    else 가능
+        S-&gt;&gt;DB: songs 영상 필드 저장 + video_synced_at
+        N--&gt;&gt;O: 미리보기 표시
+    end
+</pre></div></section>
+<section id="d24"><h2>1.1 곡·클래스·강사 (콘텐츠)</h2><p class="src">09-ERD.md</p><div class="canvas"><pre class="mermaid">erDiagram
+    artists ||--o{ songs : &quot;부른다&quot;
+    artists ||--o{ artist_aliases : &quot;별칭&quot;
+    songs ||--o{ song_aliases : &quot;별칭&quot;
+    songs ||--o| songs : &quot;병합됨(merged_into)&quot;
+    profiles ||--o| instructor_profiles : &quot;강사 프로필&quot;
+    instructor_profiles ||--o{ instructor_regions : &quot;활동 권역&quot;
+    regions ||--o{ instructor_regions : &quot;&quot;
+    instructor_profiles ||--o{ instructor_places : &quot;자주 쓰는 장소&quot;
+    instructor_profiles ||--o{ classes : &quot;연다&quot;
+    regions ||--o{ classes : &quot;열리는 권역&quot;
+    regions ||--o{ region_mappings : &quot;주소 매핑&quot;
+    classes ||--o{ class_songs : &quot;&quot;
+    songs ||--o{ class_songs : &quot;&quot;
+    classes ||--o| classes : &quot;앵콜 원본(encore_of)&quot;
+
+    artists {
+        bigint id PK
+        text name
+        text slug UK
+    }
+    songs {
+        bigint id PK
+        bigint artist_id FK
+        text title
+        text slug UK
+        review_status review_status
+        bigint merged_into_id FK
+        text yt_video_id
+        video_type video_type
+        timestamptz video_synced_at
+    }
+    song_aliases {
+        bigint id PK
+        bigint song_id FK
+        text alias
+        text alias_norm
+        bool is_primary
+    }
+    profiles {
+        uuid id PK &quot;auth.users.id&quot;
+        text nickname
+        member_role role
+    }
+    instructor_profiles {
+        bigint id PK
+        uuid user_id FK &quot;대리 등록이면 NULL&quot;
+        text display_name
+        text instagram_handle UK
+        instructor_status status
+        bool is_proxy
+        timestamptz consent_at
+    }
+    classes {
+        bigint id PK
+        bigint instructor_id FK
+        text title
+        timestamptz starts_at
+        timestamptz ends_at
+        smallint region_id FK
+        int price
+        class_level level
+        text booking_url
+        class_status status
+        bigint encore_of_class_id FK
+    }
+    class_songs {
+        bigint class_id PK
+        bigint song_id PK
+        smallint position
+    }
+    regions {
+        smallint id PK
+        text name
+        smallint sort_order
+    }
+</pre></div></section>
+<section id="d25"><h2>1.2 사용자 행동 (추가요·앵콜·이벤트)</h2><p class="src">09-ERD.md</p><div class="canvas"><pre class="mermaid">erDiagram
+    profiles ||--o{ requests : &quot;추가요&quot;
+    songs ||--o{ requests : &quot;요청받음&quot;
+    regions ||--o{ requests : &quot;희망 권역&quot;
+    classes ||--o{ requests : &quot;열렸어요(fulfilled)&quot;
+    profiles ||--o{ encores : &quot;앵콜&quot;
+    classes ||--o{ encores : &quot;앵콜받음&quot;
+    classes ||--o| encore_rounds : &quot;앵콜 진행&quot;
+    classes ||--o| encore_rounds : &quot;앵콜 클래스(encore_class)&quot;
+    classes ||--o{ events : &quot;&quot;
+    songs ||--o{ events : &quot;&quot;
+
+    requests {
+        bigint id PK
+        uuid user_id FK
+        bigint song_id FK
+        smallint region_id FK &quot;NULL=어디든&quot;
+        time_pref time_pref
+        request_status status
+        bigint fulfilled_class_id FK
+        timestamptz created_at
+    }
+    encores {
+        bigint id PK
+        uuid user_id FK
+        bigint class_id FK
+        time_pref time_pref
+        timestamptz canceled_at
+    }
+    encore_rounds {
+        bigint class_id PK
+        smallint threshold
+        encore_round_status status
+        int count_at_review
+        bigint encore_class_id FK
+        timestamptz expires_at
+    }
+    events {
+        bigint id PK
+        event_type type
+        bigint song_id FK
+        bigint class_id FK
+        uuid user_id FK
+        text session_id
+        timestamptz created_at
+    }
 </pre></div></section>
   </main>
 </div>

@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 OUT = DOCS / "diagrams.html"
-SOURCES = ["04-IA.md", "05-유저플로우.md"]
+SOURCES = ["04-IA.md", "05-유저플로우.md", "08-시스템아키텍처.md", "09-ERD.md"]
 
 BLOCK = re.compile(r"^(#{2,3}) (.+?)$|```mermaid\n(.*?)```", re.M | re.S)
 
@@ -91,7 +91,7 @@ TEMPLATE = """<!doctype html>
 </head>
 <body>
 <header>
-  <h1>올빗 · IA & 유저 플로우</h1>
+  <h1>올빗 · 다이어그램 (IA · 유저 플로우 · 아키텍처 · ERD)</h1>
   <label>확대 <input id="zoom" type="range" min="50" max="200" value="100" step="10"> <span id="zv">100%</span></label>
 </header>
 <div class="layout">
