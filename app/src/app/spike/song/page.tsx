@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { getProfile } from "@/server/profiles";
 import { SpikeSong } from "./spike-song";
 
 // 기술 검증 T-1: 곡 상세에서 [추가요!] → 카카오 로그인 → 이 화면으로 복귀 → 추가요 시트 자동 오픈 (05 플로우 3)
@@ -41,12 +42,31 @@ async function ServerSession() {
   const name = String(meta.name ?? meta.full_name ?? meta.preferred_username ?? meta.user_name ?? "");
 
   return (
-    <StatusBox
-      label="서버가 본 로그인"
-      value={claims ? `✓ ${name || "(닉네임 없음)"} · ${String(claims.sub).slice(0, 8)}…` : "✗ 로그인 안 됨"}
-      ok={Boolean(claims)}
-    />
+    <>
+      <StatusBox
+        label="서버가 본 로그인"
+        value={claims ? `✓ ${name || "(닉네임 없음)"} · ${String(claims.sub).slice(0, 8)}…` : "✗ 로그인 안 됨"}
+        ok={Boolean(claims)}
+      />
+      {claims && <DbProfile userId={String(claims.sub)} />}
+    </>
   );
+}
+
+// 로그인 콜백이 우리 DB(profiles)에 사용자를 만들었는지 확인한다
+async function DbProfile({ userId }: { userId: string }) {
+  let value: string;
+  let ok = false;
+  try {
+    const profile = await getProfile(userId);
+    ok = Boolean(profile);
+    value = profile
+      ? `✓ ${profile.nickname}${profile.avatarUrl ? " · 사진 있음" : ""} · 가입 ${profile.createdAt.toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}`
+      : "✗ 없음 (로그아웃 후 다시 로그인하면 만들어져요)";
+  } catch (e) {
+    value = `✗ DB 연결 실패: ${e instanceof Error ? e.message : String(e)}`;
+  }
+  return <StatusBox label="DB에 저장된 프로필" value={value} ok={ok} />;
 }
 
 function StatusBox({ label, value, ok }: { label: string; value: string; ok?: boolean }) {
