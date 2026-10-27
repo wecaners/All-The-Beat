@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "app-dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "app", "run", "dev", "--", "--port", "3100"],
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "app", "dev", "--port", "3100"],
       "port": 3100
     }
   ]
