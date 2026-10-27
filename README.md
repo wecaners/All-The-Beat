@@ -20,15 +20,28 @@
 
 02 인터뷰 질문지는 나중에 작성.
 
+## AI와 함께 개발하는 규칙 (FBPW)
+
+[AGENTS.md](AGENTS.md)(= `CLAUDE.md`)가 출발점이다. 세션마다 자동으로 읽힌다.
+
+| 위치 | 내용 |
+|---|---|
+| [_agent/rules/](_agent/rules/) | 최우선 원칙, 제품 원칙, 기술 스택, `app/` 코딩 규칙 |
+| [_agent/skills/](_agent/skills/) | `fbpw-plan`(기능 스펙), `verify`(검사), `git-commit`, `create-pr` |
+| [specs/](specs/) | 기능 단위 스펙 (README·spec·plan·tasks·findings·progress) |
+
+`.claude/rules`, `.claude/skills`는 `_agent/` 아래를 가리키는 링크다.
+
 ## 앱 (`app/`)
 
-Next.js 16 + Supabase. 지금은 기술 검증 단계로 `/spike/song` 페이지만 있다.
+Next.js 16 + Supabase. 곡 상세(`/song/[slug]`)와 추가요, 로그인 검증 페이지(`/spike/song`)가 있다.
 
 ```bash
 cd app
 cp .env.local.example .env.local   # 값 채우기 (docs/spike-01 1절)
 pnpm install
 pnpm dev --port 3100
+pnpm check         # 타입 검사 + 린트 + 빌드
 ```
 
 DB (Drizzle, 스키마는 `app/src/db/schema/`)
