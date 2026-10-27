@@ -15,9 +15,21 @@
 | [07 기술 스택](docs/07-기술스택.md) | Next.js 풀스택 + Supabase, 무료 티어 제약, 먼저 할 기술 검증 |
 | [08 시스템 아키텍처](docs/08-시스템아키텍처.md) | 구성도, 핵심 요청 흐름 5개, 보안·환경·배치 |
 | [09 ERD](docs/09-ERD.md) | 테이블 16개 정의, 관계도, 인덱스, 주요 쿼리 |
+| [기술 검증 T-1](docs/spike-01-인앱로그인검증.md) | 인앱 브라우저 카카오 로그인: 계정 세팅 가이드, 테스트 표 |
 | [서비스명](docs/naming-서비스명_브레인스토밍.md) | 네이밍 과정, 도메인·상표 확인 |
 
 02 인터뷰 질문지는 나중에 작성.
+
+## 앱 (`app/`)
+
+Next.js 16 + Supabase. 지금은 기술 검증 단계로 `/spike/song` 페이지만 있다.
+
+```bash
+cd app
+cp .env.local.example .env.local   # 값 채우기 (docs/spike-01 1절)
+npm install
+npm run dev -- --port 3100
+```
 
 ## 와이어프레임
 
