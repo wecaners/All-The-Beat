@@ -38,6 +38,14 @@ export async function upsertProfileOnLogin(userId: string, metadata: Record<stri
     });
 }
 
+// 이 기능 전에 로그인해 프로필이 없는 사용자도 추가요할 수 있게, 없을 때만 만든다
+export async function ensureProfile(userId: string, metadata: Record<string, unknown>) {
+  await getDb()
+    .insert(profiles)
+    .values({ id: userId, ...profileFromAuthMetadata(metadata) })
+    .onConflictDoNothing({ target: profiles.id });
+}
+
 export async function getProfile(userId: string): Promise<Profile | null> {
   const [row] = await getDb().select().from(profiles).where(eq(profiles.id, userId)).limit(1);
   return row ?? null;
