@@ -450,7 +450,18 @@ createClass(...) 후:
 | events | 무기한 보관 [가정] → 데이터가 커지면 월별 집계 테이블로 요약 후 원본 정리 |
 | YouTube 영상 정보 | 30일마다 갱신 (정책) |
 
-## 8. 열린 질문
+## 8. 구현 (Drizzle, 2026-10-27)
+
+- 코드: `app/src/db/schema/` (enums · regions · users · songs · classes · activity), 마이그레이션: `app/src/db/migrations/`
+- `0000_extensions`: `pg_trgm`을 `extensions` 스키마에 설치 / `0001_init_schema`: 이 문서의 테이블 16개 / `0002_revoke_data_api`: anon·authenticated 권한 회수
+- **보안**: 모든 테이블 RLS 켬 + 정책 0개 + 브라우저용 역할 권한 없음. 서버(Drizzle, `postgres` 역할)만 읽고 쓴다. dev DB에서 브라우저용 API 요청이 401로 막히는 것 확인
+- 이 문서에 없던 것을 코드에서 정한 부분
+  - 글자 수 CHECK: `bio` ≤ 50, `description` ≤ 1,000, 추가요·앵콜 `message` ≤ 100, `capacity` > 0, `threshold` > 0, `instagram_handle`은 소문자·@ 없음
+  - `encore_rounds.encore_class_id` UNIQUE (앵콜 클래스 하나는 한 라운드에만)
+  - 삭제 규칙: 사용자 삭제 → 추가요·앵콜 같이 삭제, 이벤트는 user_id만 NULL / 클래스 삭제 → class_songs·앵콜·라운드 같이 삭제, 추가요의 fulfilled_class_id는 NULL / 곡·권역·강사는 참조가 있으면 삭제 막힘
+  - 모든 PK는 identity(자동 증가). `regions.id`만 시드로 고정값
+
+## 9. 열린 질문
 
 | # | 질문 |
 |---|---|

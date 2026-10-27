@@ -27,8 +27,17 @@ Next.js 16 + Supabase. 지금은 기술 검증 단계로 `/spike/song` 페이지
 ```bash
 cd app
 cp .env.local.example .env.local   # 값 채우기 (docs/spike-01 1절)
-npm install
-npm run dev -- --port 3100
+pnpm install
+pnpm dev --port 3100
+```
+
+DB (Drizzle, 스키마는 `app/src/db/schema/`)
+
+```bash
+pnpm db:check      # 접속 확인
+pnpm db:generate   # 스키마 코드 → 마이그레이션 SQL
+pnpm db:migrate    # dev DB에 적용
+pnpm db:studio     # DB 내용 보기
 ```
 
 ## 와이어프레임
