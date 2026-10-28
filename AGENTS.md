@@ -11,6 +11,7 @@
 | `_agent/rules/product.md` | 제품 원칙 — MVP 원칙, 핵심 개념, 문구 규칙 |
 | `_agent/rules/tech-stack.md` | 기술 스택, 디렉터리 역할, 환경·계정 |
 | `_agent/rules/app.md` | `app/` — Next.js 16·Supabase·Drizzle 코딩 규칙 |
+| `_agent/rules/design.md` | 수강생 화면 디자인 — 덕질 스크랩북 컨셉, 토큰, 컴포넌트, 움직임 |
 
 ## 스킬 목록
 
@@ -25,6 +26,7 @@
 
 - **`core-principles.md`는 세션 시작 시 항상 읽는다.**
 - 기능을 기획하거나 화면 문구를 쓸 때는 `product.md`를 읽는다.
+- 수강생 화면을 만들거나 고칠 때는 `design.md`를 읽는다.
 - `app/` 작업 전에 `tech-stack.md`와 `app.md`를 읽는다. Next.js API를 쓰기 전에는 `app/AGENTS.md`가 가리키는 `app/node_modules/next/dist/docs/`의 해당 가이드를 읽는다.
 - 처음 보는 패턴이나 규칙이 기억나지 않을 때는 추측하지 않고 해당 파일을 다시 읽는다.
 - 스킬을 쓸 때는 스킬 파일을 Read로 연 뒤 그 절차를 따른다.

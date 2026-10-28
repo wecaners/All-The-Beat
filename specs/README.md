@@ -24,3 +24,4 @@
 | 폴더 | 기능 | 상태 |
 | --- | --- | --- |
 | [admin-song-class-registration](admin-song-class-registration/) | 운영자 곡·클래스 등록 (F-15, F-16) | 구현 완료, 운영자 계정으로 확인 대기 |
+| [design-system](design-system/) | 디자인 시스템 (덕질 스크랩북) + 곡 상세 적용 | 구현 완료, 로그인 흐름 확인 대기 |

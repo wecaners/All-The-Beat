@@ -51,7 +51,7 @@ src/app (라우트·화면·서버 액션) → src/server (비즈니스 로직) 
 ## 화면
 
 - 모바일 우선. 기준 폭 375px, 콘텐츠 최대 폭 `max-w-md`.
-- 바텀시트·칩 같은 공용 UI가 두 화면 이상에서 쓰이면 `src/components/`로 옮긴다(shadcn/ui 도입 전까지 직접 만든다).
+- 공용 UI는 `src/components/`에 있다. 모양·움직임 규칙은 `design.md`를 따른다.
 - 시간은 KST로 보여준다(`src/lib/format.ts`).
 - 화면 문구는 `product.md`의 원칙 6을 지킨다.
 

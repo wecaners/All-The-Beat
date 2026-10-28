@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
+import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
+import { ClassTicket } from "@/components/class-ticket";
+import { StickerLabel } from "@/components/sticker-label";
+import { Tape } from "@/components/tape";
+import { VideoCard } from "@/components/video-card";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { formatClassTime, formatPrice, LEVEL_LABEL, VIDEO_TYPE_LABEL } from "@/lib/format";
+import { formatPrice, formatTimeRange, LEVEL_LABEL, VIDEO_TYPE_ZINE } from "@/lib/format";
 import { listUpcomingClassesForSong } from "@/server/classes";
 import { listRegions } from "@/server/regions";
 import { getMyRequest, getRequestSummary } from "@/server/requests";
@@ -52,7 +57,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // F-04 곡 상세 ★ 서비스의 중심 화면
 export default function SongPage({ params }: Props) {
   return (
-    <main className="mx-auto w-full max-w-md pb-16">
+    <main className="mx-auto w-full max-w-md pb-20">
       <Suspense fallback={<SongSkeleton />}>
         <SongContent params={params} />
       </Suspense>
@@ -69,12 +74,12 @@ async function SongContent({ params }: Props) {
   return (
     <>
       <SongHeader song={song} />
-      <div className="px-4">
-        <Suspense fallback={<div className="mt-6 h-36 animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-900" />}>
+      <div className="px-5">
+        <Suspense fallback={<div className="mt-7 h-44 animate-pulse rounded-3xl border-2 border-ink/20 bg-pink-soft" />}>
           <RequestSection song={song} />
         </Suspense>
-        <Suspense fallback={<p className="mt-8 text-sm text-zinc-500">클래스 불러오는 중…</p>}>
-          <UpcomingClasses songId={song.id} />
+        <Suspense fallback={<p className="mt-8 text-sm font-semibold text-sub">클래스 불러오는 중…</p>}>
+          <UpcomingClasses songId={song.id} videoId={song.video?.id ?? null} />
         </Suspense>
       </div>
     </>
@@ -84,34 +89,36 @@ async function SongContent({ params }: Props) {
 function SongHeader({ song }: { song: SongDetail }) {
   return (
     <header>
-      {song.video ? (
-        <div>
-          {/* YouTube 공식 임베드, 자동재생 끔 (06 문서) */}
-          <iframe
-            className="aspect-video w-full"
-            src={`https://www.youtube-nocookie.com/embed/${song.video.id}`}
+      <div className="flex items-center justify-between px-5 pt-3">
+        <Link href="/" className="font-display text-[26px] leading-none text-pink text-sticker">
+          올빗
+        </Link>
+        <span className="font-zine text-[11px] font-extrabold uppercase tracking-[.04em]">Song</span>
+      </div>
+      <div className="px-[22px] pt-5">
+        {song.video ? (
+          // 누르기 전에는 썸네일만, 누르면 YouTube 공식 임베드 (06 문서, specs/design-system FR-3)
+          <VideoCard
+            videoId={song.video.id}
             title={song.video.title ?? `${song.title} 안무 영상`}
-            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
+            leftLabel={song.video.type ? VIDEO_TYPE_ZINE[song.video.type] : "VIDEO"}
+            rightLabel={song.video.channel ?? undefined}
           />
-          <div className="flex items-center justify-between px-4 pt-2 text-xs text-zinc-500">
-            <span>
-              {song.video.type ? VIDEO_TYPE_LABEL[song.video.type] : "영상"}
-              {song.video.channel ? ` · ${song.video.channel}` : ""}
-            </span>
-            <a href={`https://www.youtube.com/watch?v=${song.video.id}`} target="_blank" rel="noopener noreferrer" className="underline">
-              YouTube에서 보기
-            </a>
+        ) : (
+          <div className="relative rotate-[-1.4deg] rounded-[26px] border-2 border-ink bg-card p-[9px] pb-3.5 shadow-sticker-lg">
+            <Tape className="left-1/2 -top-3 -ml-[39px] rotate-3" />
+            <div className="grid aspect-video place-items-center rounded-[18px] border-2 border-ink bg-[linear-gradient(135deg,var(--color-pink-soft),var(--color-lilac))]">
+              <span className="font-display text-xl">아직 영상이 없어요</span>
+            </div>
+            <div className="px-1 pt-2.5 font-zine text-[11px] font-extrabold uppercase tracking-[.04em]">Coming soon</div>
           </div>
-        </div>
-      ) : (
-        <div className="flex aspect-video w-full items-end bg-gradient-to-br from-pink-500 via-fuchsia-500 to-violet-600 p-4">
-          <span className="text-sm font-semibold text-white/80">아직 영상이 없어요</span>
-        </div>
-      )}
-      <div className="px-4 pt-4">
-        <h1 className="text-2xl font-extrabold">{song.title}</h1>
-        <p className="text-zinc-500">{song.artistName}</p>
+        )}
+      </div>
+      <div className="px-5 pt-5">
+        <h1 className="font-display text-[56px] leading-[.95] break-keep">
+          <span className="mark-lime">{song.title}</span>
+        </h1>
+        <span className="mt-2.5 inline-flex rounded-full border-2 border-ink bg-sky px-3 py-1 text-sm font-black shadow-sticker-sm">{song.artistName}</span>
       </div>
     </header>
   );
@@ -138,32 +145,38 @@ async function RequestSection({ song }: { song: SongDetail }) {
   );
 }
 
-async function UpcomingClasses({ songId }: { songId: number }) {
+async function UpcomingClasses({ songId, videoId }: { songId: number; videoId: string | null }) {
   // 마감·새 클래스가 바로 보여야 해서 요청 시점에 읽는다 (미리 렌더링하지 않음)
   await connection();
   const classes = await listUpcomingClassesForSong(songId);
 
   return (
-    <section className="mt-8">
-      <h2 className="text-lg font-bold">다가오는 클래스</h2>
+    <section className="mt-9">
+      <div className="mb-2.5 flex items-center justify-between">
+        <h2 className="font-display text-[23px]">
+          다가오는 클래스
+          {classes.length > 0 && <StickerLabel tone="sky" className="ml-1.5 align-[4px]">{classes.length}</StickerLabel>}
+        </h2>
+        <span className="font-zine text-xs font-extrabold uppercase">Tickets</span>
+      </div>
       {classes.length === 0 ? (
-        <p className="mt-2 rounded-xl border border-dashed border-zinc-300 p-4 text-sm text-zinc-500 dark:border-zinc-700">
+        <p className="rounded-2xl border-2 border-dashed border-ink/40 bg-card/60 p-4 text-sm font-semibold text-sub">
           아직 열린 클래스가 없어요. 추가요가 쌓이면 강사님들이 볼 수 있어요
         </p>
       ) : (
-        <ul className="mt-3 space-y-3">
-          {classes.map((c) => (
+        <ul className="space-y-4">
+          {classes.map((c, i) => (
             <li key={c.id}>
-              <a href={`/class/${c.id}`} className="block rounded-xl border border-zinc-200 p-3 dark:border-zinc-800">
-                <p className="font-semibold">{c.title}</p>
-                <p className="mt-1 text-sm text-zinc-500">
-                  {formatClassTime(c.startsAt, c.endsAt)} · {c.regionName}
-                </p>
-                <p className="mt-1 text-sm">
-                  {formatPrice(c.price)} · {LEVEL_LABEL[c.level]} · {c.instructorName}
-                  {c.status === "closing_soon" && <span className="ml-2 rounded bg-amber-100 px-1.5 text-xs text-amber-800">마감 임박</span>}
-                </p>
-              </a>
+              <ClassTicket
+                href={`/class/${c.id}`}
+                index={i}
+                title={c.title}
+                startsAt={c.startsAt}
+                meta={`${formatTimeRange(c.startsAt, c.endsAt)} · ${c.regionName}`}
+                detail={`${formatPrice(c.price)} · ${LEVEL_LABEL[c.level]}`}
+                badge={c.status === "closing_soon" ? "마감 임박" : null}
+                thumbnailUrl={videoId ? `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg` : null}
+              />
             </li>
           ))}
         </ul>
@@ -174,12 +187,10 @@ async function UpcomingClasses({ songId }: { songId: number }) {
 
 function SongSkeleton() {
   return (
-    <div className="animate-pulse">
-      <div className="aspect-video w-full bg-zinc-200 dark:bg-zinc-800" />
-      <div className="px-4 pt-4">
-        <div className="h-7 w-40 rounded bg-zinc-200 dark:bg-zinc-800" />
-        <div className="mt-2 h-4 w-24 rounded bg-zinc-200 dark:bg-zinc-800" />
-      </div>
+    <div className="animate-pulse px-5 pt-14">
+      <div className="aspect-video w-full rounded-[26px] border-2 border-ink/20 bg-card" />
+      <div className="mt-6 h-12 w-40 rounded-xl bg-lime/50" />
+      <div className="mt-3 h-7 w-28 rounded-full bg-sky/50" />
     </div>
   );
 }
