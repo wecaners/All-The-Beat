@@ -7,6 +7,22 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { classInput, createClassByAdmin } from "@/server/admin/classes";
 import { consentInput, createProxyInstructor, instructorInput, recordConsent } from "@/server/admin/instructors";
 import { AdminInputError } from "@/server/admin/shared";
+import {
+  addStudioPhoto,
+  deleteStudioPhoto,
+  profileInput,
+  removeInstructorPhoto,
+  saveInstructorProfile,
+  saveStudio,
+  setInstructorPhoto,
+  setStudioArchived,
+  studioCandidateInput,
+  studioUpdateInput,
+  updateStudio,
+} from "@/server/admin/studios";
+import { kakaoConfigured, searchKakaoAddresses, searchKakaoPlaces, type StudioCandidate } from "@/server/kakao";
+import { MEDIA_BUCKET, type MediaStore } from "@/server/media";
+import { createClient } from "@/lib/supabase/server";
 import { clearSongVideo, saveSong, setSongVideo, songInput, videoInput } from "@/server/admin/songs";
 
 export type AdminActionState = { ok: boolean; error?: string; message?: string };
@@ -161,3 +177,139 @@ export async function createClassAction(_prev: AdminActionState, fd: FormData): 
       : `클래스를 등록했어요 (#${result.id}). 강사의 게재 동의 기록이 없어 아직 수강생에게 보이지 않아요`,
   };
 }
+
+// ── 스튜디오·강사 사진 (specs/instructor-studio) ─────────────────────────
+
+// 운영자 로그인 세션이 붙은 저장소. 버킷 정책이 운영자만 쓰게 막는다 (마이그레이션 0006)
+async function mediaStore(): Promise<MediaStore> {
+  const bucket = (await createClient()).storage.from(MEDIA_BUCKET);
+  return {
+    async upload(path, file, contentType) {
+      const { error } = await bucket.upload(path, file, { contentType, upsert: false, cacheControl: "31536000" });
+      if (error) throw error;
+    },
+    async remove(paths) {
+      const { error } = await bucket.remove(paths);
+      if (error) throw error;
+    },
+  };
+}
+
+export type StudioSearchState = { ok: boolean; error?: string; candidates?: StudioCandidate[] };
+
+export async function searchStudiosAction(mode: "place" | "address", query: string): Promise<StudioSearchState> {
+  await requireAdmin();
+  const q = query.trim();
+  if (q.length < 2) return { ok: false, error: "두 글자 이상 넣어 주세요" };
+  if (!kakaoConfigured()) return { ok: false, error: "카카오 키(KAKAO_REST_API_KEY)가 없어 검색할 수 없어요" };
+  try {
+    const candidates = mode === "place" ? await searchKakaoPlaces(q) : await searchKakaoAddresses(q);
+    return { ok: true, candidates };
+  } catch (e) {
+    console.error("[admin/searchStudios]", e);
+    return { ok: false, error: "카카오 검색에 실패했어요. 잠시 후 다시 시도해 주세요" };
+  }
+}
+
+export async function saveStudioAction(instructorId: number, candidate: StudioCandidate): Promise<AdminActionState & { id?: number }> {
+  await requireAdmin();
+  try {
+    const input = parse(studioCandidateInput, { instructorId, ...candidate });
+    const saved = await saveStudio(input);
+    refresh();
+    return { ok: true, id: saved.id, message: saved.existed ? "이미 있는 스튜디오예요. 그대로 쓸게요" : "스튜디오를 저장했어요" };
+  } catch (e) {
+    return toState(e, "saveStudio");
+  }
+}
+
+export async function updateStudioAction(_prev: AdminActionState, fd: FormData): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    const input = parse(studioUpdateInput, {
+      placeId: Number(text(fd, "placeId")),
+      studioName: text(fd, "studioName"),
+      regionId: Number(text(fd, "regionId")),
+      facilities: fd.getAll("facilities").map(String),
+    });
+    await updateStudio(input);
+    refresh();
+    return { ok: true, message: "저장했어요" };
+  } catch (e) {
+    return toState(e, "updateStudio");
+  }
+}
+
+export async function setStudioArchivedAction(placeId: number, archived: boolean): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    await setStudioArchived(placeId, archived);
+    refresh();
+    return { ok: true };
+  } catch (e) {
+    return toState(e, "setStudioArchived");
+  }
+}
+
+// 브라우저가 화면용(full)·목록용(thumb) 두 크기로 줄여 보낸다
+export async function addStudioPhotoAction(fd: FormData): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    await addStudioPhoto(await mediaStore(), Number(text(fd, "placeId")), fd.get("full"), fd.get("thumb"));
+    refresh();
+    return { ok: true };
+  } catch (e) {
+    return toState(e, "addStudioPhoto");
+  }
+}
+
+export async function deleteStudioPhotoAction(photoId: number): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    await deleteStudioPhoto(await mediaStore(), photoId);
+    refresh();
+    return { ok: true };
+  } catch (e) {
+    return toState(e, "deleteStudioPhoto");
+  }
+}
+
+export async function saveInstructorProfileAction(_prev: AdminActionState, fd: FormData): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    const input = parse(profileInput, {
+      instructorId: Number(text(fd, "instructorId")),
+      bio: text(fd, "bio"),
+      portfolioUrls: fd.getAll("portfolioUrls").map(String).filter((v) => v.trim()),
+      mediaConsent: fd.get("mediaConsent") === "on",
+    });
+    await saveInstructorProfile(input);
+    refresh();
+    return { ok: true, message: "강사 소개를 저장했어요" };
+  } catch (e) {
+    return toState(e, "saveInstructorProfile");
+  }
+}
+
+export async function setInstructorPhotoAction(fd: FormData): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    await setInstructorPhoto(await mediaStore(), Number(text(fd, "instructorId")), fd.get("full"), fd.get("thumb"));
+    refresh();
+    return { ok: true };
+  } catch (e) {
+    return toState(e, "setInstructorPhoto");
+  }
+}
+
+export async function removeInstructorPhotoAction(instructorId: number): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    await removeInstructorPhoto(await mediaStore(), instructorId);
+    refresh();
+    return { ok: true };
+  } catch (e) {
+    return toState(e, "removeInstructorPhoto");
+  }
+}
+

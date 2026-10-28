@@ -7,6 +7,7 @@ import type { AdminPlace, ClassSongOption } from "@/server/admin/classes";
 import type { AdminInstructorRow } from "@/server/admin/instructors";
 import type { Region } from "@/server/regions";
 import { type AdminActionState, createClassAction } from "../../actions";
+import { StudioPicker } from "../../instructors/studio-forms";
 import { buttonClass, Field, inputClass, Result } from "../../ui";
 
 const BOOKING_TYPE_LABEL = {
@@ -99,7 +100,7 @@ export function ClassForm({ instructors, instructorId, places, songs, regions, t
       </div>
 
       <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold">장소 *</legend>
+        <legend className="text-sm font-semibold">스튜디오 *</legend>
         {places.length > 0 && (
           <select name="placeId" value={placeId} onChange={(e) => setPlaceId(e.target.value)} className={inputClass}>
             {places.map((p) => (
@@ -107,14 +108,21 @@ export function ClassForm({ instructors, instructorId, places, songs, regions, t
                 {p.studioName} · {p.address}
               </option>
             ))}
-            <option value="">+ 새 장소 입력</option>
+            <option value="">+ 새 스튜디오 찾기</option>
           </select>
         )}
         {(places.length === 0 || placeId === "") && (
-          <div className="grid gap-3 sm:grid-cols-[12rem_1fr]">
-            <input name="studioName" placeholder="스튜디오 이름" maxLength={60} className={inputClass} />
-            <input name="address" placeholder="서울 마포구 양화로 100 3층" maxLength={200} className={inputClass} />
-          </div>
+          <>
+            {/* 찾아서 고르면 이 강사의 스튜디오로 저장되고, 화면이 새로 그려지며 목록에 들어온다 (specs/instructor-studio FR-7) */}
+            {instructorId && <StudioPicker instructorId={instructorId} onSaved={(id) => setPlaceId(String(id))} />}
+            <details className="text-sm">
+              <summary className="cursor-pointer text-zinc-500">카카오 검색 없이 직접 입력 (지도 미리보기 없음)</summary>
+              <div className="mt-2 grid gap-3 sm:grid-cols-[12rem_1fr]">
+                <input name="studioName" placeholder="스튜디오 이름" maxLength={60} className={inputClass} />
+                <input name="address" placeholder="서울 마포구 양화로 100 3층" maxLength={200} className={inputClass} />
+              </div>
+            </details>
+          </>
         )}
       </fieldset>
 

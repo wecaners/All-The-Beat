@@ -88,7 +88,8 @@ export async function listPlacesForInstructor(instructorId: number): Promise<Adm
   return getDb()
     .select({ id: instructorPlaces.id, studioName: instructorPlaces.studioName, address: instructorPlaces.address, regionId: instructorPlaces.regionId })
     .from(instructorPlaces)
-    .where(eq(instructorPlaces.instructorId, instructorId))
+    // 목록에서 뺀 스튜디오는 고를 수 없다 (specs/instructor-studio FR-6)
+    .where(and(eq(instructorPlaces.instructorId, instructorId), isNull(instructorPlaces.archivedAt)))
     .orderBy(sql`${instructorPlaces.lastUsedAt} desc nulls last`, desc(instructorPlaces.id));
 }
 
@@ -130,7 +131,7 @@ export async function createClassByAdmin(input: ClassInput): Promise<{ id: numbe
       const [saved] = await tx
         .select({ id: instructorPlaces.id, studioName: instructorPlaces.studioName, address: instructorPlaces.address, regionId: instructorPlaces.regionId })
         .from(instructorPlaces)
-        .where(and(eq(instructorPlaces.id, input.placeId), eq(instructorPlaces.instructorId, input.instructorId)))
+        .where(and(eq(instructorPlaces.id, input.placeId), eq(instructorPlaces.instructorId, input.instructorId), isNull(instructorPlaces.archivedAt)))
         .limit(1);
       if (!saved) throw new AdminInputError("이 강사의 장소가 아니에요");
       place = saved;

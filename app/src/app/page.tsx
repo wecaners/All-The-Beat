@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { Logo } from "@/components/logo";
+import { Twinkle } from "@/components/twinkle";
 import { listHotSongsThisWeek, listUpcomingClasses } from "@/server/classes";
 import { listTopRequestedSongs } from "@/server/requests";
 import { HomeView } from "./home-view";
@@ -13,7 +14,9 @@ export default function Home() {
         <Logo />
         <span className="font-zine text-[11px] font-extrabold uppercase tracking-[.04em]">Home</span>
       </div>
-      <p className="mt-3 px-5 text-[15px] font-bold text-sub">지금 뜨는 K-pop 곡의 원데이 댄스 클래스</p>
+      <p className="mt-3 px-5 text-[15px] font-bold text-sub">
+        지금 뜨는 K-pop 곡의 원데이 댄스 클래스 <Twinkle size={16} className="ml-0.5 align-[-2px]" />
+      </p>
       <Suspense fallback={<HomeSkeleton />}>
         <HomeSections />
       </Suspense>

@@ -4,12 +4,14 @@ import {
   bigint,
   boolean,
   check,
+  doublePrecision,
   index,
   integer,
   pgTable,
   primaryKey,
   smallint,
   text,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { createdAt, timestamptz, updatedAt } from "./columns";
 import { bookingType, classLevel, classStatus } from "./enums";
@@ -17,22 +19,52 @@ import { regions } from "./regions";
 import { songs } from "./songs";
 import { instructorProfiles } from "./users";
 
-// "이전 장소" 재사용 (T-02)
-export const instructorPlaces = pgTable("instructor_places", {
-  id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
-  instructorId: bigint({ mode: "number" })
-    .notNull()
-    .references(() => instructorProfiles.id, { onDelete: "cascade" }),
-  studioName: text().notNull(),
-  address: text().notNull(),
-  sigungu: text(), // 권역 매핑용
-  bname: text(),
-  regionId: smallint()
-    .notNull()
-    .references(() => regions.id),
-  lastUsedAt: timestamptz(),
-  createdAt: createdAt(),
-}).enableRLS();
+// 강사의 스튜디오 ("이전 장소" 재사용 T-02 → 내 스튜디오, specs/instructor-studio)
+export const instructorPlaces = pgTable(
+  "instructor_places",
+  {
+    id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+    instructorId: bigint({ mode: "number" })
+      .notNull()
+      .references(() => instructorProfiles.id, { onDelete: "cascade" }),
+    studioName: text().notNull(),
+    address: text().notNull(),
+    sigungu: text(), // 권역 매핑용
+    bname: text(),
+    regionId: smallint()
+      .notNull()
+      .references(() => regions.id),
+    // 카카오 로컬 API 검색 결과에서 고를 때 한 번 저장한다. 주소로 고르면 장소 id·링크는 없다
+    kakaoPlaceId: text(),
+    kakaoPlaceUrl: text(),
+    lat: doublePrecision(),
+    lng: doublePrecision(),
+    facilities: text().array().notNull().default(sql`'{}'::text[]`), // src/server/admin/studios.ts FACILITIES
+    archivedAt: timestamptz(), // 목록에서 빼기. 지난 클래스가 가리키므로 지우지 않는다
+    lastUsedAt: timestamptz(),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex("instructor_places_kakao_uq").on(t.instructorId, t.kakaoPlaceId).where(sql`${t.kakaoPlaceId} is not null`),
+    check("instructor_places_latlng_pair", sql`(${t.lat} is null) = (${t.lng} is null)`),
+  ],
+).enableRLS();
+
+// 스튜디오 사진. 파일은 Storage 버킷 media, 화면용 큰 사진과 목록용 작은 사진 두 장 (최대 8장은 서버가 지킨다)
+export const studioPhotos = pgTable(
+  "studio_photos",
+  {
+    id: bigint({ mode: "number" }).primaryKey().generatedAlwaysAsIdentity(),
+    placeId: bigint({ mode: "number" })
+      .notNull()
+      .references(() => instructorPlaces.id, { onDelete: "cascade" }),
+    path: text().notNull(),
+    thumbPath: text().notNull(),
+    position: smallint().notNull().default(0),
+    createdAt: createdAt(),
+  },
+  (t) => [index("studio_photos_place_idx").on(t.placeId, t.position)],
+).enableRLS();
 
 export const classes = pgTable(
   "classes",

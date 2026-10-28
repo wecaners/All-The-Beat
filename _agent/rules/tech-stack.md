@@ -45,6 +45,8 @@ app/scripts/       db-check, seed-dev 같은 로컬 스크립트
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | 브라우저 | Config | `sb_publishable_` |
 | `DATABASE_URL` | 서버 전용 | Secret | 트랜잭션 풀러 6543 |
 | `MIGRATION_DATABASE_URL` | 로컬 전용 | 넣지 않음 | 세션 풀러 5432, drizzle-kit용 |
+| `NEXT_PUBLIC_KAKAO_JS_KEY` | 브라우저 | Config | 카카오맵 JS SDK. 카카오 콘솔에 도메인 등록 필수 |
+| `KAKAO_REST_API_KEY` | 서버 전용 | Secret | 카카오 로컬 API(연습실 검색) |
 
 새 환경변수를 만들면 이 표, `app/.env.local.example`, PR 본문의 "머지 전 할 일"을 같이 고친다.
 
