@@ -5,8 +5,10 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { ClassTicket } from "@/components/class-ticket";
 import { Logo } from "@/components/logo";
+import { stagger } from "@/components/motion";
 import { StickerLabel } from "@/components/sticker-label";
 import { Tape } from "@/components/tape";
+import { Twinkle } from "@/components/twinkle";
 import { VideoCard } from "@/components/video-card";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { formatPrice, formatTimeRange, LEVEL_LABEL, VIDEO_TYPE_ZINE } from "@/lib/format";
@@ -115,6 +117,7 @@ function SongHeader({ song }: { song: SongDetail }) {
       <div className="px-5 pt-5">
         <h1 className="font-display text-[56px] leading-[.95] break-keep">
           <span className="mark-lime">{song.title}</span>
+          <Twinkle size={22} className="ml-1 align-top" />
         </h1>
         <span className="mt-2.5 inline-flex rounded-full border-2 border-ink bg-sky px-3 py-1 text-sm font-black shadow-sticker-sm">{song.artistName}</span>
       </div>
@@ -164,7 +167,7 @@ async function UpcomingClasses({ songId, videoId }: { songId: number; videoId: s
       ) : (
         <ul className="space-y-4">
           {classes.map((c, i) => (
-            <li key={c.id}>
+            <li key={c.id} className="animate-stick-in" style={stagger(i)}>
               <ClassTicket
                 href={`/class/${c.id}`}
                 index={i}

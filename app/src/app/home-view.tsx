@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ClassTicket } from "@/components/class-ticket";
+import { stagger } from "@/components/motion";
 import { SongCard } from "@/components/song-card";
 import { StarBurst } from "@/components/star-burst";
 import { StickerLabel } from "@/components/sticker-label";
+import { TiltRow } from "@/components/tilt-row";
 import { formatPrice, formatTimeRange, LEVEL_LABEL } from "@/lib/format";
 import type { HotSong, UpcomingClassCard } from "@/server/classes";
 import type { TopRequestedSong } from "@/server/requests";
@@ -48,9 +50,9 @@ function HotSongs({ songs }: { songs: HotSong[] }) {
         zine="This week"
       />
       {/* 가로로 넘기는 포토카드 줄. 카드가 기울고 스티커가 튀어나와 위아래 여백을 둔다 */}
-      <ul className="flex snap-x gap-4 overflow-x-auto px-5 pt-5 pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <TiltRow className="flex snap-x gap-4 overflow-x-auto px-5 pt-5 pb-7 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {songs.map((s, i) => (
-          <li key={s.slug} className="w-[196px] flex-none snap-start">
+          <li key={s.slug} className="w-[196px] flex-none snap-start animate-stick-in" style={stagger(i)}>
             <SongCard
               slug={s.slug}
               title={s.title}
@@ -67,7 +69,7 @@ function HotSongs({ songs }: { songs: HotSong[] }) {
             />
           </li>
         ))}
-      </ul>
+      </TiltRow>
     </section>
   );
 }
@@ -82,7 +84,7 @@ function UpcomingClasses({ classes }: { classes: UpcomingClassCard[] }) {
       />
       <ul className="mt-2.5 space-y-4 px-5">
         {classes.map((c, i) => (
-          <li key={c.id}>
+          <li key={c.id} className="animate-stick-in" style={stagger(i)}>
             {/* 홈에서는 곡이 주인공이라 클래스 이름 대신 곡명·아티스트 (MVP 원칙 1) */}
             <ClassTicket
               href={`/class/${c.id}`}
@@ -110,7 +112,7 @@ function TopRequests({ songs }: { songs: TopRequestedSong[] }) {
       <p className="px-5 text-[13px] font-semibold text-sub">누가 요청했는지는 보이지 않아요</p>
       <ol className="mt-3 space-y-2.5 px-5">
         {songs.map((s, i) => (
-          <li key={s.slug} className="sticker-edge flex items-center gap-3 rounded-[18px] bg-card py-2 pr-2.5 pl-2">
+          <li key={s.slug} style={stagger(i)} className="animate-stick-in sticker-edge flex items-center gap-3 rounded-[18px] bg-card py-2 pr-2.5 pl-2">
             <span className={`grid h-9 w-9 flex-none place-items-center rounded-full border-2 border-ink font-display text-lg leading-none ${RANK_TONE[i]}`}>
               {i + 1}
             </span>

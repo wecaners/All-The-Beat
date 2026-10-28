@@ -59,3 +59,8 @@ export function centerOf(el: Element) {
   const r = el.getBoundingClientRect();
   return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
 }
+
+// 목록이 처음 보일 때 스티커처럼 하나씩 붙는다 (animate-stick-in과 함께). 뒤쪽은 기다리지 않게 6번째에서 멈춘다
+export function stagger(index: number) {
+  return { animationDelay: `${Math.min(index, 6) * 60}ms` };
+}

@@ -40,11 +40,12 @@
 | `ChoiceChip`, `InfoChip` | 고르는 칩(라디오), 보기만 하는 칩 |
 | `BottomSheet` | 입력·로그인 시트 |
 | `VideoCard` | 곡 영상. 누르기 전엔 썸네일, 누르면 YouTube 임베드 |
-| `ClassTicket` | 클래스 목록 항목 |
+| `ClassTicket` | 클래스 목록 항목. 누르면 찢기며 이동 |
 | `SongCard` | 곡 포토카드(정지). 누르면 곡 상세. 가로로 넘기는 줄·순위·검색 결과 |
 | `StarBurst`, `StickerLabel`, `Tape` | 별 스티커, 작은 라벨, 테이프 |
+| `TiltRow`, `Twinkle` | 가로 포토카드 줄(넘기면 기울기), 반짝이는 별 낙서 |
 | `Celebration`, `Toast` | 감정 순간 오버레이, 짧은 안내 |
-| `motion.ts` | `play`, `confetti`, `buzz`, `reducedMotion` |
+| `motion.ts` | `play`, `confetti`, `buzz`, `reducedMotion`, `stagger` |
 
 ## 움직임
 
@@ -54,6 +55,22 @@
 - 화면 전환·버튼 반응은 0.3~0.4초 안에 끝낸다. 예약처럼 중요한 동선을 애니메이션으로 기다리게 하지 않는다.
 - `prefers-reduced-motion`이면 장식 움직임을 끈다(`globals.css`, `motion.ts`가 처리). 움직임에만 의존해 정보를 전달하지 않는다.
 - 움직임은 Web Animations API와 CSS로 만든다. 애니메이션 라이브러리를 추가하려면 먼저 묻는다.
+
+### 인터랙션 표 (round-3에서 채택한 9가지)
+
+새 화면·부품을 만들 때 이 표에서 해당하는 줄을 찾아 같이 넣는다. 화면이 생겨서 붙일 수 있게 되면 상태를 고친다. 원본 움직임은 `design/concepts/round-3.html`.
+
+| 인터랙션 | 붙는 곳 | 상태 |
+| --- | --- | --- |
+| 착착 붙기 | 목록 항목에 `animate-stick-in` + `stagger(i)`(`motion.ts`). 로고는 누르면 0.4초 흔들림(`Logo`) | 홈·곡 상세 목록, 로고 |
+| 포토카드 기울기 | 가로로 넘기는 포토카드 줄은 `TiltRow`로 감싼다 | 홈 핫한 곡 |
+| 홀로 포토카드 | 재생하는 영상 카드 `VideoCard` | 곡·클래스 상세 |
+| 추가요 클라이맥스 | `BottomSheet`, `ChoiceChip`, `Celebration` | 곡 상세 |
+| 티켓 찢기 | `ClassTicket` 자체에 있다(0.35초 뒤 이동, 동작 줄이기면 바로 이동, 새 탭 클릭은 그대로) | 클래스 티켓 전부 |
+| 앵콜 응원봉 | 앵콜(F-24)을 만들 때 | 기능 없음 |
+| 당겨서 새로고침 | 하지 않는다. 브라우저·인앱 브라우저의 기본 당겨서 새로고침과 부딪히고, 막으면 기본 동작을 잃는다 | 보류 |
+| 탭바 알약 | 하단 탭바를 만들 때 | 탭바 없음 |
+| 작은 생활 움직임 | 숨쉬는 재생 버튼(`VideoCard`), 살랑이는 스티커(`animate-sway`), 반짝이는 별(`Twinkle`, 화면당 한두 개). 흐르는 글자 띠는 하지 않는다(계속 움직이는 글자, WCAG 2.2.2) | 홈·곡 상세 |
 
 ## 이미지·영상
 

@@ -53,6 +53,7 @@
 4. 사용자 피드백(Bagel 가독성·피로도)으로 후보 12종 비교 시안(`design/concepts/font-compare.html`)을 만들고, 사용자가 고른 메이플스토리 Bold로 디스플레이 폰트를 교체 (`layout.tsx`, `globals.css`, `app/src/app/fonts/`)
 5. 교체 후 `pnpm check` 통과, 모바일(375) 비로그인 곡 상세·로그인 시트 확인, 콘솔·서버 오류 없음
 6. 사용자 지시로 줄바꿈을 전역 어절 단위로 (`body`에 `word-break: keep-all` + `overflow-wrap: break-word`). 추가요 카드 문구가 "남겨 / 주세요!"로 끊기는 것 확인
+7. 사용자 지적으로 빠진 인터랙션을 채움: 티켓 찢기 0.35초(흔들림 0.09 + 찢김 0.26, 실측 이동 시작 약 0.40초), 착착 붙기(`stagger`), 로고 흔들림, 포토카드 기울기(`TiltRow`), 반짝임(`Twinkle`). 뒤로 가기 때 티켓 원상 복귀, 동작 줄이기면 바로 이동(약 0.1초) 확인. `design.md`에 인터랙션 표 추가
 
 ## Test Results
 
