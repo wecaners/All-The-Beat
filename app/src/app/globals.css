@@ -1,26 +1,103 @@
 @import "tailwindcss";
+/* Pretendard: 화면에 쓰인 글자 묶음만 받는 동적 분할 (specs/design-system findings) */
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* 다크 모드 없음 (CON-2): 기존 화면의 dark: 클래스가 OS 설정으로 켜지지 않게, .dark 클래스가 있을 때만 동작시킨다 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ═════════ 덕질 스크랩북 토큰 (_agent/rules/design.md) ═════════
+   색은 역할 이름으로 쓴다. 큰 면적의 색은 한 화면에 pink 하나. */
+@theme {
+  --color-paper: #fff7ec;      /* 다이어리 속지 = 배경 */
+  --color-dot: #eadcc6;        /* 모눈 점 */
+  --color-card: #ffffff;       /* 붙인 카드 */
+  --color-ink: #161616;        /* 테두리·글자 */
+  --color-sub: #6f655a;        /* 보조 글자 */
+  --color-pink: #ff6fb5;       /* 추가요·행동 */
+  --color-pink-soft: #ffd6ea;
+  --color-lime: #cff23a;       /* 형광펜·완료 */
+  --color-sky: #7cc8ff;        /* 스티커·칩 */
+  --color-butter: #ffe15c;
+  --color-lilac: #c9b6ff;
+  --color-kakao: #fee500;
+
+  --font-sans: "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-bagel), "Pretendard Variable", sans-serif; /* 외침·제목·큰 숫자 */
+  --font-zine: var(--font-bricolage), "Pretendard Variable", sans-serif; /* 팬진 라벨 (영문 대문자) */
+
+  --shadow-sticker-sm: 2px 2px 0 var(--color-ink);
+  --shadow-sticker: 4px 4px 0 var(--color-ink);
+  --shadow-sticker-lg: 6px 6px 0 var(--color-ink);
+  --shadow-sticker-pink: 4px 4px 0 var(--color-pink);
+
+  --radius-card: 18px;
+  --radius-photo: 24px;
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-breathe: breathe 2.2s ease-in-out infinite;
+  --animate-sway: sway 3.4s ease-in-out infinite;
+  --animate-twinkle: twinkle 2.4s ease-in-out infinite;
+  --animate-stick-in: stick-in 0.52s var(--ease-spring) both;
+
+  @keyframes breathe { 50% { transform: scale(1.08); } }
+  /* 붙여둔 스티커가 살랑살랑. 가끔 통 튄다 */
+  @keyframes sway {
+    0%, 100% { transform: rotate(10deg) scale(1); }
+    40% { transform: rotate(-4deg) scale(1); }
+    52% { transform: rotate(-6deg) scale(1.12); }
+    60% { transform: rotate(-3deg) scale(1); }
+  }
+  @keyframes twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(0.6) rotate(45deg); } }
+  @keyframes stick-in { from { opacity: 0; transform: translateY(18px) rotate(-3deg) scale(0.94); } }
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* 속지 배경: 크림 + 모눈 점 */
+@utility bg-paper {
+  background-color: var(--color-paper);
+  background-image: radial-gradient(var(--color-dot) 1.2px, transparent 1.2px);
+  background-size: 14px 14px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* 형광펜: 글자 아래쪽 절반만 라임 */
+@utility mark-lime {
+  background: linear-gradient(transparent 52%, var(--color-lime) 52%, var(--color-lime) 92%, transparent 92%);
+  padding: 0 2px;
+}
+
+/* 붙인 스티커의 기본: 굵은 테두리 + 딱 떨어지는 그림자 */
+@utility sticker-edge {
+  border: 2px solid var(--color-ink);
+  box-shadow: var(--shadow-sticker);
+}
+
+/* 도장 찍기: 누르면 그림자가 사라지며 꾹 눌린다 */
+@utility press {
+  transition: transform 0.12s var(--ease-snap), box-shadow 0.12s var(--ease-snap);
+  &:active:not(:disabled) {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 var(--color-ink);
   }
 }
 
+/* 굵은 외곽선 글씨 (흰 글자 + 검정 테두리 + 그림자) */
+@utility text-sticker {
+  -webkit-text-stroke: 1.6px var(--color-ink);
+  text-shadow: 3px 3px 0 var(--color-ink);
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 동작 줄이기: 장식 움직임을 끈다 (FR-5) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
 }

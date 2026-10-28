@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>올빗 인터랙션 시안 3차</title>
+<!-- 3차: "덕질 스크랩북" 컨셉에 인터랙션·애니메이션을 입힌 동작 시안. 썸네일은 각 그룹 공식 채널 안무 연습 영상(시안 확인용) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { background: #E8E5DF; color: #161616; font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  img { display: block; -webkit-user-drag: none; user-select: none; }
+  button { font: inherit; border: 0; background: none; color: inherit; cursor: pointer; }
+  :root {
+    --paper: #FFF7EC; --ink: #161616; --sub: #6F655A; --dot: #EADCC6;
+    --pink: #FF6FB5; --pink-soft: #FFD6EA; --lime: #CFF23A; --sky: #7CC8FF; --butter: #FFE15C; --lilac: #C9B6FF;
+    --bw: 2px; --sh: 4px 4px 0 var(--ink); --sh-lg: 6px 6px 0 var(--ink);
+    --spring: cubic-bezier(.34, 1.56, .64, 1); --out: cubic-bezier(.22, 1, .36, 1);
+  }
+
+  /* ───────── 보드 ───────── */
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 40px 32px 80px; display: grid; grid-template-columns: 1fr 395px; gap: 48px; align-items: start; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: .08em; padding: 4px 10px; border-radius: 999px; background: #161616; color: #fff; }
+  h1 { margin-top: 12px; font-size: 30px; font-weight: 900; letter-spacing: -.03em; }
+  .lead { margin-top: 8px; color: #555; line-height: 1.65; }
+  .guide { padding-top: 6px; }
+  .list { margin-top: 22px; display: grid; gap: 10px; }
+  .item { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; background: #fff; border-radius: 16px; padding: 12px 14px; border: 2px solid transparent; }
+  .item.hot { border-color: #161616; }
+  .item .no { width: 34px; height: 34px; border-radius: 50%; background: #F1EEE8; display: grid; place-items: center; font-weight: 900; font-size: 14px; }
+  .item b { font-size: 15px; }
+  .item p { font-size: 13px; color: #666; line-height: 1.5; margin-top: 2px; }
+  .item p em { font-style: normal; color: #161616; font-weight: 700; }
+  .play-btn { height: 34px; padding: 0 12px; border-radius: 10px; background: #161616; color: #fff; font-size: 13px; font-weight: 800; white-space: nowrap; transition: transform .12s; }
+  .play-btn:active { transform: scale(.94); }
+  .side-note { margin-top: 22px; background: #fff; border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.65; color: #444; }
+  .side-note b { color: #161616; }
+  .device { position: sticky; top: 24px; }
+  .device .cap { text-align: center; margin-top: 14px; font-size: 13px; color: #777; font-weight: 700; }
+  .rm { margin-top: 10px; text-align: center; font-size: 12px; color: #888; }
+  .rm label { cursor: pointer; }
+
+  /* ───────── 폰 ───────── */
+  .phone { width: 375px; height: 812px; border-radius: 44px; overflow: hidden; position: relative; box-shadow: 0 0 0 10px #111, 0 30px 60px rgba(0,0,0,.22); margin: 10px; background: var(--paper); }
+  .app { position: absolute; inset: 0; overflow: hidden; color: var(--ink); }
+  .paper { background-color: var(--paper); background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px); background-size: 14px 14px; }
+  .status { position: absolute; top: 0; left: 0; right: 0; height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px; font-size: 14px; font-weight: 700; z-index: 30; pointer-events: none; }
+  .scr { position: absolute; inset: 0; will-change: transform; }
+  .scr .scroll { position: absolute; top: 44px; bottom: 0; left: 0; right: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; overscroll-behavior: contain; }
+  .scr .scroll::-webkit-scrollbar { display: none; }
+  .hidden { display: none; }
+
+  .display { font-family: "Bagel Fat One", sans-serif; font-weight: 400; line-height: 1; }
+  .zine { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+  .mark { background: linear-gradient(transparent 52%, var(--lime) 52%, var(--lime) 92%, transparent 92%); padding: 0 2px; }
+  .thumb { position: relative; overflow: hidden; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* 눌림: 도장 찍기 — 모든 스티커형 버튼 공통 */
+  .press { transition: transform .12s var(--out), box-shadow .12s var(--out); }
+  .press:active, .press.is-pressed { transform: translate(3px, 3px) !important; box-shadow: 1px 1px 0 var(--ink) !important; }
+
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 800; padding: 6px 12px; border-radius: 999px; background: #fff; border: var(--bw) solid var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+  .chip.on { background: var(--pink); color: #fff; }
+  .btn { height: 56px; width: 100%; border-radius: 18px; border: var(--bw) solid var(--ink); box-shadow: var(--sh); font-family: "Bagel Fat One"; font-size: 22px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn.pink { background: var(--pink); color: #fff; -webkit-text-stroke: 1px var(--ink); text-shadow: 2px 2px 0 var(--ink); }
+  .btn.lime { background: var(--lime); }
+  .btn.white { background: #fff; }
+  .btn.ink { background: var(--ink); color: var(--lime); box-shadow: 4px 4px 0 var(--pink); }
+  .btn.done { background: #fff; font-size: 18px; }
+  .tape { position: absolute; width: 78px; height: 22px; background: rgba(255,225,92,.82); border: 1.5px solid rgba(0,0,0,.18); z-index: 3; pointer-events: none; }
+  .tape.pink { background: rgba(255,111,181,.6); } .tape.sky { background: rgba(124,200,255,.65); }
+  .burst { display: grid; place-items: center; text-align: center; background: var(--butter); border: var(--bw) solid var(--ink); clip-path: polygon(50% 0%, 61% 18%, 82% 9%, 79% 31%, 100% 38%, 84% 54%, 96% 74%, 74% 76%, 68% 98%, 50% 84%, 32% 98%, 26% 76%, 4% 74%, 16% 54%, 0% 38%, 21% 31%, 18% 9%, 39% 18%); font-family: "Bagel Fat One"; }
+  .sticker { display: inline-block; font-size: 11px; font-weight: 900; padding: 3px 9px; border: var(--bw) solid var(--ink); border-radius: 999px; transform: rotate(-5deg); margin-left: 6px; vertical-align: 4px; }
+
+  /* 홈 */
+  .top { display: flex; justify-content: space-between; align-items: center; padding: 6px 20px 0; }
+  .logo { font-family: "Bagel Fat One"; font-size: 32px; line-height: 1; color: var(--pink); -webkit-text-stroke: 1.6px var(--ink); text-shadow: 3px 3px 0 var(--ink); display: inline-block; }
+  .logo:hover, .logo.wiggle { animation: wiggle .5s var(--out); }
+  @keyframes wiggle { 20% { transform: rotate(-8deg) scale(1.08); } 45% { transform: rotate(6deg); } 70% { transform: rotate(-3deg); } 100% { transform: none; } }
+  .twinkle { animation: twinkle 2.4s ease-in-out infinite; transform-origin: center; }
+  @keyframes twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(.6) rotate(45deg); } }
+  .me { width: 38px; height: 38px; border-radius: 50%; border: var(--bw) solid var(--ink); background: var(--lilac); display: grid; place-items: center; font-size: 18px; }
+  .marquee { margin-top: 14px; border-top: var(--bw) solid var(--ink); border-bottom: var(--bw) solid var(--ink); background: var(--lime); overflow: hidden; white-space: nowrap; transform: rotate(-1.5deg); width: 110%; margin-left: -5%; }
+  .marquee span { display: inline-block; padding: 6px 0; font-size: 13px; animation: marquee 18s linear infinite; }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+  .search { margin: 16px 20px 0; height: 50px; border-radius: 16px; background: #fff; border: var(--bw) solid var(--ink); box-shadow: var(--sh); display: flex; align-items: center; gap: 10px; padding: 0 14px; color: var(--sub); font-size: 15px; font-weight: 600; }
+  .search .caret { width: 2px; height: 18px; background: var(--pink); animation: blink 1s steps(2) infinite; margin-left: -6px; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .sec { margin-top: 26px; }
+  .sec-h { display: flex; align-items: center; justify-content: space-between; padding: 0 20px 6px; }
+  .sec-h h4 { font-family: "Bagel Fat One"; font-size: 23px; font-weight: 400; }
+  .sec-h .zine { font-size: 12px; }
+  .hscroll { display: flex; gap: 14px; overflow-x: auto; padding: 14px 20px 18px; scrollbar-width: none; scroll-snap-type: x mandatory; }
+  .hscroll::-webkit-scrollbar { display: none; }
+  .pc { position: relative; flex: 0 0 196px; scroll-snap-align: center; background: #fff; border: var(--bw) solid var(--ink); border-radius: 20px; box-shadow: var(--sh); padding: 8px 8px 12px; cursor: pointer; transition: box-shadow .15s; will-change: transform; }
+  .pc:active { box-shadow: 8px 8px 0 var(--ink); }
+  .pc .thumb { height: 120px; border-radius: 14px; border: var(--bw) solid var(--ink); }
+  .pc .t { font-family: "Bagel Fat One"; font-size: 22px; margin-top: 10px; padding: 0 4px; line-height: 1.05; }
+  .pc .a { font-size: 12px; font-weight: 700; color: var(--sub); padding: 0 4px; margin-top: 2px; }
+  .pc .n { position: absolute; top: -12px; right: -10px; width: 54px; height: 54px; font-size: 11px; line-height: 1.05; transform: rotate(12deg); z-index: 4; }
+  .pc:hover .n { animation: spinSticker .6s var(--spring); }
+  @keyframes spinSticker { from { transform: rotate(12deg) scale(1); } 50% { transform: rotate(40deg) scale(1.2); } to { transform: rotate(12deg) scale(1); } }
+
+  .ticket { position: relative; margin: 0 20px 16px; display: flex; border: var(--bw) solid var(--ink); border-radius: 16px; box-shadow: var(--sh); background: #fff; cursor: pointer; }
+  .ticket .stub { width: 78px; flex: none; border-right: var(--bw) dashed var(--ink); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 14px 0 0 14px; transform-origin: 100% 0; }
+  .ticket .stub .m { font-size: 11px; } .ticket .stub .d { font-family: "Bagel Fat One"; font-size: 34px; line-height: 1; } .ticket .stub .w { font-size: 11px; font-weight: 800; }
+  .ticket .body { flex: 1; padding: 12px 12px 12px 14px; min-width: 0; }
+  .ticket h5 { font-size: 15px; font-weight: 800; letter-spacing: -.01em; }
+  .ticket .meta { font-size: 13px; color: var(--sub); margin-top: 3px; font-weight: 600; }
+  .ticket .price { font-size: 14px; font-weight: 900; margin-top: 6px; }
+  .ticket .thumb { width: 64px; height: 64px; border-radius: 12px; border: var(--bw) solid var(--ink); flex: none; margin: 10px 10px 10px 0; align-self: center; }
+  .ticket::before, .ticket::after { content: ""; position: absolute; left: 69px; width: 16px; height: 16px; border-radius: 50%; background: var(--paper); border: var(--bw) solid var(--ink); z-index: 2; }
+  .ticket::before { top: -9px; clip-path: inset(50% 0 0 0); } .ticket::after { bottom: -9px; clip-path: inset(0 0 50% 0); }
+  .ticket.closed { background: #F4EFE7; }
+  .ticket.closed .body, .ticket.closed .thumb { opacity: .6; }
+  .badge { display: inline-block; font-size: 11px; font-weight: 900; padding: 1px 7px; border-radius: 999px; border: var(--bw) solid var(--ink); background: var(--butter); margin-left: 4px; vertical-align: 1px; }
+  .badge.enc { background: var(--pink); color: #fff; }
+
+  .rank { display: flex; align-items: center; gap: 10px; margin: 0 20px 10px; padding: 8px 12px 8px 8px; border-radius: 18px; border: var(--bw) solid var(--ink); background: #fff; position: relative; }
+  .rank .no { width: 36px; height: 36px; border-radius: 50%; border: var(--bw) solid var(--ink); display: grid; place-items: center; font-family: "Bagel Fat One"; font-size: 18px; flex: none; }
+  .rank .thumb { width: 54px; height: 36px; border-radius: 9px; border: var(--bw) solid var(--ink); flex: none; }
+  .rank .t { flex: 1; font-size: 15px; font-weight: 800; min-width: 0; }
+  .rank .t small { display: block; font-size: 12px; color: var(--sub); font-weight: 600; }
+  .rank .c { text-align: right; font-family: "Bagel Fat One"; font-size: 18px; }
+  .rank .c small { display: block; font-family: "Pretendard Variable"; font-size: 11px; font-weight: 900; }
+  .rank .c small span { background: var(--lime); padding: 0 3px; border-radius: 4px; }
+  .up-pop { position: absolute; right: -6px; top: -12px; font-size: 11px; padding: 2px 7px; transform: rotate(8deg); }
+
+  /* 당겨서 새로고침: 스티커 떼기 */
+  .ptr { position: absolute; top: 44px; left: 0; right: 0; height: 0; overflow: hidden; display: flex; justify-content: center; align-items: flex-end; z-index: 4; pointer-events: none; }
+  .ptr .peel { width: 64px; height: 64px; margin-bottom: 8px; font-size: 12px; background: var(--lime); transform-origin: 50% 0; }
+
+  /* 탭바 */
+  .tabbar { position: absolute; left: 14px; right: 14px; bottom: 22px; height: 66px; border-radius: 24px; display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; background: #fff; border: var(--bw) solid var(--ink); box-shadow: var(--sh); font-size: 11px; font-weight: 800; color: var(--sub); z-index: 20; }
+  .tabbar .pill { position: absolute; top: 9px; height: 30px; width: 42px; border-radius: 11px; background: var(--lime); border: var(--bw) solid var(--ink); transition: left .45s var(--spring); }
+  .tabbar button { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; padding-top: 4px; }
+  .tabbar button.on { color: var(--ink); }
+  .tabbar button.on svg { animation: hop .45s var(--spring); }
+  @keyframes hop { 40% { transform: translateY(-6px) scale(1.15); } }
+
+  /* 곡 상세 */
+  .back { position: absolute; top: 52px; left: 16px; z-index: 6; width: 40px; height: 40px; border-radius: 50%; background: #fff; border: var(--bw) solid var(--ink); box-shadow: 2px 2px 0 var(--ink); display: grid; place-items: center; font-size: 18px; font-weight: 900; }
+  .hero { position: relative; padding: 22px 22px 0; perspective: 800px; }
+  .holo { position: relative; background: #fff; border: var(--bw) solid var(--ink); border-radius: 26px; box-shadow: var(--sh-lg); padding: 9px 9px 14px; transform: rotate(-1.4deg); transform-style: preserve-3d; transition: transform .25s var(--out); touch-action: pan-y; }
+  .holo .thumb { height: 178px; border-radius: 18px; border: var(--bw) solid var(--ink); }
+  .holo .sheen { position: absolute; inset: 9px 9px 36px; border-radius: 18px; pointer-events: none; mix-blend-mode: color-dodge; opacity: 0; transition: opacity .3s; background: linear-gradient(115deg, transparent 20%, rgba(255,111,181,.55) 35%, rgba(124,200,255,.55) 45%, rgba(207,242,58,.55) 55%, transparent 70%); background-size: 250% 250%; }
+  .holo:hover .sheen, .holo.tilting .sheen { opacity: 1; }
+  .holo .cap2 { display: flex; justify-content: space-between; align-items: center; padding: 10px 4px 0; font-size: 11px; }
+  .playbtn { position: absolute; top: 74px; left: 50%; margin-left: -29px; width: 58px; height: 58px; border-radius: 50%; background: var(--lime); border: var(--bw) solid var(--ink); box-shadow: 3px 3px 0 var(--ink); display: grid; place-items: center; z-index: 3; animation: breathe 2.2s ease-in-out infinite; }
+  .playbtn::before { content: ""; border-left: 17px solid var(--ink); border-top: 10px solid transparent; border-bottom: 10px solid transparent; margin-left: 5px; }
+  @keyframes breathe { 50% { transform: scale(1.08); } }
+  .titles { padding: 18px 20px 0; position: relative; }
+  .big { font-family: "Bagel Fat One"; font-size: 64px; line-height: .95; display: inline-block; }
+  .artist { display: inline-flex; margin-top: 10px; font-size: 14px; font-weight: 900; padding: 5px 12px; border-radius: 999px; border: var(--bw) solid var(--ink); background: var(--sky); box-shadow: 2px 2px 0 var(--ink); }
+  .wait { position: relative; margin: 26px 20px 0; padding: 18px; border-radius: 24px; background: var(--pink); border: var(--bw) solid var(--ink); box-shadow: var(--sh-lg); }
+  .wait .mini { position: absolute; width: 84px; height: 84px; top: -26px; right: 12px; font-size: 15px; animation: spinSlow 10s linear infinite; }
+  @keyframes spinSlow { to { transform: rotate(372deg); } }
+  .wait .num { font-family: "Bagel Fat One"; font-size: 56px; line-height: 1; color: #fff; -webkit-text-stroke: 1.6px var(--ink); text-shadow: 3px 3px 0 var(--ink); display: inline-block; }
+  .wait .num small { font-size: 26px; }
+  .wait .lbl { font-size: 16px; font-weight: 900; margin-top: 6px; }
+  .wait .chips { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .wait .btn { margin-top: 14px; }
+  .plus1 { position: absolute; font-family: "Bagel Fat One"; font-size: 26px; color: var(--lime); -webkit-text-stroke: 1.4px var(--ink); pointer-events: none; z-index: 9; }
+
+  /* 시트 */
+  .dim { position: absolute; inset: 0; background: rgba(22,22,22,.45); z-index: 40; opacity: 0; transition: opacity .3s; }
+  .dim.show { opacity: 1; }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 41; border-top: var(--bw) solid var(--ink); border-radius: 28px 28px 0 0; padding: 12px 20px 30px; transform: translateY(105%); }
+  .grab { width: 44px; height: 6px; border-radius: 99px; background: var(--ink); margin: 0 auto 14px; }
+  .sheet h3 { font-family: "Bagel Fat One"; font-size: 30px; font-weight: 400; }
+  .sheet .hint { font-size: 13px; color: var(--sub); font-weight: 600; margin-top: 4px; }
+  .field { margin-top: 18px; }
+  .field .lb { font-size: 14px; font-weight: 900; margin-bottom: 8px; }
+  .field .lb small { font-weight: 600; color: var(--sub); }
+  .field .chips { display: flex; gap: 7px; flex-wrap: wrap; }
+  .field .chip { cursor: pointer; transition: transform .2s var(--spring), background .15s; }
+  .field .chip:active { transform: scale(.92); }
+  textarea { width: 100%; height: 60px; border: var(--bw) solid var(--ink); border-radius: 14px; padding: 10px 12px; font: inherit; font-size: 14px; background: #fff; resize: none; outline: none; }
+  textarea:focus { box-shadow: 3px 3px 0 var(--pink); }
+
+  /* 완료 */
+  .done { position: absolute; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 28px; text-align: center; background: rgba(255,247,236,.94); opacity: 0; pointer-events: none; }
+  .done.show { pointer-events: auto; }
+  .done .slam { width: 210px; height: 210px; font-size: 34px; line-height: 1.05; background: var(--lime); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .done .rankline { margin-top: 26px; font-size: 17px; font-weight: 900; }
+  .done .rankline b { font-family: "Bagel Fat One"; font-weight: 400; font-size: 30px; color: var(--pink); -webkit-text-stroke: 1px var(--ink); display: inline-block; }
+  .done .sub2 { margin-top: 6px; font-size: 14px; color: var(--sub); font-weight: 600; line-height: 1.5; }
+  .done .row { display: flex; gap: 10px; width: 100%; margin-top: 26px; }
+  .done .row .btn { font-size: 17px; }
+
+  /* 클래스 상세 */
+  .bigticket { position: relative; margin: 60px 20px 0; background: #fff; border: var(--bw) solid var(--ink); border-radius: 24px; box-shadow: var(--sh-lg); }
+  .bigticket .thumb { height: 170px; border-radius: 22px 22px 0 0; border-bottom: var(--bw) solid var(--ink); }
+  .perf { position: relative; border-top: var(--bw) dashed var(--ink); margin: 0 14px; }
+  .perf::before, .perf::after { content: ""; position: absolute; top: -10px; width: 18px; height: 18px; border-radius: 50%; background: var(--paper); border: var(--bw) solid var(--ink); }
+  .perf::before { left: -26px; clip-path: inset(0 0 0 50%); } .perf::after { right: -26px; clip-path: inset(0 50% 0 0); }
+  .bt-head { padding: 14px 16px 12px; }
+  .bt-head h2 { font-family: "Bagel Fat One"; font-weight: 400; font-size: 26px; line-height: 1.1; margin-top: 8px; }
+  .bt-rows { padding: 12px 16px 16px; display: grid; grid-template-columns: 64px 1fr; row-gap: 9px; font-size: 14px; }
+  .bt-rows dt { font-size: 11px; padding-top: 2px; } .bt-rows dd { font-weight: 800; } .bt-rows dd small { display: block; font-weight: 600; color: var(--sub); font-size: 12px; }
+  .bottom { position: absolute; left: 0; right: 0; bottom: 0; z-index: 5; padding: 12px 20px 30px; background: linear-gradient(transparent, var(--paper) 24%); }
+  .bottom p { text-align: center; font-size: 12px; font-weight: 700; color: var(--sub); margin-bottom: 8px; }
+  .closed-veil { position: absolute; inset: 0 0 auto; height: 170px; border-radius: 22px 22px 0 0; background: rgba(22,22,22,.55); display: grid; place-items: center; z-index: 2; }
+  .closed-veil span { font-family: "Bagel Fat One"; font-size: 34px; color: #fff; -webkit-text-stroke: 1.2px var(--ink); transform: rotate(-8deg); border: 3px solid #fff; padding: 2px 14px; border-radius: 10px; }
+
+  /* 앵콜: 응원봉 */
+  .encore { margin: 18px 20px 0; padding: 16px; border-radius: 22px; border: var(--bw) solid var(--ink); background: var(--lilac); box-shadow: var(--sh); position: relative; overflow: hidden; }
+  .encore h4 { font-family: "Bagel Fat One"; font-weight: 400; font-size: 22px; }
+  .encore p { font-size: 13px; font-weight: 700; margin-top: 4px; }
+  .gauge { margin-top: 12px; height: 18px; border: var(--bw) solid var(--ink); border-radius: 99px; background: #fff; overflow: hidden; }
+  .gauge i { display: block; height: 100%; background: repeating-linear-gradient(-45deg, var(--pink) 0 8px, #ff8ec4 8px 16px); border-right: var(--bw) solid var(--ink); transition: width .6s var(--spring); animation: stripes 1s linear infinite; background-size: 22.6px 22.6px; }
+  @keyframes stripes { to { background-position: 22.6px 0; } }
+  .stick { position: absolute; right: 14px; top: 10px; width: 46px; transform-origin: 50% 95%; }
+  .crowd { position: absolute; left: 0; right: 0; bottom: 96px; height: 70px; display: flex; justify-content: center; gap: 8px; z-index: 4; pointer-events: none; opacity: 0; }
+  .crowd svg { transform-origin: 50% 95%; }
+
+  /* 토스트 */
+  .toast { position: absolute; left: 50%; bottom: 110px; transform: translateX(-50%) translateY(20px); z-index: 60; background: var(--ink); color: #fff; font-size: 13px; font-weight: 800; padding: 10px 16px; border-radius: 999px; opacity: 0; pointer-events: none; white-space: nowrap; box-shadow: 3px 3px 0 var(--pink); }
+  .particle { position: absolute; z-index: 55; pointer-events: none; }
+  .spacer { height: 130px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="guide">
+    <span class="tag">ROUND 3 · 만져보는 시안</span>
+    <h1>덕질 스크랩북, 움직이면 이렇게</h1>
+    <p class="lead">오른쪽 폰은 실제로 동작해요. 누르고, 끌고, 스크롤해 보세요. 왼쪽 목록의 <b>▶</b>를 누르면 그 인터랙션을 폰에서 바로 재생해요. 모든 움직임은 "스티커를 붙이고, 도장을 찍고, 티켓을 찢는" 손맛을 흉내 내요.</p>
+    <div class="list" id="list"></div>
+    <div class="side-note">
+      <b>움직임 규칙</b> — ① 정보를 기다리게 하지 않는다: 화면 전환·버튼은 0.3초 안에 끝 ② 크게 터지는 건 감정 순간(추가요·앵콜·완료)에만 ③ 평소 움직임은 아주 작게(반짝이, 숨쉬기, 흐르는 띠) ④ 기기 설정에서 '동작 줄이기'를 켠 사람에게는 움직임을 끈다(아래 체크로 체험).<br><br>
+      <b>3D 에셋은 아직 안 넣었어요.</b> 이번엔 코드로 만들 수 있는 움직임만 확인하고, 3D(부푼 스티커·응원봉·마스코트)는 이 움직임이 마음에 들면 다음 라운드에서 자리를 정해 스타일 테스트로 보여드릴게요.
+    </div>
+  </div>
+  <div class="device">
+    <div class="phone"><div class="app" id="app"></div></div>
+    <div class="cap">실제 크기 375×812 · 마우스로 눌러보세요</div>
+    <div class="rm"><label><input type="checkbox" id="rm"> 동작 줄이기 켜고 보기</label></div>
+  </div>
+</div>
+
+<script>
+/* ═════════ 데이터 ═════════ */
+const T = (id, q = "hqdefault") => `https://i.ytimg.com/vi/${id}/${q}.jpg`;
+const hot = [
+  { id: "3tbOGqoLPW0", title: "HOT", artist: "LE SSERAFIM", n: 5, tape: "" },
+  { id: "bD9aJN48kuE", title: "Cherish", artist: "ILLIT", n: 4, tape: "pink" },
+  { id: "gSm-eTRl9JE", title: "GO!", artist: "CORTIS", n: 3, tape: "sky" },
+  { id: "NLjMZJKMOIc", title: "STYLE", artist: "Hearts2Hearts", n: 2, tape: "" },
+];
+const stubColors = ["var(--pink-soft)", "#DDF0FF", "#FFF2B8", "#EDE6FF"];
+const classes = [
+  { id: "3tbOGqoLPW0", title: "HOT 후렴 완곡반", d: "01", w: "토", time: "14:00", region: "홍대·합정", price: "30,000원", level: "입문", go: "class" },
+  { id: "bD9aJN48kuE", title: "Cherish 원데이 클래스", d: "02", w: "일", time: "19:00", region: "강남·역삼", price: "35,000원", level: "초급", badge: "마감 임박", go: "class" },
+  { id: "NLjMZJKMOIc", title: "STYLE 킬링파트", d: "28", w: "화", time: "20:30", region: "건대·성수", price: "25,000원", level: "초급", badge: "앵콜 모으는 중", enc: true, go: "encore", closed: true },
+];
+let ranks = [
+  { id: "h5CwaVjF_78", title: "Strategy", artist: "TWICE", c: 128, up: 23, col: "var(--pink)" },
+  { id: "vU43ebmiPRk", title: "Knife", artist: "ENHYPEN", c: 96, up: 11, col: "var(--sky)" },
+  { id: "G_1zDzhAz9w", title: "Ditto", artist: "NewJeans", c: 74, up: 6, col: "var(--butter)" },
+];
+let waitCount = 128, requested = false, encoreCount = 7; const encoreGoal = 10;
+
+/* ═════════ 도구 ═════════ */
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const app = $("#app");
+let reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+$("#rm").checked = reduce;
+$("#rm").onchange = (e) => { reduce = e.target.checked; document.documentElement.style.setProperty("--anim", reduce ? "paused" : "running"); $$(".twinkle,.marquee span,.playbtn,.wait .mini,.gauge i").forEach(el => el.style.animationPlayState = reduce ? "paused" : "running"); };
+const D = (ms) => (reduce ? 1 : ms);
+const anim = (el, kf, o) => el.animate(kf, { duration: D(o?.duration ?? 400), easing: o?.easing ?? "cubic-bezier(.34,1.56,.64,1)", fill: o?.fill ?? "none", delay: reduce ? 0 : (o?.delay ?? 0) });
+// 진동은 안드로이드만, 사용자가 한 번이라도 누른 뒤에만 (브라우저 규칙)
+const buzz = (ms = 10) => { if (navigator.userActivation?.hasBeenActive) navigator.vibrate?.(ms); };
+const wait = (ms) => new Promise(r => setTimeout(r, reduce ? 0 : ms));
+
+const star = (s = 26, fill = "#FFE15C", cls = "") => `<svg class="${cls}" width="${s}" height="${s}" viewBox="0 0 24 24"><path d="M12 1 L14 10 L23 12 L14 14 L12 23 L10 14 L1 12 L10 10 Z" fill="${fill}" stroke="#161616" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+const heart = (s = 22, fill = "#FF6FB5") => `<svg width="${s}" height="${s * .92}" viewBox="0 0 24 22"><path d="M12 21 C5 15 1 11 1 6.5 A5 5 0 0 1 12 4.5 A5 5 0 0 1 23 6.5 C23 11 19 15 12 21 Z" fill="${fill}" stroke="#161616" stroke-width="1.8"/></svg>`;
+const lightstick = (s = 46, glow = false) => `<svg width="${s}" height="${s * 2.1}" viewBox="0 0 40 84">
+  ${glow ? '<circle cx="20" cy="18" r="17" fill="#FFF6A8" opacity=".55"/>' : ""}
+  <path d="M20 3 L23.5 12.5 L33.5 13 L25.6 19.2 L28.4 29 L20 23.4 L11.6 29 L14.4 19.2 L6.5 13 L16.5 12.5 Z" fill="#FF6FB5" stroke="#161616" stroke-width="2" stroke-linejoin="round"/>
+  <rect x="16" y="30" width="8" height="46" rx="4" fill="#fff" stroke="#161616" stroke-width="2"/><rect x="16" y="46" width="8" height="8" fill="#CFF23A" stroke="#161616" stroke-width="2"/></svg>`;
+const thumb = (id, q) => `<div class="thumb"><img src="${T(id, q)}" alt="" loading="lazy" draggable="false"></div>`;
+const ICON = {
+  home: '<path d="M3 11 L12 3 L21 11 V21 H14 V15 H10 V21 H3 Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>',
+  find: '<circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 L21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',
+  req: '<path d="M12 2 L14.6 8.6 L21.5 9.2 L16.2 13.6 L17.9 20.5 L12 16.8 L6.1 20.5 L7.8 13.6 L2.5 9.2 L9.4 8.6 Z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/>',
+  me: '<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M4 21 C4 16 8 14 12 14 C16 14 20 16 20 21" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+};
+
+/* 터지는 하트·별 (감정 순간 전용) */
+function confetti(x, y, n = 18, spread = 1) {
+  const shapes = [() => heart(18), () => star(18), () => star(16, "#7CC8FF"), () => star(16, "#CFF23A"), () => heart(14, "#C9B6FF")];
+  for (let i = 0; i < (reduce ? 0 : n); i++) {
+    const p = document.createElement("div");
+    p.className = "particle"; p.innerHTML = shapes[i % shapes.length]();
+    p.style.left = x + "px"; p.style.top = y + "px";
+    app.appendChild(p);
+    const a = Math.random() * Math.PI * 2, v = (60 + Math.random() * 120) * spread;
+    const dx = Math.cos(a) * v, dy = Math.sin(a) * v - 60, rot = (Math.random() - .5) * 540;
+    p.animate([
+      { transform: "translate(-50%,-50%) scale(.2) rotate(0)", opacity: 1 },
+      { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(1.1) rotate(${rot / 2}deg)`, opacity: 1, offset: .45 },
+      { transform: `translate(calc(-50% + ${dx * 1.3}px), calc(-50% + ${dy + 180}px)) scale(.8) rotate(${rot}deg)`, opacity: 0 },
+    ], { duration: 1100 + Math.random() * 400, easing: "cubic-bezier(.2,.7,.4,1)" }).onfinish = () => p.remove();
+  }
+}
+function toast(msg) {
+  let t = $(".toast", app); if (!t) { t = document.createElement("div"); t.className = "toast"; app.appendChild(t); }
+  t.textContent = msg;
+  t.animate([{ opacity: 0, transform: "translateX(-50%) translateY(20px) scale(.9)" }, { opacity: 1, transform: "translateX(-50%) translateY(0) scale(1)", offset: .15 }, { opacity: 1, transform: "translateX(-50%) translateY(0)", offset: .85 }, { opacity: 0, transform: "translateX(-50%) translateY(10px)" }], { duration: D(2000), easing: "ease-out", fill: "forwards" });
+}
+function relPos(el) { const a = app.getBoundingClientRect(), b = el.getBoundingClientRect(); return { x: b.left - a.left + b.width / 2, y: b.top - a.top + b.height / 2 }; }
+
+/* 붙이기: 화면에 들어올 때 스티커처럼 착착 붙는다 */
+function stickIn(root) {
+  $$("[data-in]", root).forEach((el, i) => anim(el, [
+    { opacity: 0, transform: `translateY(18px) rotate(${i % 2 ? 3 : -3}deg) scale(.94)` },
+    { opacity: 1, transform: getComputedStyle(el).transform === "none" ? "none" : getComputedStyle(el).transform },
+  ], { duration: 520, delay: 60 * i }));
+}
+
+/* ═════════ 화면 ═════════ */
+const status = `<div class="status"><span>9:41</span><span>●●● ▮</span></div>`;
+const tabbar = () => `<nav class="tabbar"><span class="pill"></span>${[["home", "홈"], ["find", "찾기"], ["req", "추가요"], ["me", "마이"]].map(([k, l], i) => `<button data-tab="${i}" class="${i === 0 ? "on" : ""}"><svg width="20" height="20" viewBox="0 0 24 24">${ICON[k]}</svg>${l}</button>`).join("")}</nav>`;
+const ticketHTML = (c, i) => `<div class="ticket ${c.closed ? "closed" : ""}" data-in data-go="${c.go}"><div class="stub" style="background:${stubColors[i % 4]}"><span class="zine m">${c.closed ? "OCT" : "NOV"}</span><span class="d">${c.d}</span><span class="w">${c.w}요일</span></div>
+  <div class="body"><h5>${c.title}</h5><div class="meta">${c.time} · ${c.region}</div><div class="price">${c.price} · ${c.level}${c.badge ? `<span class="badge ${c.enc ? "enc" : ""}">${c.badge}</span>` : ""}</div></div>${thumb(c.id, "mqdefault")}</div>`;
+const rankHTML = () => ranks.map((r, i) => `<div class="rank" data-id="${r.id}"><div class="no" style="background:${["var(--pink)", "var(--sky)", "var(--butter)"][i]}">${i + 1}</div>${thumb(r.id, "mqdefault")}<div class="t">${r.title}<small>${r.artist}</small></div><div class="c">${r.c}<small><span>▲${r.up}</span></small></div></div>`).join("");
+
+const SCREENS = {
+  home: () => `<div class="scr paper" data-name="home"><div class="ptr"><div class="burst peel">새로<br>고침!</div></div><div class="scroll">
+    <div class="top"><div style="display:flex;align-items:center;gap:8px"><span class="logo" id="logo">올빗</span>${star(20, "#FFE15C", "twinkle")}</div><div class="me">🎧</div></div>
+    <div class="marquee zine"><span>NOW TRENDING ★ HOT ★ Cherish ★ GO! ★ STYLE ★ Strategy ★ Knife ★ NOW TRENDING ★ HOT ★ Cherish ★ GO! ★ STYLE ★ Strategy ★ Knife ★&nbsp;</span></div>
+    <div class="search press" data-in><svg width="18" height="18" viewBox="0 0 24 24">${ICON.find}</svg><span class="caret"></span>추고 싶은 곡이나 아티스트</div>
+    <div class="sec"><div class="sec-h"><h4>이번 주 핫한 곡<span class="sticker" style="background:var(--butter)">HOT!</span></h4><span class="zine">01—04</span></div>
+      <div class="hscroll" id="hs">${hot.map((s, i) => `<div class="pc" data-go="song" data-base="${i % 2 ? 1.4 : -1.6}" style="transform:rotate(${i % 2 ? 1.4 : -1.6}deg)"><span class="tape ${s.tape}" style="top:-11px;left:58px;transform:rotate(-4deg)"></span>${thumb(s.id)}<div class="t">${s.title}</div><div class="a">${s.artist}</div><div class="burst n">클래스<br>${s.n}</div></div>`).join("")}</div></div>
+    <div class="sec"><div class="sec-h"><h4>다가오는 클래스</h4><span class="zine">TICKETS</span></div>${classes.map(ticketHTML).join("")}</div>
+    <div class="sec"><div class="sec-h"><h4>추가요 TOP<span class="sticker" style="background:var(--lime)">LIVE</span></h4><span class="zine">당겨서 새로고침</span></div><div id="ranks">${rankHTML()}</div></div>
+    <div class="spacer"></div></div>${tabbar()}</div>`,
+
+  song: () => `<div class="scr paper" data-name="song"><button class="back press" data-back>←</button><div class="scroll">
+    <div class="hero"><div class="holo" id="holo"><span class="tape" style="top:-12px;left:50%;margin-left:-39px;transform:rotate(3deg)"></span>${thumb("3tbOGqoLPW0", "maxresdefault")}<div class="sheen"></div><div class="playbtn"></div>
+      <div class="cap2 zine"><span>▶ DANCE PRACTICE</span><span>LE SSERAFIM OFFICIAL</span></div></div></div>
+    <div class="titles" data-in><div class="big" id="bigTitle"><span class="mark">HOT</span></div><br><span class="artist">LE SSERAFIM</span></div>
+    <div class="wait" data-in><div class="burst mini">추가요!</div>
+      <div class="num" id="num">${waitCount}<small>명</small></div><div class="lbl">이 곡 클래스를 기다리고 있어요</div>
+      <div class="chips"><span class="chip">홍대 42</span><span class="chip">강남 31</span><span class="chip">건대 18</span></div>
+      <button class="btn ${requested ? "done" : "lime"} press" id="reqBtn">${requested ? "추가요 완료 ✓ · 수정" : "나도 추가요!"}</button></div>
+    <div class="sec"><div class="sec-h"><h4>다가오는 클래스</h4><span class="zine">TICKETS</span></div>${ticketHTML(classes[0], 0)}</div>
+    <div class="spacer"></div></div></div>`,
+
+  class: () => `<div class="scr paper" data-name="class"><button class="back press" data-back>←</button><div class="scroll">
+    <div class="bigticket" data-in><span class="tape sky" style="top:-11px;right:24px;transform:rotate(6deg)"></span>${thumb("3tbOGqoLPW0", "maxresdefault")}
+      <div class="bt-head"><span class="sticker" style="background:var(--lime);margin-left:0">모집중</span><h2>HOT 후렴 완곡반</h2>
+        <div style="margin-top:8px"><span class="chip" style="background:var(--pink-soft);box-shadow:none">♪ HOT · LE SSERAFIM</span></div></div>
+      <div class="perf"></div>
+      <dl class="bt-rows"><dt class="zine">DATE</dt><dd>11월 1일 (토) 14:00 – 16:00</dd><dt class="zine">PLACE</dt><dd>합정 무브먼트 스튜디오<small>마포구 양화로 100 · 홍대·합정</small></dd>
+        <dt class="zine">PRICE</dt><dd>30,000원</dd><dt class="zine">LEVEL</dt><dd>입문 · 정원 12명</dd><dt class="zine">BY</dt><dd>댄서 미나<small>@dancer.mina (예시)</small></dd></dl></div>
+    <div style="height:200px"></div></div>
+    <div class="bottom"><p>예약은 강사님의 <b>네이버 예약</b>에서 진행돼요</p><button class="btn ink press" id="bookBtn">예약하러 가기 →</button></div></div>`,
+
+  encore: () => `<div class="scr paper" data-name="encore"><button class="back press" data-back>←</button><div class="scroll">
+    <div class="bigticket" data-in>${thumb("NLjMZJKMOIc", "maxresdefault")}<div class="closed-veil"><span>마감</span></div>
+      <div class="bt-head"><h2>STYLE 킬링파트</h2><div style="margin-top:8px"><span class="chip" style="background:#EDE6FF;box-shadow:none">♪ STYLE · Hearts2Hearts</span></div></div>
+      <div class="perf"></div><dl class="bt-rows"><dt class="zine">DATE</dt><dd>10월 28일 (화) 20:30 · 지난 클래스</dd><dt class="zine">PLACE</dt><dd>성수 스텝업 스튜디오<small>성동구 · 건대·성수</small></dd></dl></div>
+    <div class="encore" data-in><div class="stick" id="stick">${lightstick(46)}</div>
+      <h4>한 번 더 열어주세요!</h4><p><b id="encN">${encoreCount}</b>명이 앵콜 중 · <b>${encoreGoal}</b>명이 모이면 강사님께 전해요</p>
+      <div class="gauge"><i id="gauge" style="width:${encoreCount / encoreGoal * 100}%"></i></div></div>
+    <div style="height:200px"></div></div>
+    <div class="crowd" id="crowd">${Array.from({ length: 7 }, () => lightstick(22, true)).join("")}</div>
+    <div class="bottom"><button class="btn pink press" id="encBtn">앵콜!</button></div></div>`,
+};
+
+/* ═════════ 라우터: 붙였다 떼는 전환 ═════════ */
+const stack = [];
+function mount(name) { const tmp = document.createElement("div"); tmp.innerHTML = SCREENS[name](); const el = tmp.firstElementChild; app.appendChild(el); wire(el, name); return el; }
+async function push(name) {
+  const prev = stack.at(-1), next = mount(name); stack.push(next);
+  anim(next, [{ transform: "translateX(100%) rotate(4deg)" }, { transform: "none" }], { duration: 420, easing: "cubic-bezier(.22,1,.36,1)" });
+  if (prev) anim(prev, [{ transform: "none", filter: "brightness(1)" }, { transform: "translateX(-28%) scale(.96)", filter: "brightness(.85)" }], { duration: 420, easing: "cubic-bezier(.22,1,.36,1)", fill: "forwards" });
+  stickIn(next); buzz(8);
+  await wait(430); if (prev) prev.classList.add("hidden");
+}
+async function pop() {
+  if (stack.length < 2) return;
+  const cur = stack.pop(), prev = stack.at(-1);
+  prev.classList.remove("hidden");
+  prev.getAnimations().forEach(a => a.cancel());
+  anim(prev, [{ transform: "translateX(-28%) scale(.96)", filter: "brightness(.85)" }, { transform: "none", filter: "brightness(1)" }], { duration: 380, easing: "cubic-bezier(.22,1,.36,1)" });
+  await anim(cur, [{ transform: "none" }, { transform: "translateX(100%) rotate(4deg)" }], { duration: 380, easing: "cubic-bezier(.4,0,.6,1)", fill: "forwards" }).finished;
+  cur.remove();
+  if (prev.dataset.name === "song") refreshSong(prev);
+}
+async function goHome() { while (stack.length > 1) { const s = stack.pop(); s.remove(); } stack[0].classList.remove("hidden"); stack[0].getAnimations().forEach(a => a.cancel()); }
+
+/* ═════════ 화면별 동작 ═════════ */
+function wire(el, name) {
+  $$("[data-back]", el).forEach(b => b.onclick = pop);
+  if (name === "home") wireHome(el);
+  if (name === "song") wireSong(el);
+  if (name === "class") $("#bookBtn", el).onclick = () => toast("네이버 예약으로 이동해요 (시안)");
+  if (name === "encore") wireEncore(el);
+}
+
+function wireHome(el) {
+  const logo = $("#logo", el); logo.onclick = () => { logo.classList.remove("wiggle"); void logo.offsetWidth; logo.classList.add("wiggle"); confetti(relPos(logo).x, relPos(logo).y, 8, .5); };
+  // 포토카드: 가로 스크롤 위치에 따라 기울기가 바뀐다
+  const hs = $("#hs", el);
+  const tilt = () => { const mid = hs.getBoundingClientRect().left + hs.clientWidth / 2; $$(".pc", hs).forEach(c => { const r = c.getBoundingClientRect(); const off = (r.left + r.width / 2 - mid) / hs.clientWidth; const base = +c.dataset.base; c.style.transform = reduce ? `rotate(${base}deg)` : `rotate(${base + off * 10}deg) translateY(${Math.abs(off) * 10}px)`; }); };
+  hs.addEventListener("scroll", tilt, { passive: true }); tilt();
+  $$(".pc", el).forEach(c => c.onclick = async () => { await anim(c, [{ transform: c.style.transform }, { transform: "scale(1.06) rotate(0deg)" }, { transform: c.style.transform }], { duration: 260 }).finished; push("song"); });
+  // 티켓: 누르면 절취선에서 찢긴다
+  $$(".ticket", el).forEach(t => t.onclick = () => tearTicket(t));
+  // 탭바: 라임 알약이 통통 튀며 따라간다
+  const tb = $(".tabbar", el), pill = $(".pill", tb);
+  const place = (i) => { const b = $$("button", tb)[i]; pill.style.left = (b.offsetLeft + b.offsetWidth / 2 - 21) + "px"; };
+  requestAnimationFrame(() => place(0));
+  $$("button", tb).forEach((b, i) => b.onclick = () => { $$("button", tb).forEach(x => x.classList.remove("on")); b.classList.add("on"); place(i); buzz(6); if (i) toast(`${b.textContent.trim()} 화면은 다음 라운드에서 (시안)`); });
+  wirePull(el);
+}
+
+async function tearTicket(t, go = true) {
+  const stub = $(".stub", t);
+  buzz(12);
+  await anim(t, [{ transform: "none" }, { transform: "translateX(-3px) rotate(-1deg)" }, { transform: "translateX(3px) rotate(1deg)" }, { transform: "none" }], { duration: 220, easing: "linear" }).finished;
+  await anim(stub, [{ transform: "none", opacity: 1 }, { transform: "translate(-30px, 70px) rotate(-38deg)", opacity: 0 }], { duration: 480, easing: "cubic-bezier(.5,0,.75,0)", fill: "forwards" }).finished;
+  if (go) await push(t.dataset.go);
+  stub.getAnimations().forEach(a => a.cancel());
+}
+
+/* 당겨서 새로고침 = 스티커 떼기 → 랭킹 순위 바뀜 */
+function wirePull(el) {
+  const sc = $(".scroll", el), ptr = $(".ptr", el), peel = $(".peel", el);
+  let y0 = null, dy = 0;
+  sc.addEventListener("pointerdown", (e) => { if (sc.scrollTop <= 0) { y0 = e.clientY; dy = 0; } });
+  window.addEventListener("pointermove", (e) => {
+    if (y0 === null) return; dy = Math.max(0, Math.min(140, e.clientY - y0));
+    sc.style.transform = `translateY(${dy * .6}px)`; ptr.style.height = dy * .6 + "px";
+    peel.style.transform = `rotate(${dy * 1.2}deg) scale(${.5 + dy / 280})`;
+  });
+  window.addEventListener("pointerup", () => { if (y0 === null) return; const pulled = dy > 70; y0 = null; release(pulled); });
+  async function release(pulled) {
+    if (pulled) { buzz(15); await anim(peel, [{ transform: peel.style.transform }, { transform: "rotate(720deg) scale(1)" }], { duration: 600, easing: "cubic-bezier(.22,1,.36,1)" }).finished; }
+    sc.style.transition = "transform .35s cubic-bezier(.34,1.56,.64,1)"; sc.style.transform = ""; ptr.style.transition = "height .35s"; ptr.style.height = "0";
+    setTimeout(() => { sc.style.transition = ""; ptr.style.transition = ""; }, 400);
+    if (pulled) shuffleRanks(el);
+  }
+}
+async function shuffleRanks(root) {
+  const box = $("#ranks", root); if (!box) return;
+  const before = new Map($$(".rank", box).map(r => [r.dataset.id, r.getBoundingClientRect().top]));
+  // Knife가 추가요를 받아 1위로
+  ranks = [ranks[1], ranks[0], ranks[2]].map(r => r); ranks[0] = { ...ranks[0], c: ranks[0].c + 40, up: ranks[0].up + 40 };
+  box.innerHTML = rankHTML();
+  $$(".rank", box).forEach(r => { const d = before.get(r.dataset.id) - r.getBoundingClientRect().top; anim(r, [{ transform: `translateY(${d}px)` }, { transform: "none" }], { duration: 560 }); });
+  const first = $(".rank", box); const pop = document.createElement("span"); pop.className = "sticker up-pop"; pop.style.background = "var(--lime)"; pop.textContent = "▲ 1위!"; first.appendChild(pop);
+  anim(pop, [{ transform: "rotate(8deg) scale(0)" }, { transform: "rotate(8deg) scale(1)" }], { duration: 500, delay: 300, fill: "backwards" });
+  const p = relPos(first); confetti(p.x + 120, p.y, 10, .6);
+}
+
+/* 곡 상세: 홀로 포토카드 + 추가요 */
+function wireSong(el) {
+  const holo = $("#holo", el), sheen = $(".sheen", holo);
+  holo.addEventListener("pointermove", (e) => {
+    if (reduce) return; const r = holo.getBoundingClientRect(); const px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
+    holo.classList.add("tilting"); holo.style.transform = `rotate(-1.4deg) rotateY(${px * 18}deg) rotateX(${-py * 14}deg) scale(1.02)`;
+    sheen.style.backgroundPosition = `${50 + px * 120}% ${50 + py * 120}%`;
+  });
+  holo.addEventListener("pointerleave", () => { holo.classList.remove("tilting"); holo.style.transform = ""; });
+  $(".playbtn", el).onclick = () => toast("YouTube 안무 영상 재생 (시안)");
+  $("#bigTitle", el).onclick = (e) => anim(e.currentTarget, [{ transform: "none" }, { transform: "scale(1.15) rotate(-4deg)" }, { transform: "none" }], { duration: 450 });
+  $("#reqBtn", el).onclick = openSheet;
+  $$(".ticket", el).forEach(t => t.onclick = () => tearTicket(t));
+}
+function refreshSong(el) { const b = $("#reqBtn", el); b.className = `btn ${requested ? "done" : "lime"} press`; b.textContent = requested ? "추가요 완료 ✓ · 수정" : "나도 추가요!"; $("#num", el).innerHTML = `${waitCount}<small>명</small>`; }
+
+function openSheet() {
+  buzz(8);
+  const dim = document.createElement("div"); dim.className = "dim"; const sh = document.createElement("div"); sh.className = "sheet paper";
+  sh.innerHTML = `<div class="grab"></div><h3>HOT <span class="mark">추가요!</span></h3><div class="hint">누가 요청했는지는 다른 사람에게 보이지 않아요</div>
+    <div class="field"><div class="lb">어디서 배우고 싶어요?</div><div class="chips" data-single>${["어디든 좋아요", "홍대·합정", "강남·역삼", "건대·성수", "잠실·송파", "종로·을지로", "신림·사당", "노원·수유"].map((r, i) => `<span class="chip ${i === 1 ? "on" : ""}">${r}</span>`).join("")}</div></div>
+    <div class="field"><div class="lb">언제가 좋아요? <small>(선택)</small></div><div class="chips" data-single>${["평일 저녁", "주말 낮", "주말 저녁", "상관없음"].map((r, i) => `<span class="chip ${i === 1 ? "on" : ""}">${r}</span>`).join("")}</div></div>
+    <div class="field"><div class="lb">강사님께 한마디 <small>(선택)</small></div><textarea placeholder="킬링파트만이라도!"></textarea></div>
+    <button class="btn pink press" style="margin-top:18px" id="submit">추가요!</button>`;
+  app.append(dim, sh);
+  requestAnimationFrame(() => dim.classList.add("show"));
+  anim(sh, [{ transform: "translateY(105%)" }, { transform: "translateY(0)" }], { duration: 520, easing: "cubic-bezier(.34,1.3,.64,1)", fill: "forwards" });
+  $$(".chips[data-single]", sh).forEach(g => $$(".chip", g).forEach(c => c.onclick = () => {
+    $$(".chip", g).forEach(x => x.classList.remove("on")); c.classList.add("on"); buzz(6);
+    anim(c, [{ transform: "scale(.85) rotate(-4deg)" }, { transform: "scale(1.12) rotate(3deg)" }, { transform: "none" }], { duration: 380 });
+    const p = relPos(c); confetti(p.x, p.y, 4, .35);
+  }));
+  const close = async () => { dim.classList.remove("show"); await anim(sh, [{ transform: "translateY(0)" }, { transform: "translateY(105%)" }], { duration: 300, easing: "cubic-bezier(.4,0,1,1)", fill: "forwards" }).finished; dim.remove(); sh.remove(); };
+  dim.onclick = close;
+  $("#submit", sh).onclick = async () => { await close(); celebrate(); };
+}
+
+/* 추가요 완료: 스티커가 쾅 + 숫자 카운트업 + 터짐 */
+async function celebrate() {
+  const firstTime = !requested; requested = true; if (firstTime) waitCount++;
+  buzz([20, 40, 30]);
+  const d = document.createElement("div"); d.className = "done show";
+  d.innerHTML = `<div class="burst slam" id="slam"><span>추가요</span><span>완료!</span></div>
+    <div class="rankline"><b id="rankN">${waitCount - 1}</b>번째로 기다리는 중</div>
+    <div class="sub2">HOT 클래스를 기다리는 사람이 늘수록<br>강사님 눈에 잘 띄어요</div>
+    <div class="row"><button class="btn lime press" id="share">공유하기</button><button class="btn white press" id="ok">확인</button></div>`;
+  app.appendChild(d);
+  anim(d, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, fill: "forwards", easing: "ease-out" });
+  const slam = $("#slam", d);
+  await anim(slam, [{ transform: "scale(2.6) rotate(-40deg)", opacity: 0 }, { transform: "scale(.9) rotate(-6deg)", opacity: 1, offset: .55 }, { transform: "scale(1.05) rotate(-9deg)", offset: .8 }, { transform: "scale(1) rotate(-8deg)" }], { duration: 620, easing: "cubic-bezier(.2,.9,.3,1)", fill: "forwards" }).finished;
+  anim(app, [{ transform: "translate(0,0)" }, { transform: "translate(-4px,3px)" }, { transform: "translate(4px,-2px)" }, { transform: "translate(0,0)" }], { duration: 220, easing: "linear" });
+  const p = relPos(slam); confetti(p.x, p.y, 26, 1.2);
+  // 순번 카운트업
+  const rn = $("#rankN", d); const to = waitCount; let from = to - 12;
+  const t0 = performance.now(); const dur = D(700);
+  (function step(t) { const k = Math.min(1, (t - t0) / dur); const v = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))); rn.textContent = v; if (k < 1) requestAnimationFrame(step); else anim(rn, [{ transform: "scale(1.5)" }, { transform: "scale(1)" }], { duration: 400 }); })(t0);
+  $("#share", d).onclick = () => toast("인스타 스토리용 이미지 공유 (시안)");
+  $("#ok", d).onclick = async () => {
+    await anim(d, [{ opacity: 1 }, { opacity: 0 }], { duration: 220, fill: "forwards" }).finished; d.remove();
+    const song = stack.at(-1); if (song?.dataset.name !== "song") return;
+    refreshSong(song); const num = $("#num", song);
+    const pp = relPos(num); const plus = document.createElement("div"); plus.className = "plus1"; plus.textContent = "+1"; plus.style.left = pp.x + 40 + "px"; plus.style.top = pp.y - 10 + "px"; app.appendChild(plus);
+    anim(plus, [{ transform: "translateY(0) scale(.6)", opacity: 0 }, { transform: "translateY(-20px) scale(1.2)", opacity: 1, offset: .3 }, { transform: "translateY(-46px) scale(1)", opacity: 0 }], { duration: 900, easing: "ease-out" }).onfinish = () => plus.remove();
+    anim(num, [{ transform: "scale(1)" }, { transform: "scale(1.25) rotate(-4deg)" }, { transform: "scale(1)" }], { duration: 500 });
+  };
+}
+
+/* 앵콜: 응원봉 흔들기 + 관객 응원봉 + 게이지 */
+function wireEncore(el) {
+  const btn = $("#encBtn", el), stick = $("#stick", el), crowd = $("#crowd", el), gauge = $("#gauge", el), n = $("#encN", el);
+  btn.onclick = async () => {
+    buzz([10, 30, 10, 30, 10]);
+    anim(stick, [{ transform: "rotate(0)" }, { transform: "rotate(-28deg)" }, { transform: "rotate(24deg)" }, { transform: "rotate(-20deg)" }, { transform: "rotate(14deg)" }, { transform: "rotate(0)" }], { duration: 900, easing: "ease-in-out" });
+    crowd.style.opacity = 1;
+    $$("svg", crowd).forEach((s, i) => anim(s, [{ transform: "translateY(60px) rotate(0)" }, { transform: "translateY(0) rotate(-20deg)", offset: .3 }, { transform: "rotate(18deg)", offset: .55 }, { transform: "rotate(-14deg)", offset: .8 }, { transform: "translateY(60px) rotate(0)" }], { duration: 1400, delay: i * 60, easing: "ease-in-out" }));
+    setTimeout(() => crowd.style.opacity = 0, D(1800));
+    if (encoreCount < encoreGoal) encoreCount++;
+    n.textContent = encoreCount; anim(n, [{ transform: "scale(1)" }, { transform: "scale(1.6)" }, { transform: "scale(1)" }], { duration: 450 });
+    gauge.style.width = (encoreCount / encoreGoal * 100) + "%";
+    btn.textContent = "앵콜 완료 ✓"; btn.className = "btn done press";
+    const p = relPos(stick); confetti(p.x, p.y - 20, 12, .7);
+    if (encoreCount >= encoreGoal) { await wait(700); toast("10명 모였어요! 강사님께 전달했어요"); }
+  };
+}
+
+/* ═════════ 시작 + 왼쪽 목록 ═════════ */
+function reset() { app.innerHTML = status; stack.length = 0; waitCount = 128; requested = false; encoreCount = 7; ranks = [{ id: "h5CwaVjF_78", title: "Strategy", artist: "TWICE", c: 128, up: 23 }, { id: "vU43ebmiPRk", title: "Knife", artist: "ENHYPEN", c: 96, up: 11 }, { id: "G_1zDzhAz9w", title: "Ditto", artist: "NewJeans", c: 74, up: 6 }]; const h = mount("home"); stack.push(h); stickIn(h); }
+reset();
+
+const homeEl = () => stack[0];
+const ensureHome = async () => { await goHome(); $(".scroll", homeEl()).scrollTo({ top: 0 }); };
+const DEMOS = [
+  ["화면이 착착 붙어요", "처음 열 때 카드들이 <em>스티커처럼 기울며 붙어요</em>. 로고를 누르면 흔들려요.", async () => { reset(); }],
+  ["포토카드 기울기", "핫한 곡을 <em>옆으로 넘기면</em> 카드 기울기가 바뀌어요. 누르면 곡 상세로.", async () => { await ensureHome(); const hs = $("#hs", homeEl()); hs.scrollTo({ left: 220, behavior: "smooth" }); await wait(900); hs.scrollTo({ left: 0, behavior: "smooth" }); }],
+  ["홀로 포토카드", "곡 상세의 영상 카드 위에서 <em>마우스를 움직이면</em> 3D로 기울고 무지개 빛이 흘러요.", async () => { await ensureHome(); await push("song"); const holo = $("#holo", stack.at(-1)); const r = holo.getBoundingClientRect(); for (let k = 0; k <= 30; k++) { holo.dispatchEvent(new PointerEvent("pointermove", { clientX: r.left + r.width * (k / 30), clientY: r.top + r.height * (.3 + .4 * Math.sin(k / 5)) })); await wait(30); } holo.dispatchEvent(new PointerEvent("pointerleave")); }],
+  ["추가요! (클라이맥스)", "<em>시트가 튕기며 올라오고</em>, 칩을 고르면 톡 튀어요. 제출하면 스티커가 쾅, 순번이 올라가고, 하트·별이 터져요.", async () => { if (stack.at(-1)?.dataset.name !== "song") { await ensureHome(); await push("song"); } requested = false; openSheet(); }, true],
+  ["티켓 찢기", "클래스 티켓을 누르면 <em>절취선에서 찢기며</em> 상세로 들어가요.", async () => { await ensureHome(); const sc = $(".scroll", homeEl()); const t = $(".ticket", homeEl()); sc.scrollTo({ top: t.offsetTop - 200, behavior: "smooth" }); await wait(500); tearTicket(t); }],
+  ["앵콜! 응원봉", "마감된 클래스에서 앵콜을 누르면 <em>응원봉이 흔들리고 관객 응원봉이 올라와요</em>. 게이지가 차요.", async () => { await ensureHome(); const sc = $(".scroll", homeEl()); const t = $$(".ticket", homeEl())[2]; sc.scrollTo({ top: t.offsetTop - 200, behavior: "smooth" }); await wait(500); await tearTicket(t); await wait(300); $("#encBtn", stack.at(-1))?.click(); }, true],
+  ["당겨서 새로고침 = 스티커 떼기", "홈 맨 위에서 <em>아래로 끌었다 놓으면</em> 스티커가 떼어지며 돌고, 추가요 랭킹 순위가 통 튀며 바뀌어요.", async () => { await ensureHome(); const sc = $(".scroll", homeEl()); const r = sc.getBoundingClientRect(); sc.dispatchEvent(new PointerEvent("pointerdown", { clientX: r.left + 100, clientY: r.top + 40, bubbles: true })); for (let k = 0; k <= 20; k++) { window.dispatchEvent(new PointerEvent("pointermove", { clientX: r.left + 100, clientY: r.top + 40 + k * 7 })); await wait(18); } await wait(150); window.dispatchEvent(new PointerEvent("pointerup")); await wait(700); sc.scrollTo({ top: sc.scrollHeight, behavior: "smooth" }); }],
+  ["탭바 알약", "아래 탭을 누르면 <em>라임 알약이 통통 튀며</em> 따라가고 아이콘이 뛰어요.", async () => { await ensureHome(); const bs = $$(".tabbar button", homeEl()); for (const i of [2, 1, 3, 0]) { bs[i].click(); await wait(520); } }],
+  ["작은 생활 움직임", "늘 조용히 움직이는 것들: <em>반짝이는 별, 흐르는 띠, 숨쉬는 재생 버튼, 천천히 도는 추가요 스티커, 검색창 커서</em>.", async () => { await ensureHome(); const logo = $("#logo", homeEl()); logo.click(); }],
+];
+$("#list").innerHTML = DEMOS.map(([t, d, , hot], i) => `<div class="item ${hot ? "hot" : ""}"><div class="no">${i + 1}</div><div><b>${t}${hot ? ' <span style="font-size:11px;background:#FF6FB5;color:#fff;padding:2px 6px;border-radius:99px;vertical-align:2px">감정 순간</span>' : ""}</b><p>${d}</p></div><button class="play-btn" data-demo="${i}">▶ 재생</button></div>`).join("");
+$$("[data-demo]").forEach(b => b.onclick = () => DEMOS[+b.dataset.demo][2]());
+</script>
+</body>
+</html>

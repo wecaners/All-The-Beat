@@ -5,7 +5,8 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { ensureProfile } from "@/server/profiles";
 import { cancelRequest, RequestError, requestInput, saveRequest } from "@/server/requests";
 
-export type RequestActionState = { ok: boolean; error?: string };
+// isNew: 첫 추가요(완료 순간을 보여줄지), position: 몇 번째로 기다리는지 (서버 계산)
+export type RequestActionState = { ok: boolean; error?: string; isNew?: boolean; position?: number };
 
 // 서버 액션은 화면 밖에서도 POST로 호출될 수 있다. 로그인·입력은 여기서 다시 검사한다
 export async function saveRequestAction(
@@ -26,9 +27,10 @@ export async function saveRequestAction(
   });
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? "입력을 확인해 주세요" };
 
+  let saved: Awaited<ReturnType<typeof saveRequest>>;
   try {
     await ensureProfile(user.id, user.metadata);
-    await saveRequest(user.id, songId, parsed.data);
+    saved = await saveRequest(user.id, songId, parsed.data);
   } catch (e) {
     if (e instanceof RequestError) return { ok: false, error: e.message };
     console.error("[saveRequestAction]", e);
@@ -36,7 +38,7 @@ export async function saveRequestAction(
   }
 
   refresh();
-  return { ok: true };
+  return { ok: true, isNew: saved.isNew, position: saved.position };
 }
 
 export async function cancelRequestAction(songId: number): Promise<RequestActionState> {

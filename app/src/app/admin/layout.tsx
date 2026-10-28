@@ -15,8 +15,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
 async function AdminShell({ children }: { children: ReactNode }) {
   await requireAdmin();
+  // 운영 화면은 내부 도구라 스크랩북 배경 대신 흰 배경
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 pb-20">
+    <div className="min-h-screen w-full bg-white"><div className="mx-auto w-full max-w-3xl px-4 pb-20">
       <nav className="sticky top-0 z-10 -mx-4 flex items-center gap-4 border-b border-zinc-200 bg-white/90 px-4 py-3 text-sm backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/90">
         <Link href="/admin" className="font-extrabold">
           올빗 운영
@@ -26,6 +27,6 @@ async function AdminShell({ children }: { children: ReactNode }) {
         <Link href="/admin/classes/new">클래스 등록</Link>
       </nav>
       {children}
-    </div>
+    </div></div>
   );
 }

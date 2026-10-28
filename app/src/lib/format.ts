@@ -12,6 +12,20 @@ export function formatClassTime(startsAt: Date, endsAt: Date): string {
   return `${date.month}/${date.day}(${date.weekday}) ${time(startsAt)}~${time(endsAt)}`;
 }
 
+// 티켓 날짜: { month: "NOV", day: "01", weekday: "토" } (KST)
+export function formatTicketDate(d: Date): { month: string; day: string; weekday: string } {
+  const month = new Intl.DateTimeFormat("en-US", { timeZone: KST, month: "short" }).format(d).toUpperCase();
+  const day = new Intl.DateTimeFormat("en-US", { timeZone: KST, day: "2-digit" }).format(d);
+  const weekday = new Intl.DateTimeFormat("ko-KR", { timeZone: KST, weekday: "short" }).format(d);
+  return { month, day, weekday };
+}
+
+// "19:00~21:00" (KST)
+export function formatTimeRange(startsAt: Date, endsAt: Date): string {
+  const time = (d: Date) => new Intl.DateTimeFormat("ko-KR", { timeZone: KST, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(d);
+  return `${time(startsAt)}~${time(endsAt)}`;
+}
+
 export function formatPrice(price: number): string {
   return price === 0 ? "무료" : `${price.toLocaleString("ko-KR")}원`;
 }
@@ -26,3 +40,6 @@ export const TIME_PREF_LABEL = {
 } as const;
 
 export const VIDEO_TYPE_LABEL = { dance_practice: "안무 연습", performance: "퍼포먼스", mv: "MV" } as const;
+
+// 포토카드 아래 팬진 라벨용 영문
+export const VIDEO_TYPE_ZINE = { dance_practice: "DANCE PRACTICE", performance: "PERFORMANCE", mv: "MUSIC VIDEO" } as const;
