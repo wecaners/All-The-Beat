@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>올빗 3D 에셋 스타일 4차</title>
+<!-- 4차: 3D 에셋 스타일 테스트. SVG 그라데이션으로 3D 질감을 흉내 낸 시안이며, 실제 에셋은 고른 방향으로 3D 툴에서 제작한다 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Bricolage+Grotesque:opsz,wght@12..96,800&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #E8E5DF; color: #161616; font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  button { font: inherit; border: 0; background: none; cursor: pointer; }
+  :root { --paper: #FFF7EC; --ink: #161616; --sub: #6F655A; --dot: #EADCC6; --pink: #FF6FB5; --lime: #CFF23A; --sky: #7CC8FF; --butter: #FFE15C; --lilac: #C9B6FF; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 44px 32px 80px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: .08em; padding: 4px 10px; border-radius: 999px; background: #161616; color: #fff; }
+  h1 { margin-top: 12px; font-size: 30px; font-weight: 900; letter-spacing: -.03em; }
+  .lead { margin-top: 8px; color: #555; line-height: 1.65; max-width: 960px; }
+  .where { margin-top: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .where div { background: #fff; border-radius: 14px; padding: 12px 14px; font-size: 13px; line-height: 1.5; }
+  .where b { display: block; font-size: 14px; }
+  .cols { margin-top: 26px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .col { background: #fff; border-radius: 26px; padding: 22px; }
+  .col h2 { font-size: 24px; font-weight: 900; letter-spacing: -.02em; display: flex; align-items: center; gap: 8px; }
+  .col h2 .k { font-size: 12px; padding: 3px 9px; border-radius: 99px; background: #161616; color: #fff; }
+  .col .one { margin-top: 4px; font-size: 14px; color: #555; font-weight: 600; }
+  .assets { margin-top: 16px; border-radius: 18px; padding: 16px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; align-items: end; justify-items: center; background-color: var(--paper); background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px); background-size: 14px 14px; }
+  .assets .lab { font-size: 11px; font-weight: 800; color: #888; margin-top: 4px; text-align: center; }
+  .asset { display: flex; flex-direction: column; align-items: center; }
+  .asset svg { overflow: visible; }
+  .float { animation: float 3s ease-in-out infinite; }
+  .float.d1 { animation-delay: -.7s; } .float.d2 { animation-delay: -1.4s; } .float.d3 { animation-delay: -2.1s; }
+  @keyframes float { 50% { transform: translateY(-6px) rotate(-3deg); } }
+  .pc { margin-top: 14px; }
+  .pc li { font-size: 13px; line-height: 1.6; list-style: none; padding-left: 18px; position: relative; color: #333; }
+  .pc li::before { position: absolute; left: 0; }
+  .pc .p::before { content: "＋"; color: #2a9d3a; font-weight: 900; } .pc .c::before { content: "－"; color: #d23; font-weight: 900; }
+  .rec { outline: 3px solid #161616; }
+  .rec-badge { display: inline-block; margin-left: auto; font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 999px; background: var(--lime); border: 2px solid #161616; }
+
+  /* 미니 폰: 완료 순간 */
+  .phone { margin: 18px auto 6px; width: 300px; height: 520px; border-radius: 36px; overflow: hidden; position: relative; box-shadow: 0 0 0 8px #111, 0 20px 40px rgba(0,0,0,.2); background-color: var(--paper); background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px); background-size: 14px 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 22px; }
+  .phone .hero3d { position: relative; width: 210px; height: 210px; }
+  .phone .hero3d svg { position: absolute; inset: 0; }
+  .phone .hero3d .txt { position: absolute; inset: 0; display: grid; place-items: center; font-family: "Bagel Fat One"; font-size: 30px; line-height: 1.05; pointer-events: none; }
+  .bounce { animation: bounce 1.8s cubic-bezier(.34,1.56,.64,1) infinite; transform-origin: 50% 80%; }
+  @keyframes bounce { 0%, 100% { transform: translateY(0) scale(1) rotate(-6deg); } 20% { transform: translateY(4px) scale(1.06, .92) rotate(-6deg); } 45% { transform: translateY(-18px) scale(.96, 1.05) rotate(-2deg); } 70% { transform: translateY(0) scale(1.03, .97) rotate(-7deg); } }
+  .phone .rankline { margin-top: 18px; font-size: 15px; font-weight: 900; }
+  .phone .rankline b { font-family: "Bagel Fat One"; font-weight: 400; font-size: 26px; color: var(--pink); -webkit-text-stroke: 1px var(--ink); }
+  .phone .sub2 { margin-top: 4px; font-size: 12px; color: var(--sub); font-weight: 600; }
+  .phone .btn { margin-top: 18px; height: 48px; width: 100%; border-radius: 16px; border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); background: var(--lime); font-family: "Bagel Fat One"; font-size: 18px; }
+  .phone .mini { position: absolute; }
+  .cap { text-align: center; font-size: 12px; color: #888; font-weight: 700; }
+
+  .panel { margin-top: 26px; background: #fff; border-radius: 26px; padding: 26px; }
+  .panel h2 { font-size: 22px; font-weight: 900; letter-spacing: -.02em; }
+  .panel p { margin-top: 6px; font-size: 14px; color: #444; line-height: 1.65; }
+  table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid #eee; vertical-align: top; line-height: 1.5; }
+  th { background: #161616; color: #fff; font-weight: 800; }
+  .mascot-row { display: flex; gap: 28px; align-items: flex-end; margin-top: 16px; flex-wrap: wrap; }
+  .mascot-row .m { text-align: center; font-size: 12px; font-weight: 800; color: #777; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="tag">ROUND 4 · 3D 에셋 스타일</span>
+  <h1>3D는 어떤 질감으로? — 같은 에셋, 세 가지 재질</h1>
+  <p class="lead">3D는 "시그니처 순간"에만 써요. 같은 에셋 4종(별 스티커, 하트, 응원봉, 마스코트 후보)을 세 가지 재질로 그렸어요. 아래 폰은 각 재질이 <b>추가요 완료 순간</b>에 들어갔을 때의 모습이에요. 이건 SVG로 3D 질감을 흉내 낸 시안이에요. 고른 방향으로 실제 3D 툴에서 제작해요.</p>
+  <div class="where">
+    <div><b>⭐ 추가요 완료</b>별 스티커가 통통 튀며 등장</div>
+    <div><b>🪄 앵콜</b>응원봉이 흔들리며 빛남</div>
+    <div><b>🫧 빈 화면·온보딩</b>마스코트가 안내 (선택)</div>
+    <div><b>🔗 공유 이미지</b>곡 포토카드 + 3D 스티커</div>
+  </div>
+
+  <div class="cols">
+    <section class="col rec" id="s1">
+      <h2><span class="k">S1</span>부푼 스티커 <span class="rec-badge">추천</span></h2>
+      <p class="one">검은 테두리는 그대로, 속만 빵빵하게 부푼 비닐 스티커</p>
+      <div class="assets" data-style="puffy"></div>
+      <div class="phone" data-style="puffy"></div>
+      <ul class="pc"><li class="p">지금 화면(검은 테두리·딱 떨어지는 그림자)과 한 몸처럼 붙어요</li><li class="p">평면 스티커와 섞여도 어색하지 않아서 3D를 "조금만" 쓰기 좋아요</li><li class="p">작게 줄여도 테두리 덕분에 형태가 또렷해요</li><li class="c">3D 효과가 셋 중 가장 덜 극적이에요</li></ul>
+    </section>
+    <section class="col" id="s2">
+      <h2><span class="k">S2</span>젤리·캔디</h2>
+      <p class="one">반투명 젤리처럼 빛이 비치는 Y2K 캔디 재질</p>
+      <div class="assets" data-style="jelly"></div>
+      <div class="phone" data-style="jelly"></div>
+      <ul class="pc"><li class="p">가장 Y2K답고 반짝여서 "갖고 싶은" 느낌이 강해요</li><li class="p">공유 이미지에서 눈에 확 띄어요</li><li class="c">테두리가 없어 평면 스티커 UI와 결이 달라요</li><li class="c">배경이 크림색이라 반투명이 탁해 보일 수 있어요</li></ul>
+    </section>
+    <section class="col" id="s3">
+      <h2><span class="k">S3</span>클레이</h2>
+      <p class="one">손으로 빚은 무광 점토, 부드러운 그림자</p>
+      <div class="assets" data-style="clay"></div>
+      <div class="phone" data-style="clay"></div>
+      <ul class="pc"><li class="p">가장 따뜻하고 귀여워요. 마스코트와 잘 맞아요</li><li class="p">요즘 3D 아이콘 팩에서 가장 흔해서 구하기 쉬워요</li><li class="c">흔한 만큼 올빗만의 개성이 약해요</li><li class="c">흐린 그림자가 우리의 딱 떨어지는 그림자와 충돌해요</li></ul>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>마스코트 후보 — "빗별이" (가칭)</h2>
+    <p>앱 아이콘의 반짝이 별에서 나온 캐릭터예요. 스크랩북에 붙은 별 스티커가 살아 움직이는 설정이라 컨셉과 이어져요. 표정 몇 개만 있으면 빈 화면, 온보딩, 완료, 오류 화면을 모두 맡을 수 있어요. 둘지 말지는 이번에 같이 정해요.</p>
+    <div class="mascot-row" id="mascots"></div>
+  </section>
+
+  <section class="panel">
+    <h2>고른 뒤 실제 제작은 이렇게</h2>
+    <table>
+      <tr><th>에셋</th><th>쓰는 곳</th><th>형태</th><th>용량 목표</th></tr>
+      <tr><td>별 스티커 (추가요)</td><td>추가요 완료, 공유 이미지</td><td>움직이는 애니메이션 (Rive) + 정지 이미지 (WebP)</td><td>애니메이션 50KB 이하, 이미지 40KB 이하</td></tr>
+      <tr><td>응원봉 (앵콜)</td><td>앵콜 버튼 순간, 앵콜 게이지</td><td>흔들기·빛나기 애니메이션 (Rive)</td><td>50KB 이하</td></tr>
+      <tr><td>하트·반짝이</td><td>터지는 장식 (작게 여러 개)</td><td>정지 이미지 (WebP, 2배 해상도)</td><td>개당 8KB 이하</td></tr>
+      <tr><td>마스코트 (선택)</td><td>빈 화면, 온보딩, 완료, 오류</td><td>표정 4~6종 정지 이미지 + 대표 동작 1개 애니메이션</td><td>표정당 30KB 이하</td></tr>
+    </table>
+    <p>실시간 3D(WebGL)는 쓰지 않아요. 인스타·카톡 인앱 브라우저에서 무겁고, 홈 3초 기준을 깨기 쉬워요. 제작은 ① 3D 일러스트레이터 외주 ② 3D 툴(Spline·Blender) 직접 작업 ③ AI 이미지 생성 후 다듬기(상업 이용 조건 확인) 중에서 고르면 돼요. 재질을 고르시면 에셋별 제작 브리프(형태, 색 코드, 조명 방향, 테두리 두께, 각도, 크기)를 써드릴게요.</p>
+  </section>
+</div>
+
+<script>
+/* 공통 도형 */
+const STAR = "M60 8 L73 42 L110 45 L82 69 L91 106 L60 86 L29 106 L38 69 L10 45 L47 42 Z";
+const HEART = "M60 104 C26 80 8 60 8 38 A24 24 0 0 1 60 28 A24 24 0 0 1 112 38 C112 60 94 80 60 104 Z";
+const PAL = { pink: ["#FFC2E0", "#FF6FB5", "#D9468F"], lime: ["#F0FFB0", "#CFF23A", "#9DBE12"], butter: ["#FFF4B8", "#FFE15C", "#E3B91F"], sky: ["#D6EEFF", "#7CC8FF", "#3E97D6"], white: ["#FFFFFF", "#F3EEE6", "#D9CFC2"] };
+let uid = 0;
+
+/* 재질별 그리기: shape 경로 + 색 → SVG 조각 */
+function puffy(d, c, w = 120) {
+  const id = "p" + uid++;
+  return `<defs><radialGradient id="${id}" cx="38%" cy="30%" r="75%"><stop offset="0" stop-color="${c[0]}"/><stop offset=".55" stop-color="${c[1]}"/><stop offset="1" stop-color="${c[2]}"/></radialGradient>
+    <filter id="${id}b"><feGaussianBlur stdDeviation="3"/></filter></defs>
+    <path d="${d}" transform="translate(5 6)" fill="#161616" stroke="#161616" stroke-width="10" stroke-linejoin="round"/>
+    <path d="${d}" fill="#161616" stroke="#161616" stroke-width="10" stroke-linejoin="round"/>
+    <path d="${d}" fill="url(#${id})" stroke="url(#${id})" stroke-width="4" stroke-linejoin="round"/>
+    <ellipse cx="44" cy="40" rx="16" ry="9" fill="#fff" opacity=".85" filter="url(#${id}b)" transform="rotate(-25 44 40)"/>
+    <ellipse cx="40" cy="38" rx="5" ry="3" fill="#fff" transform="rotate(-25 40 38)"/>`;
+}
+function jelly(d, c) {
+  const id = "j" + uid++;
+  return `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c[0]}" stop-opacity=".95"/><stop offset=".6" stop-color="${c[1]}" stop-opacity=".78"/><stop offset="1" stop-color="${c[2]}" stop-opacity=".92"/></linearGradient>
+    <filter id="${id}s" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter><filter id="${id}b"><feGaussianBlur stdDeviation="2.5"/></filter></defs>
+    <path d="${d}" transform="translate(0 10) scale(1)" fill="${c[1]}" opacity=".45" filter="url(#${id}s)"/>
+    <path d="${d}" fill="url(#${id})" stroke="${c[2]}" stroke-width="5" stroke-linejoin="round" stroke-opacity=".6"/>
+    <path d="${d}" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" opacity=".7" transform="translate(60 60) scale(.86) translate(-60 -60)"/>
+    <ellipse cx="46" cy="38" rx="20" ry="9" fill="#fff" opacity=".9" filter="url(#${id}b)" transform="rotate(-25 46 38)"/>
+    <circle cx="84" cy="76" r="4" fill="#fff" opacity=".8"/>`;
+}
+function clay(d, c) {
+  const id = "c" + uid++;
+  return `<defs><radialGradient id="${id}" cx="40%" cy="32%" r="80%"><stop offset="0" stop-color="${c[0]}"/><stop offset=".7" stop-color="${c[1]}"/><stop offset="1" stop-color="${c[2]}"/></radialGradient>
+    <filter id="${id}s" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="7"/></filter></defs>
+    <path d="${d}" transform="translate(4 14)" fill="#8a6a4a" opacity=".35" filter="url(#${id}s)"/>
+    <path d="${d}" fill="url(#${id})" stroke="url(#${id})" stroke-width="9" stroke-linejoin="round"/>
+    <ellipse cx="46" cy="42" rx="18" ry="10" fill="#fff" opacity=".28" transform="rotate(-25 46 42)"/>`;
+}
+const STYLES = { puffy, jelly, clay };
+
+/* 응원봉 = 별 머리 + 막대 */
+function stick(style) {
+  const head = STYLES[style](STAR, PAL.pink);
+  const bar = style === "puffy"
+    ? `<rect x="49" y="98" width="22" height="92" rx="11" fill="#161616" transform="translate(5 6)"/><rect x="49" y="98" width="22" height="92" rx="11" fill="#fff" stroke="#161616" stroke-width="5"/><rect x="49" y="128" width="22" height="18" fill="#CFF23A" stroke="#161616" stroke-width="5"/><rect x="54" y="104" width="5" height="70" rx="2.5" fill="#fff" opacity=".9"/>`
+    : style === "jelly"
+      ? `<rect x="49" y="98" width="22" height="92" rx="11" fill="#E9F7FF" fill-opacity=".85" stroke="#9BCBEA" stroke-width="4"/><rect x="49" y="128" width="22" height="18" fill="#CFF23A" fill-opacity=".8"/><rect x="54" y="104" width="5" height="70" rx="2.5" fill="#fff"/>`
+      : `<rect x="49" y="98" width="22" height="92" rx="11" fill="#F3EEE6" stroke="#E3D8C9" stroke-width="5"/><rect x="49" y="128" width="22" height="18" fill="#CFF23A"/><rect x="53" y="104" width="5" height="70" rx="2.5" fill="#fff" opacity=".5"/>`;
+  const glow = style === "puffy" ? "" : `<circle cx="60" cy="58" r="58" fill="#FFF3A0" opacity=".35"/>`;
+  return `<svg width="70" height="116" viewBox="0 0 120 200">${glow}${bar}<g>${head}</g></svg>`;
+}
+
+/* 마스코트 "빗별이": 별 몸 + 얼굴 */
+function face(expr = "smile", style = "puffy") {
+  const eye = (x) => expr === "wink" && x > 60
+    ? `<path d="M${x - 7} 62 Q${x} 56 ${x + 7} 62" fill="none" stroke="#161616" stroke-width="4" stroke-linecap="round"/>`
+    : expr === "happy" ? `<path d="M${x - 7} 63 Q${x} 54 ${x + 7} 63" fill="none" stroke="#161616" stroke-width="4" stroke-linecap="round"/>`
+    : `<ellipse cx="${x}" cy="60" rx="5" ry="${expr === "wow" ? 8 : 7}" fill="#161616"/><circle cx="${x + 1.6}" cy="57" r="1.8" fill="#fff"/>`;
+  const mouth = expr === "wow" ? `<ellipse cx="60" cy="76" rx="6" ry="7" fill="#161616"/><ellipse cx="60" cy="79" rx="3.5" ry="3" fill="#FF6FB5"/>`
+    : expr === "sad" ? `<path d="M52 79 Q60 72 68 79" fill="none" stroke="#161616" stroke-width="4" stroke-linecap="round"/>`
+    : `<path d="M51 72 Q60 82 69 72" fill="#161616" stroke="#161616" stroke-width="3" stroke-linejoin="round"/><path d="M55 76 Q60 80 65 76" fill="#FF6FB5"/>`;
+  const blush = style === "jelly" ? .5 : .8;
+  return `${eye(48)}${eye(72)}<ellipse cx="38" cy="72" rx="7" ry="4" fill="#FF6FB5" opacity="${blush}"/><ellipse cx="82" cy="72" rx="7" ry="4" fill="#FF6FB5" opacity="${blush}"/>${mouth}`;
+}
+function mascot(style, expr = "smile", size = 84) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 120 120">${STYLES[style](STAR, PAL.butter)}${face(expr, style)}</svg>`;
+}
+const svg = (inner, s = 72) => `<svg width="${s}" height="${s}" viewBox="0 0 120 120">${inner}</svg>`;
+
+document.querySelectorAll(".assets").forEach((el) => {
+  const st = el.dataset.style;
+  el.innerHTML = [
+    [svg(STYLES[st](STAR, PAL.pink), 78), "별 스티커", ""],
+    [svg(STYLES[st](HEART, PAL.pink), 66), "하트", "d1"],
+    [stick(st), "응원봉", "d2"],
+    [mascot(st, "smile", 78), "마스코트", "d3"],
+  ].map(([s, l, d]) => `<div class="asset"><div class="float ${d}">${s}</div><div class="lab">${l}</div></div>`).join("");
+});
+
+document.querySelectorAll(".phone").forEach((el) => {
+  const st = el.dataset.style;
+  el.innerHTML = `
+    <div class="mini float" style="left:22px;top:60px">${svg(STYLES[st](HEART, PAL.pink), 34)}</div>
+    <div class="mini float d2" style="right:26px;top:96px">${svg(STYLES[st](STAR, PAL.sky), 30)}</div>
+    <div class="mini float d1" style="left:30px;bottom:96px">${svg(STYLES[st](STAR, PAL.butter), 26)}</div>
+    <div class="mini float d3" style="right:22px;bottom:120px">${svg(STYLES[st](HEART, PAL.lime), 28)}</div>
+    <div class="hero3d bounce"><svg viewBox="0 0 120 120">${STYLES[st](STAR, PAL.lime)}</svg><div class="txt">추가요<br>완료!</div></div>
+    <div class="rankline"><b>129</b>번째로 기다리는 중</div>
+    <div class="sub2">HOT 클래스를 기다리는 사람이 늘수록 강사님 눈에 잘 띄어요</div>
+    <button class="btn">공유하기</button>`;
+});
+
+document.getElementById("mascots").innerHTML = [["smile", "기본"], ["happy", "신남 (완료)"], ["wow", "놀람 (새 클래스)"], ["wink", "윙크 (온보딩)"], ["sad", "시무룩 (빈 화면·오류)"]]
+  .map(([e, l], i) => `<div class="m"><div class="float d${i % 4}">${mascot("puffy", e, 96)}</div>${l}</div>`).join("") +
+  `<div class="m" style="margin-left:24px"><div class="float">${mascot("clay", "smile", 96)}</div>클레이 버전</div><div class="m"><div class="float d2">${mascot("jelly", "smile", 96)}</div>젤리 버전</div>`;
+</script>
+</body>
+</html>
