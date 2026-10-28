@@ -13,6 +13,16 @@ import { RequestPanel } from "./request-panel";
 
 type Props = { params: Promise<{ slug: string }> };
 
+// 한글 slug가 본문 렌더에서는 퍼센트 인코딩된 채로 들어온다(메타데이터와 다름). 한 번 풀어서 DB·캐시 키를 맞춘다
+async function readSlug(params: Props["params"]): Promise<string> {
+  const { slug } = await params;
+  try {
+    return decodeURIComponent(slug);
+  } catch {
+    return slug;
+  }
+}
+
 // 곡 정보는 자주 안 바뀌어서 캐시한다. 운영자가 곡을 고치면 updateTag(`song:${slug}`)로 갱신 (F-16, 나중에)
 async function getSong(slug: string) {
   "use cache";
@@ -28,7 +38,7 @@ async function getRegions() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const lookup = await getSong((await params).slug);
+  const lookup = await getSong(await readSlug(params));
   if (lookup.kind !== "found") return { title: "올빗" };
   const { title, artistName } = lookup.song;
   // OG 이미지는 올빗이 만든 이미지로 (03 명세 F-04, 다음 작업)
@@ -51,8 +61,7 @@ export default function SongPage({ params }: Props) {
 }
 
 async function SongContent({ params }: Props) {
-  const { slug } = await params;
-  const lookup = await getSong(slug);
+  const lookup = await getSong(await readSlug(params));
   if (lookup.kind === "missing") notFound();
   if (lookup.kind === "merged") permanentRedirect(`/song/${lookup.slug}`);
   const song = lookup.song;
