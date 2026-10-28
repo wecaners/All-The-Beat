@@ -44,6 +44,8 @@
 | `SongCard` | 곡 포토카드(정지). 누르면 곡 상세. 가로로 넘기는 줄·순위·검색 결과 |
 | `StarBurst`, `StickerLabel`, `Tape` | 별 스티커, 작은 라벨, 테이프 |
 | `TiltRow`, `Twinkle` | 가로 포토카드 줄(넘기면 기울기), 반짝이는 별 낙서 |
+| `StaticMap` | 연습실 위치 미리보기(카카오 정적 지도, 보일 때만 로드, 누르면 카카오맵). 키·위치가 없으면 안 그린다 |
+| `PhotoStrip` | 작은 사진 목록 + 크게 보기(`<dialog>`, 넘기기·닫기·Esc·뒤로 가기) |
 | `Celebration`, `Toast` | 감정 순간 오버레이, 짧은 안내 |
 | `motion.ts` | `play`, `confetti`, `buzz`, `reducedMotion`, `stagger` |
 

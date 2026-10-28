@@ -3,9 +3,13 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getInstructorForAdmin } from "@/server/admin/instructors";
+import { getInstructorMediaForAdmin, listStudiosForAdmin } from "@/server/admin/studios";
+import { listRegions } from "@/server/regions";
 import { todayKst } from "@/server/admin/shared";
 import { linkButtonClass, Section } from "../../ui";
 import { ConsentForm } from "../instructor-forms";
+import { InstructorMediaForm } from "../profile-forms";
+import { StudioCard, StudioPicker } from "../studio-forms";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -24,6 +28,7 @@ async function Instructor({ params }: Props) {
   const id = Number((await params).id);
   const instructor = Number.isInteger(id) ? await getInstructorForAdmin(id) : null;
   if (!instructor) notFound();
+  const [media, studios, regions] = await Promise.all([getInstructorMediaForAdmin(instructor.id), listStudiosForAdmin(instructor.id), listRegions()]);
 
   return (
     <>
@@ -65,6 +70,25 @@ async function Instructor({ params }: Props) {
           <ConsentForm instructorId={instructor.id} today={todayKst()} hasConsent={Boolean(instructor.consentAt)} />
         </Section>
       )}
+
+      {media && (
+        <Section title="강사 소개 (클래스 상세에 보여요)">
+          <InstructorMediaForm instructorId={instructor.id} isProxy={instructor.isProxy} media={media} />
+        </Section>
+      )}
+
+      <Section title="스튜디오">
+        <p className="mb-3 text-sm text-zinc-500">한 번 등록하면 이 강사의 클래스 등록에서 골라 써요. 시설·사진은 그 스튜디오의 모든 클래스에 나와요.</p>
+        <StudioPicker instructorId={instructor.id} />
+        <div className="mt-4 space-y-3">
+          {studios.map((st) => (
+            <div key={st.id}>
+              <h3 className="mb-1 text-sm font-bold">{st.studioName}</h3>
+              <StudioCard studio={st} regions={regions} />
+            </div>
+          ))}
+        </div>
+      </Section>
     </>
   );
 }

@@ -461,6 +461,8 @@ createClass(...) 후:
   - 삭제 규칙: 사용자 삭제 → 추가요·앵콜 같이 삭제, 이벤트는 user_id만 NULL / 클래스 삭제 → class_songs·앵콜·라운드 같이 삭제, 추가요의 fulfilled_class_id는 NULL / 곡·권역·강사는 참조가 있으면 삭제 막힘
   - 모든 PK는 identity(자동 증가). `regions.id`만 시드로 고정값
 - 기준 데이터 마이그레이션: `0003` 권역 8개, `0004` 서울 25개 구 → 권역 매핑(구 단위만, 동 단위는 나중에) [가정]
+- `0005_instructor_studio` (2026-10-28, `specs/instructor-studio`): `instructor_places`를 강사의 스튜디오로 넓힘 — `kakao_place_id`·`kakao_place_url`·`lat`·`lng`(카카오 검색에서 한 번 저장, 위도·경도는 둘 다 있거나 둘 다 없음)·`facilities text[]`·`archived_at`(목록에서 빼기, 지우지 않음), (강사, 카카오 장소) 유니크. 새 테이블 `studio_photos`(스튜디오 사진, 큰 사진·작은 사진 경로, 스튜디오 삭제 시 같이 삭제). `instructor_profiles`에 `photo_path`·`photo_thumb_path`·`portfolio_video_ids text[]`(최대 2)·`media_consent`(대리 등록 강사의 사진·영상 게재 동의)
+- `0006_media_storage`: Supabase Storage 공개 버킷 `media`(이미지, 2MB). 쓰기·지우기는 `public.is_admin()`(정의자 권한 함수, authenticated만 실행) 정책으로 운영자만. 읽기는 공개 주소
 
 ## 9. 열린 질문
 

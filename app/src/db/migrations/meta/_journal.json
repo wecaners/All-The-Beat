@@ -36,6 +36,20 @@
       "when": 1793094705649,
       "tag": "0004_seed_region_mappings",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793177363207,
+      "tag": "0005_instructor_studio",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793177363828,
+      "tag": "0006_media_storage",
+      "breakpoints": true
     }
   ]
 }

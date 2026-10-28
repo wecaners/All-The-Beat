@@ -1,7 +1,9 @@
 import { and, asc, count, desc, eq, gt, inArray, isNotNull, isNull, lt, min, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db";
-import { artists, bookingType, classes, classSongs, classStatus, instructorProfiles, regions, songs } from "@/db/schema";
+import { artists, bookingType, classes, classSongs, classStatus, instructorPlaces, instructorProfiles, regions, songs, studioPhotos } from "@/db/schema";
+import { type Facility, isFacility } from "@/lib/facilities";
+import { mediaUrl } from "@/server/media";
 import { visibleVideoId } from "@/server/songs";
 
 export type ClassCard = {
@@ -93,7 +95,22 @@ export type ClassDetail = {
   description: string | null;
   status: ClassDisplayStatus;
   canBook: boolean;
-  instructor: { displayName: string; instagramHandle: string };
+  /** 사진·소개·포트폴리오는 대리 등록 강사면 사진·영상 게재 동의가 있을 때만 (FR-12) */
+  instructor: {
+    displayName: string;
+    instagramHandle: string;
+    photoUrl: string | null;
+    bio: string | null;
+    portfolioVideoIds: string[];
+  };
+  /** 스튜디오의 지금 값 (이름·주소는 클래스 스냅샷을 쓴다, FR-8). 연결된 스튜디오가 없으면 비어 있다 */
+  studio: {
+    lat: number | null;
+    lng: number | null;
+    kakaoPlaceUrl: string | null;
+    facilities: Facility[];
+    photos: { url: string; thumbUrl: string }[];
+  };
   /** position 순. 첫 곡이 대표 곡 */
   songs: { slug: string; title: string; artistName: string; videoId: string | null }[];
 };
@@ -123,12 +140,32 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
       ended: classEnded,
       instructorName: instructorProfiles.displayName,
       instagramHandle: instructorProfiles.instagramHandle,
+      isProxy: instructorProfiles.isProxy,
+      mediaConsent: instructorProfiles.mediaConsent,
+      photoPath: instructorProfiles.photoPath,
+      bio: instructorProfiles.bio,
+      portfolioVideoIds: instructorProfiles.portfolioVideoIds,
+      placeId: classes.placeId,
+      lat: instructorPlaces.lat,
+      lng: instructorPlaces.lng,
+      kakaoPlaceUrl: instructorPlaces.kakaoPlaceUrl,
+      facilities: instructorPlaces.facilities,
     })
     .from(classes)
     .innerJoin(instructorProfiles, eq(instructorProfiles.id, classes.instructorId))
     .innerJoin(regions, eq(regions.id, classes.regionId))
+    .leftJoin(instructorPlaces, eq(instructorPlaces.id, classes.placeId))
     .where(and(eq(classes.id, id), publiclyVisible));
   if (!row) return null;
+
+  const photoRows = row.placeId
+    ? await db
+        .select({ path: studioPhotos.path, thumbPath: studioPhotos.thumbPath })
+        .from(studioPhotos)
+        .where(eq(studioPhotos.placeId, row.placeId))
+        .orderBy(asc(studioPhotos.position), asc(studioPhotos.id))
+    : [];
+  const showMedia = !row.isProxy || row.mediaConsent;
 
   const songRows = await db
     .select({ slug: songs.slug, title: songs.title, artistName: artists.name, videoId: visibleVideoId })
@@ -154,7 +191,21 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
     description: row.description,
     status,
     canBook: canBook(status),
-    instructor: { displayName: row.instructorName, instagramHandle: row.instagramHandle },
+    instructor: {
+      displayName: row.instructorName,
+      instagramHandle: row.instagramHandle,
+      photoUrl: showMedia && row.photoPath ? mediaUrl(row.photoPath) : null,
+      bio: showMedia ? row.bio : null,
+      portfolioVideoIds: showMedia ? row.portfolioVideoIds : [],
+    },
+    studio: {
+      lat: row.lat,
+      lng: row.lng,
+      kakaoPlaceUrl: row.kakaoPlaceUrl,
+      facilities: (row.facilities ?? []).filter(isFacility),
+      // 연습실 사진도 강사가 준 사진이라 같은 동의를 따른다
+      photos: showMedia ? photoRows.map((p) => ({ url: mediaUrl(p.path), thumbUrl: mediaUrl(p.thumbPath) })) : [],
+    },
     songs: songRows,
   };
 }
