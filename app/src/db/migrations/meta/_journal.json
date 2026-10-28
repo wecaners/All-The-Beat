@@ -29,6 +29,13 @@
       "when": 1793085974029,
       "tag": "0003_seed_regions",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793094705649,
+      "tag": "0004_seed_region_mappings",
+      "breakpoints": true
     }
   ]
 }

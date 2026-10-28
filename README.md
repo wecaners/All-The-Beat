@@ -34,7 +34,7 @@
 
 ## 앱 (`app/`)
 
-Next.js 16 + Supabase. 곡 상세(`/song/[slug]`)와 추가요, 로그인 검증 페이지(`/spike/song`)가 있다.
+Next.js 16 + Supabase. 곡 상세(`/song/[slug]`)와 추가요, 운영 화면(`/admin`: 곡·강사·클래스 대리 등록), 로그인 검증 페이지(`/spike/song`)가 있다.
 
 ```bash
 cd app
@@ -52,6 +52,7 @@ pnpm db:generate   # 스키마 코드 → 마이그레이션 SQL
 pnpm db:migrate    # dev DB에 적용
 pnpm db:seed:dev   # dev DB에 샘플 곡 넣기 (A2O LITE - NEON → /song/a2o-lite-neon)
 pnpm db:studio     # DB 내용 보기
+pnpm admin:grant <닉네임>   # 운영자 지정 (--revoke로 해제). 운영 화면은 /admin
 ```
 
 ## 와이어프레임

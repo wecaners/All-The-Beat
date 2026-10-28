@@ -23,3 +23,4 @@
 
 | 폴더 | 기능 | 상태 |
 | --- | --- | --- |
+| [admin-song-class-registration](admin-song-class-registration/) | 운영자 곡·클래스 등록 (F-15, F-16) | 구현 완료, 운영자 계정으로 확인 대기 |
