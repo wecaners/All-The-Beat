@@ -15,7 +15,7 @@ const VARIANT = {
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: keyof typeof VARIANT;
   size?: "md" | "lg";
-  /** 버블 글씨(Bagel). 긴 문장은 false */
+  /** 디스플레이 글씨(메이플스토리). 긴 문장은 false */
   display?: boolean;
 };
 

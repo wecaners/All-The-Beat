@@ -50,6 +50,9 @@
 1. `pnpm check` 통과
 2. 모바일 크기(375)로 비로그인 곡 상세·로그인 시트 확인, 콘솔 오류 없음
 3. 별 스티커 위치 충돌(relative/absolute) 발견·수정
+4. 사용자 피드백(Bagel 가독성·피로도)으로 후보 12종 비교 시안(`design/concepts/font-compare.html`)을 만들고, 사용자가 고른 메이플스토리 Bold로 디스플레이 폰트를 교체 (`layout.tsx`, `globals.css`, `app/src/app/fonts/`)
+5. 교체 후 `pnpm check` 통과, 모바일(375) 비로그인 곡 상세·로그인 시트 확인, 콘솔·서버 오류 없음
+6. 사용자 지시로 줄바꿈을 전역 어절 단위로 (`body`에 `word-break: keep-all` + `overflow-wrap: break-word`). 추가요 카드 문구가 "남겨 / 주세요!"로 끊기는 것 확인
 
 ## Test Results
 
@@ -58,6 +61,7 @@
 | 곡 상세 (비로그인) | /song/a2o-lite-neon | 포토카드·형광펜 제목·핑크 카드·티켓 | 같음 | ✅ |
 | 로그인 시트      | 나도 추가요! (비로그인) | 카톡 복귀 안내 + 카카오 버튼 | 같음 | ✅ |
 | 첫 추가요 완료 순간 | 로그인 후 제출 | 스티커·순번 | 미확인 (로그인 필요) | ⏸️ |
+| 메이플스토리 적용 | /song/a2o-lite-neon | 로고·곡 제목·추가요 카드·버튼·티켓 날짜·시트 제목이 메이플스토리 | 같음, 폰트 loaded | ✅ |
 
 ## Error Log
 

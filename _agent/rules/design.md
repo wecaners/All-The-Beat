@@ -23,7 +23,9 @@
 
 - 색 (역할 이름): `paper` 배경, `card` 붙인 카드, `ink` 테두리·글자, `sub` 보조 글자, `pink` 추가요·행동, `lime` 형광펜·완료, `sky`·`butter`·`lilac` 스티커·칩, `pink-soft` 옅은 바탕, `kakao` 카카오 버튼
 - **큰 면적에 칠하는 색은 한 화면에 `pink` 하나.** 나머지 색은 스티커·칩·작은 면적에만
-- 글꼴: `font-display`(Bagel Fat One) 외침·곡 제목·큰 숫자·버튼 / `font-zine`(Bricolage) 영문 대문자 라벨 / 기본(Pretendard) 본문·정보
+- 글꼴: `font-display`(메이플스토리 Bold) 로고·외침·곡 제목·큰 숫자·버튼 / `font-zine`(Bricolage) 영문 대문자 라벨 / 기본(Pretendard) 본문·정보. 한글 디스플레이 폰트는 하나만 쓴다. 섞으면 화면이 산만해지고 오래 볼 때 피로하다
+- 줄바꿈은 전역(`body`)에서 어절 단위(`keep-all`)다. 화면마다 `break-keep`을 따로 붙이지 않는다
+- 메이플스토리 서체는 약관상 파일을 수정(서브셋·변환)해 배포할 수 없다. `app/src/app/fonts/`의 원본 woff를 그대로 쓰고, 서비스 안에 저작권 표기("메이플스토리 서체 © NEXON Korea")를 둔다
 - 테두리는 2px `ink`, 그림자는 딱 떨어지는 `shadow-sticker-sm|sticker|sticker-lg`. 흐린 그림자(blur)는 쓰지 않는다
 - 유틸: `sticker-edge`(테두리+그림자), `press`(누르면 꾹), `mark-lime`(형광펜), `text-sticker`(외곽선 글씨). 별 스티커는 SVG 컴포넌트 `StarBurst`(CSS clip-path로 자르면 테두리가 계단처럼 깨진다)
 
