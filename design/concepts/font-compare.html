@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>올빗 · 디스플레이 폰트 비교</title>
+<!-- 본문 (지금 앱과 같음) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<!-- Google Fonts 후보 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Jua&display=swap">
+<!-- 나눔스퀘어라운드 -->
+<link rel="stylesheet" href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-round.css">
+<style>
+  /* 눈누(projectnoonnu) 배포본. 비교용으로만 CDN에서 불러온다 */
+  @font-face { font-family: "Cafe24Ssurround"; src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24Ssurround.woff") format("woff"); font-display: swap; }
+  @font-face { font-family: "ONE-Mobile-POP"; src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/ONE-Mobile-POP.woff") format("woff"); font-display: swap; }
+  @font-face { font-family: "TmonMonsori"; src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_two@1.0/TmonMonsori.woff") format("woff"); font-display: swap; }
+  @font-face { font-family: "Jalnan"; src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.2/JalnanOTF00.woff") format("woff"); font-display: swap; }
+  @font-face { font-family: "JalnanGothic"; src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_231029@1.1/JalnanGothic.woff") format("woff"); font-display: swap; }
+  @font-face { font-family: "SBAggroB"; src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/SBAggroB.woff") format("woff"); font-display: swap; }
+  @font-face { font-family: "MaplestoryBold"; src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_20-04@2.1/MaplestoryOTFBold.woff") format("woff"); font-display: swap; }
+  @font-face { font-family: "GmarketSansBold"; src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansBold.woff") format("woff"); font-display: swap; }
+  @font-face { font-family: "Paperlogy"; font-weight: 800; src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/2408-3@1.0/Paperlogy-8ExtraBold.woff2") format("woff2"); font-display: swap; }
+
+  :root {
+    --paper: #fff7ec; --dot: #eadcc6; --card: #fff; --ink: #161616; --sub: #6f655a;
+    --pink: #ff6fb5; --pink-soft: #ffd6ea; --lime: #cff23a; --sky: #7cc8ff; --butter: #ffe15c; --lilac: #c9b6ff; --kakao: #fee500;
+    --sans: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+    --display: "Bagel Fat One", var(--sans);
+    --display-weight: 400;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: var(--sans); color: var(--ink);
+    background-color: var(--paper);
+    background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
+    background-size: 14px 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .d { font-family: var(--display); font-weight: var(--display-weight); letter-spacing: var(--display-tracking, 0); }
+  .sticker-edge { border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--ink); }
+  .text-sticker { -webkit-text-stroke: 1.6px var(--ink); text-shadow: 3px 3px 0 var(--ink); }
+  .mark-lime { background: linear-gradient(transparent 52%, var(--lime) 52%, var(--lime) 92%, transparent 92%); padding: 0 2px; }
+
+  /* ── 페이지 머리 ── */
+  .page { max-width: 1120px; margin: 0 auto; padding: 28px 16px 80px; }
+  .intro h1 { font-size: 26px; font-weight: 900; letter-spacing: -0.02em; }
+  .intro p { margin-top: 8px; color: var(--sub); font-size: 15px; line-height: 1.6; max-width: 720px; }
+  .section-title { margin: 44px 0 6px; font-size: 20px; font-weight: 900; }
+  .section-desc { color: var(--sub); font-size: 14px; line-height: 1.6; margin-bottom: 14px; }
+
+  /* ── 고르는 칩 ── */
+  .picker { position: sticky; top: 0; z-index: 20; margin: 18px -16px 0; padding: 12px 16px; background: rgba(255, 247, 236, .94); backdrop-filter: blur(6px); border-bottom: 2px solid var(--ink); }
+  .picker-row { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+  .picker-row::-webkit-scrollbar { display: none; }
+  .chip { flex: none; border: 2px solid var(--ink); background: var(--card); border-radius: 999px; padding: 7px 13px 6px; font: 700 14px/1 var(--sans); cursor: pointer; box-shadow: 2px 2px 0 var(--ink); white-space: nowrap; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .chip small { font-weight: 600; opacity: .6; margin-left: 4px; }
+  .picker-note { margin-top: 6px; font-size: 13px; color: var(--sub); }
+  .picker-note b { color: var(--ink); }
+
+  /* ── 폰 두 대 ── */
+  .phones { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; margin-top: 22px; }
+  .phone-wrap { width: 375px; max-width: 100%; }
+  .phone-label { display: flex; align-items: baseline; gap: 8px; margin: 0 4px 10px; }
+  .phone-label b { font-size: 15px; font-weight: 900; }
+  .phone-label span { font-size: 13px; color: var(--sub); }
+  .phone { border: 2px solid var(--ink); border-radius: 28px; overflow: hidden; box-shadow: 6px 6px 0 var(--ink);
+    background-color: var(--paper); background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px); background-size: 14px 14px;
+    padding: 16px 18px 26px; }
+
+  .top { display: flex; align-items: center; justify-content: space-between; }
+  .logo { font-size: 26px; line-height: 1; color: var(--pink); }
+  .top-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--card); display: grid; place-items: center; }
+  .top-btn i { display: block; width: 14px; height: 2px; background: var(--ink); box-shadow: 0 5px 0 var(--ink), 0 -5px 0 var(--ink); }
+
+  .photo { position: relative; margin: 22px 8px 0; background: var(--card); border-radius: 24px; padding: 10px 10px 14px; transform: rotate(-2deg); }
+  .photo .thumb { aspect-ratio: 16 / 10; border-radius: 16px; border: 2px solid var(--ink);
+    background: repeating-linear-gradient(135deg, #ffd6ea 0 14px, #ffe9f3 14px 28px); display: grid; place-items: center; }
+  .photo .play { width: 52px; height: 52px; border-radius: 50%; background: var(--card); border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink); display: grid; place-items: center; }
+  .photo .play::after { content: ""; border-left: 15px solid var(--ink); border-top: 9px solid transparent; border-bottom: 9px solid transparent; margin-left: 4px; }
+  .photo .cap { margin-top: 8px; font-size: 12px; color: var(--sub); font-weight: 600; }
+  .tape { position: absolute; top: -12px; left: 50%; width: 86px; height: 24px; margin-left: -43px; background: rgba(201, 182, 255, .8); border: 1.5px solid rgba(22, 22, 22, .35); transform: rotate(3deg); }
+
+  .song-title { margin-top: 22px; font-size: 56px; line-height: .95; word-break: keep-all; }
+  .artist { margin-top: 8px; font-size: 15px; font-weight: 700; color: var(--sub); }
+  .chips { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .info-chip { border: 2px solid var(--ink); border-radius: 999px; background: var(--card); padding: 4px 10px; font-size: 13px; font-weight: 700; }
+
+  .panel { position: relative; margin-top: 26px; background: var(--pink); border-radius: 18px; padding: 18px 16px 16px; }
+  .panel p { padding-right: 80px; font-size: 26px; line-height: 1.2; color: #fff; word-break: keep-all; }
+  .burst { position: absolute; right: -14px; top: -26px; transform: rotate(10deg); }
+  .btn { display: block; width: 100%; margin-top: 14px; border-radius: 16px; padding: 15px 0 13px; font-size: 22px; line-height: 1; text-align: center; cursor: pointer; }
+  .btn-lime { background: var(--lime); }
+  .btn-ink { background: var(--ink); color: #fff; font: 800 15px/1 var(--sans); padding: 12px 0; border-radius: 12px; margin-top: 12px; box-shadow: 3px 3px 0 var(--pink); }
+  .btn-kakao { background: var(--kakao); font: 800 16px/1 var(--sans); }
+
+  .h2 { margin-top: 30px; font-size: 23px; line-height: 1.1; }
+
+  .ticket { display: flex; margin-top: 12px; background: var(--card); border-radius: 16px; overflow: hidden; }
+  .ticket .date { flex: none; width: 78px; display: grid; place-items: center; align-content: center; background: var(--butter); border-right: 2px dashed var(--ink); padding: 10px 0; }
+  .ticket .date small { font-size: 12px; font-weight: 800; }
+  .ticket .date b { font-size: 34px; line-height: 1; margin-top: 2px; }
+  .ticket .body { flex: 1; padding: 12px 14px; }
+  .ticket .body .t { font-size: 15px; font-weight: 800; }
+  .ticket .body .s { margin-top: 3px; font-size: 13px; color: var(--sub); font-weight: 600; }
+
+  .rank { margin-top: 12px; background: var(--card); border-radius: 16px; padding: 4px 14px; }
+  .rank li { list-style: none; display: flex; align-items: center; gap: 12px; padding: 11px 0; }
+  .rank li + li { border-top: 1.5px dashed rgba(22, 22, 22, .25); }
+  .rank .no { width: 26px; font-size: 24px; line-height: 1; text-align: center; }
+  .rank li:first-child .no { color: var(--pink); -webkit-text-stroke: 1px var(--ink); }
+  .rank .nm { flex: 1; min-width: 0; }
+  .rank .nm b { display: block; font-size: 18px; line-height: 1.15; word-break: keep-all; }
+  .rank .nm span { font-size: 12px; color: var(--sub); font-weight: 600; }
+  .rank .cnt { font-size: 18px; line-height: 1; }
+  .rank .cnt small { font: 700 12px var(--sans); color: var(--sub); margin-left: 1px; }
+
+  .sheet { margin: 30px -18px -26px; background: var(--card); border-top: 2px solid var(--ink); border-radius: 26px 26px 0 0; padding: 12px 18px 22px; }
+  .sheet .grab { width: 44px; height: 5px; border-radius: 9px; background: #d9d0c4; margin: 0 auto 16px; }
+  .sheet h3 { font-size: 28px; line-height: 1.1; }
+  .sheet p { margin-top: 8px; font-size: 14px; line-height: 1.55; color: var(--sub); }
+
+  /* ── 한눈에 보기 카드 ── */
+  .group-title { margin: 26px 0 10px; font-size: 15px; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+  .group-title i { font-style: normal; font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 999px; border: 1.5px solid var(--ink); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px; }
+  .card { background: var(--card); border-radius: 18px; padding: 14px 14px 16px; cursor: pointer; text-align: left; font: inherit; color: inherit; transition: transform .12s; }
+  .card:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--ink); }
+  .card.on { outline: 3px solid var(--pink); outline-offset: 3px; }
+  .card-head { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+  .card-head b { font-size: 16px; font-weight: 900; }
+  .card-head .meta { font-size: 12px; color: var(--sub); font-weight: 600; text-align: right; line-height: 1.45; }
+  .card .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
+  .card .tags span { font-size: 11px; font-weight: 800; padding: 2px 7px; border-radius: 999px; background: var(--pink-soft); }
+  .sample { margin-top: 12px; }
+  .s-row { display: flex; align-items: center; gap: 14px; }
+  .s-logo { font-size: 30px; line-height: 1; color: var(--pink); }
+  .s-num { font-size: 30px; line-height: 1; }
+  .s-num small { font: 700 12px var(--sans); color: var(--sub); }
+  .s-panel { margin-top: 12px; background: var(--pink); border-radius: 14px; padding: 12px 12px 12px; }
+  .s-panel p { color: #fff; font-size: 22px; line-height: 1.2; }
+  .s-panel .btn { margin-top: 10px; font-size: 19px; padding: 12px 0 10px; border-radius: 12px; }
+  .s-small { margin-top: 12px; font-size: 15px; line-height: 1.5; }
+  .s-small .lab { font: 700 11px var(--sans); color: var(--sub); display: block; margin-bottom: 2px; }
+  .s-latin { margin-top: 8px; font-size: 22px; line-height: 1.1; }
+
+  .notes { margin-top: 40px; background: var(--card); border-radius: 18px; padding: 18px 18px 16px; font-size: 14px; line-height: 1.7; }
+  .notes h3 { font-size: 16px; font-weight: 900; margin-bottom: 6px; }
+  .notes ul { padding-left: 18px; }
+
+  @media (max-width: 420px) {
+    .phone { border-radius: 22px; padding: 14px 14px 24px; }
+    .sheet { margin: 30px -14px -24px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .card { transition: none; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="intro">
+    <h1>디스플레이 폰트 비교</h1>
+    <p>외침·곡 제목·큰 숫자·버튼에 쓰는 <b>디스플레이 폰트</b>만 바꿔 봐요. 본문은 지금처럼 Pretendard 그대로예요. 왼쪽은 지금(Bagel Fat One), 오른쪽은 위에서 고른 폰트예요. 아래 카드를 눌러도 바뀌어요.</p>
+  </header>
+
+  <div class="picker">
+    <div class="picker-row" id="picker"></div>
+    <div class="picker-note" id="pickerNote"></div>
+  </div>
+
+  <div class="phones">
+    <div class="phone-wrap">
+      <div class="phone-label"><b>지금</b><span>Bagel Fat One</span></div>
+      <div class="phone sticker-edge" id="phoneA"></div>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone-label"><b>바꿔 보기</b><span id="phoneBName"></span></div>
+      <div class="phone sticker-edge" id="phoneB"></div>
+    </div>
+  </div>
+
+  <h2 class="section-title">한눈에 보기</h2>
+  <p class="section-desc">같은 문구를 폰트마다 찍었어요. 맨 아래 작은 글씨 줄은 "완료" 도장·티켓 날짜처럼 작게 쓰일 때 읽히는지 보는 줄이에요.</p>
+  <div id="cards"></div>
+
+  <section class="notes sticker-edge">
+    <h3>보는 법</h3>
+    <ul>
+      <li><b>귀여움 유지</b>는 지금 분위기(통통·팝)를 살리면서 Bagel보다 획이 덜 뭉치는 폰트, <b>가독성 우선</b>은 둥근 고딕·굵은 고딕 계열이에요.</li>
+      <li>"추가요 TOP"처럼 디스플레이 폰트가 여러 줄 반복될 때 피로도가 가장 잘 드러나요. 폰 화면의 그 부분을 비교해 보세요.</li>
+      <li>라이선스는 모두 상업적 무료 사용이 가능한 폰트로 골랐지만, 확정하면 원문 약관(웹 임베딩·로고 사용)을 한 번 더 확인해요.</li>
+      <li>비교용이라 CDN에서 불러와요. 앱에 넣을 때는 필요한 굵기만 받아서 직접 서빙해요.</li>
+    </ul>
+  </section>
+</div>
+
+<script>
+  // 후보 폰트. group: cute(귀여움 유지) / clean(가독성 우선)
+  const FONTS = [
+    { id: "bagel", name: "Bagel Fat One", ko: "베이글 팻 원 (지금)", family: '"Bagel Fat One"', weight: 400, group: "now", weights: "1종", src: "Google Fonts · OFL", tags: ["통통", "버블"] },
+    { id: "ssurround", name: "카페24 써라운드", family: '"Cafe24Ssurround"', weight: 400, group: "cute", weights: "2종 (써라운드·에어)", src: "카페24 · 상업 무료", tags: ["둥근", "통통", "말랑"] },
+    { id: "pop", name: "원스토어 모바일POP", family: '"ONE-Mobile-POP"', weight: 400, group: "cute", weights: "1종", src: "원스토어 · 상업 무료", tags: ["팝", "키치"] },
+    { id: "monsori", name: "티몬 몬소리", family: '"TmonMonsori"', weight: 400, group: "cute", weights: "1종", src: "티몬 · 상업 무료", tags: ["굵은", "장난스러운"] },
+    { id: "jua", name: "배민 주아", family: '"Jua"', weight: 400, group: "cute", weights: "1종", src: "Google Fonts · OFL", tags: ["둥근", "손글씨풍"] },
+    { id: "jalnan", name: "여기어때 잘난체", family: '"Jalnan"', weight: 400, group: "cute", weights: "1종", src: "여기어때 · 상업 무료", tags: ["굵은", "키치", "대중적"] },
+    { id: "aggro", name: "어그로체 B", family: '"SBAggroB"', weight: 400, group: "cute", weights: "3종 (L·M·B)", src: "샌드박스 · 상업 무료", tags: ["굵은", "유튜브 썸네일"] },
+    { id: "maple", name: "메이플스토리 Bold", family: '"MaplestoryBold"', weight: 400, group: "cute", weights: "2종 (L·B)", src: "넥슨 · 상업 무료", tags: ["게임", "친근"] },
+    { id: "nsr", name: "나눔스퀘어라운드 EB", family: '"NanumSquareRoundEB"', weight: 400, group: "clean", weights: "4종 (L·R·B·EB)", src: "네이버 · OFL", tags: ["둥근 고딕", "편안"] },
+    { id: "gmarket", name: "지마켓 산스 Bold", family: '"GmarketSansBold"', weight: 400, group: "clean", weights: "3종 (L·M·B)", src: "G마켓 · 상업 무료", tags: ["기하", "브랜드 단골"] },
+    { id: "jalnangothic", name: "잘난체 고딕", family: '"JalnanGothic"', weight: 400, group: "clean", weights: "1종", src: "여기어때 · 상업 무료", tags: ["굵은 고딕", "잘난체 동생"] },
+    { id: "paperlogy", name: "페이퍼로지 ExtraBold", family: '"Paperlogy"', weight: 800, group: "clean", weights: "9종", src: "OFL", tags: ["요즘 고딕", "단정"] },
+    { id: "pretendard", name: "Pretendard Black", family: '"Pretendard Variable", Pretendard', weight: 900, group: "clean", weights: "9종 (본문과 같음)", src: "OFL", tags: ["본문과 통일", "가장 읽힘"], tracking: "-0.02em" },
+  ];
+
+  // 별 스티커 (app/src/components/star-burst.tsx와 같은 모양)
+  function starPath(points, outer, inner, c = 50) {
+    const step = Math.PI / points; let d = "";
+    for (let i = 0; i < points * 2; i++) {
+      const r = i % 2 === 0 ? outer : inner, a = i * step - Math.PI / 2;
+      d += `${i === 0 ? "M" : "L"}${(c + r * Math.cos(a)).toFixed(2)} ${(c + r * Math.sin(a)).toFixed(2)} `;
+    }
+    return d + "Z";
+  }
+  const PATH = starPath(12, 41, 33);
+  const burst = (text, size) => `
+    <div class="burst" style="width:${size}px;height:${size}px;display:grid;place-items:center" aria-hidden="true">
+      <svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible">
+        <path d="${PATH}" transform="translate(3.5 4)" fill="#161616" stroke="#161616" stroke-width="13" stroke-linejoin="round"/>
+        <path d="${PATH}" fill="#161616" stroke="#161616" stroke-width="13" stroke-linejoin="round"/>
+        <path d="${PATH}" fill="#fff" stroke="#fff" stroke-width="8.5" stroke-linejoin="round"/>
+        <path d="${PATH}" fill="#ffe15c" stroke="#161616" stroke-width="1.6" stroke-linejoin="round"/>
+        <ellipse cx="36" cy="30" rx="9" ry="4.5" fill="#fff" opacity=".7" transform="rotate(-30 36 30)"/>
+      </svg>
+      <span class="d" style="position:relative;font-size:${Math.round(size / 5.4)}px;line-height:1.05">${text}</span>
+    </div>`;
+
+  // 곡 상세 + 홈 일부를 한 화면에 (지금 앱의 크기 그대로)
+  const PHONE = `
+    <div class="top">
+      <span class="d logo text-sticker">올빗</span>
+      <span class="top-btn sticker-edge" aria-hidden="true"><i></i></span>
+    </div>
+    <div class="photo sticker-edge">
+      <span class="tape" aria-hidden="true"></span>
+      <div class="thumb"><span class="play"></span></div>
+      <div class="cap">YouTube · 공식 안무 영상</div>
+    </div>
+    <h1 class="d song-title">NEON</h1>
+    <div class="artist">A2O LITE</div>
+    <div class="chips"><span class="info-chip">홍대·합정</span><span class="info-chip">주말 낮</span><span class="info-chip">입문</span></div>
+    <div class="panel sticker-edge">
+      <p class="d text-sticker">첫 추가요를 남겨 주세요!</p>
+      ${burst("추가요!", 84)}
+      <button class="btn btn-lime sticker-edge d" type="button">나도 추가요!</button>
+    </div>
+    <h2 class="d h2">다가오는 <span class="mark-lime">클래스</span></h2>
+    <div class="ticket sticker-edge">
+      <div class="date"><small>10월 · 목</small><b class="d">29</b></div>
+      <div class="body">
+        <div class="t">NEON 원데이 클래스</div>
+        <div class="s">홍대·합정 · 19:30 · 3만 원</div>
+        <button class="btn btn-ink" type="button">예약하러 가기</button>
+      </div>
+    </div>
+    <h2 class="d h2">추가요 TOP</h2>
+    <ol class="rank sticker-edge">
+      <li><span class="d no">1</span><span class="nm"><b class="d">첫 만남은 계획대로 되지 않아</b><span>TWS</span></span><span class="d cnt">128<small>명</small></span></li>
+      <li><span class="d no">2</span><span class="nm"><b class="d">Supernova</b><span>aespa</span></span><span class="d cnt">96<small>명</small></span></li>
+      <li><span class="d no">3</span><span class="nm"><b class="d">마그네틱</b><span>ILLIT</span></span><span class="d cnt">81<small>명</small></span></li>
+      <li><span class="d no">4</span><span class="nm"><b class="d">APT.</b><span>로제 · Bruno Mars</span></span><span class="d cnt">77<small>명</small></span></li>
+    </ol>
+    <div class="sheet">
+      <div class="grab"></div>
+      <h3 class="d">로그인하고 추가요!</h3>
+      <p>카카오 로그인이 끝나면 카톡 안에서 이 화면으로 돌아와요.</p>
+      <button class="btn btn-kakao sticker-edge" type="button">카카오로 계속하기</button>
+    </div>`;
+
+  const applyFont = (el, f) => {
+    el.style.setProperty("--display", `${f.family}, var(--sans)`);
+    el.style.setProperty("--display-weight", f.weight);
+    el.style.setProperty("--display-tracking", f.tracking || "0");
+  };
+
+  const phoneA = document.getElementById("phoneA");
+  const phoneB = document.getElementById("phoneB");
+  phoneA.innerHTML = PHONE; phoneB.innerHTML = PHONE;
+  applyFont(phoneA, FONTS[0]);
+
+  // 칩
+  const picker = document.getElementById("picker");
+  FONTS.slice(1).forEach((f) => {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.dataset.id = f.id;
+    b.innerHTML = `${f.name}<small>${f.group === "cute" ? "귀여움" : "가독"}</small>`;
+    b.addEventListener("click", () => select(f.id, true));
+    picker.appendChild(b);
+  });
+
+  // 카드
+  const cards = document.getElementById("cards");
+  const GROUPS = [
+    { key: "now", title: "지금", tag: "기준", bg: "var(--card)" },
+    { key: "cute", title: "귀여움 유지", tag: "통통·팝", bg: "var(--pink-soft)" },
+    { key: "clean", title: "가독성 우선", tag: "둥근·굵은 고딕", bg: "#e6f6c0" },
+  ];
+  GROUPS.forEach((g) => {
+    const h = document.createElement("div");
+    h.className = "group-title";
+    h.innerHTML = `${g.title} <i style="background:${g.bg}">${g.tag}</i>`;
+    const grid = document.createElement("div"); grid.className = "grid";
+    FONTS.filter((f) => f.group === g.key).forEach((f) => {
+      const c = document.createElement(f.group === "now" ? "div" : "button");
+      if (f.group !== "now") { c.type = "button"; c.addEventListener("click", () => select(f.id, false)); }
+      c.className = "card sticker-edge"; c.dataset.id = f.id;
+      c.innerHTML = `
+        <div class="card-head"><div><b>${f.ko || f.name}</b><div class="tags">${f.tags.map((t) => `<span>${t}</span>`).join("")}</div></div>
+          <div class="meta">${f.weights}<br>${f.src}</div></div>
+        <div class="sample">
+          <div class="s-row"><span class="d s-logo text-sticker">올빗</span><span class="d s-num">D-3</span><span class="d s-num">128<small>명</small></span></div>
+          <div class="s-panel sticker-edge">
+            <p class="d text-sticker">첫 추가요를 남겨 주세요!</p>
+            <div class="btn btn-lime sticker-edge d">나도 추가요!</div>
+          </div>
+          <div class="d s-latin">NEON · Supernova · APT.</div>
+          <div class="s-small d"><span class="lab">15px</span>완료 · 앵콜! · 10월 29일 목 · 홍대·합정</div>
+        </div>`;
+      applyFont(c, f);
+      grid.appendChild(c);
+    });
+    cards.appendChild(h); cards.appendChild(grid);
+  });
+
+  function select(id, fromChip) {
+    const f = FONTS.find((x) => x.id === id);
+    applyFont(phoneB, f);
+    document.getElementById("phoneBName").textContent = f.name;
+    document.getElementById("pickerNote").innerHTML = `<b>${f.name}</b> · ${f.weights} · ${f.src}`;
+    picker.querySelectorAll(".chip").forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.id === id)));
+    cards.querySelectorAll(".card").forEach((c) => c.classList.toggle("on", c.dataset.id === id));
+    const chip = picker.querySelector(`[data-id="${id}"]`);
+    // 칩 줄만 가로로 옮긴다 (scrollIntoView는 페이지 전체를 내린다)
+    if (chip) picker.scrollTo({ left: chip.offsetLeft - picker.clientWidth / 2 + chip.clientWidth / 2, behavior: "smooth" });
+    if (!fromChip) phoneB.scrollIntoView({ block: "start", behavior: "smooth" });
+  }
+  select("ssurround", true);
+</script>
+</body>
+</html>

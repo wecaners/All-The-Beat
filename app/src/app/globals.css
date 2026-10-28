@@ -22,7 +22,7 @@
   --color-kakao: #fee500;
 
   --font-sans: "Pretendard Variable", Pretendard, system-ui, -apple-system, sans-serif;
-  --font-display: var(--font-bagel), "Pretendard Variable", sans-serif; /* 외침·제목·큰 숫자 */
+  --font-display: var(--font-maple), "Pretendard Variable", sans-serif; /* 로고·외침·제목·큰 숫자 */
   --font-zine: var(--font-bricolage), "Pretendard Variable", sans-serif; /* 팬진 라벨 (영문 대문자) */
 
   --shadow-sticker-sm: 2px 2px 0 var(--color-ink);

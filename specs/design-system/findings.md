@@ -27,6 +27,7 @@
 - 시안: `design/concepts/round-2.html`(모양), `round-3.html`(움직임)
 - next/font 가이드: `app/node_modules/next/dist/docs/01-app/01-getting-started/13-fonts.md`
 - Pretendard: <https://github.com/orioncactus/pretendard> (OFL)
+- 메이플스토리 서체 약관 요약: <https://www.sandollcloud.com/free-font/16195/Maplestory-OTF> (넥슨, 원문은 넥슨 브랜드 사이트)
 
 ### 코드 참조
 
@@ -41,12 +42,14 @@
 
 | Decision | Rationale |
 | -------- | --------- |
-| Bagel Fat One·Bricolage는 `next/font/google`, `preload: false` | `next/font`의 Google 데이터에 한글 서브셋이 없어 미리 불러오기 대상이 없다. 자체 호스팅되고, 쓰는 글자 범위만 받는다 |
+| Bagel Fat One·Bricolage는 `next/font/google`, `preload: false` | `next/font`의 Google 데이터에 한글 서브셋이 없어 미리 불러오기 대상이 없다. 자체 호스팅되고, 쓰는 글자 범위만 받는다 (Bagel은 아래 메이플스토리로 교체) |
 | Pretendard는 npm 패키지의 동적 분할 CSS를 `globals.css`에서 import | 한글 전체 폰트(수 MB)를 피하고 쓰인 글자 묶음만 받는다. 외부 CDN 없이 자체 호스팅 |
 | 다크 모드 변수 제거, 밝은 화면만 | 스크랩북 컨셉은 크림 속지가 정체성. 기존 화면의 `dark:` 클래스는 남겨도 무해 |
 | 영상은 썸네일 → 누르면 iframe | YouTube 플레이어는 무겁다. 첫 화면 속도(홈 3초 기준)와 인앱 브라우저를 위해 누를 때만 부른다 |
 | 움직임은 Web Animations API + CSS, 라이브러리 없음 | framer-motion 등은 번들이 커진다. 시안 3차가 같은 방식으로 충분히 동작했다 |
 | 완료 순번은 서버가 계산 | "N번째"는 시스템이 보장할 수 있는 숫자여야 한다(원칙 6). 클라이언트 추정 금지 |
+| 디스플레이 폰트를 메이플스토리 Bold 하나로 (로고 포함) | 사용자 판단: Bagel은 한글 가독성이 떨어지고 오래 보면 피로하다. 후보 12종 비교(`design/concepts/font-compare.html`) 뒤 선택. 굵은 디스플레이 폰트 두 개를 섞으면 위계가 흐려져 하나로 통일 |
+| 메이플스토리는 원본 woff(약 410KB)를 `next/font/local`로 통째로 서빙 — FR-2(쓰인 글자만 받기)의 예외 | 넥슨 약관이 폰트 파일 수정·재배포를 금한다. 서브셋·woff2 변환도 수정이라 하지 않는다. `display: swap`이라 받기 전엔 Pretendard로 먼저 보인다. 약관: 웹 임베딩·BI 사용 가능, 저작권 표기 필요 (산돌구름 요약) |
 
 ## Issues Encountered
 
