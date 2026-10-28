@@ -1,11 +1,13 @@
-import { and, count, desc, eq, gte, isNotNull, lte, ne, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, isNotNull, isNull, lte, max, ne, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db";
-import { regions, requests, timePref } from "@/db/schema";
-import { isRequestableSong } from "@/server/songs";
+import { artists, regions, requests, songs, timePref } from "@/db/schema";
+import { isRequestableSong, visibleVideoId } from "@/server/songs";
 
 // 곡 상세의 추가요 수는 최근 90일 기준 (03 명세 F-04)
 const SUMMARY_DAYS = 90;
+// 홈의 추가요 TOP은 "요즘" 기다리는 곡이라 최근 30일 (03 명세 F-01)
+const TOP_DAYS = 30;
 
 export const requestInput = z.object({
   regionId: z.number().int().positive().nullable(), // null = 어디든 좋아요
@@ -124,4 +126,31 @@ export async function cancelRequest(userId: string, songId: number) {
     .update(requests)
     .set({ status: "canceled", canceledAt: sql`now()` })
     .where(and(eq(requests.userId, userId), eq(requests.songId, songId), ne(requests.status, "canceled")));
+}
+
+export type TopRequestedSong = { slug: string; title: string; artistName: string; videoId: string | null; waiting: number };
+
+// 홈 "추가요 TOP" (F-01): 최근 30일·취소 제외 추가요가 많은 곡. 같으면 최근에 요청이 들어온 곡 먼저. 병합된 곡은 뺀다
+export async function listTopRequestedSongs(limit = 5): Promise<TopRequestedSong[]> {
+  return getDb()
+    .select({
+      slug: songs.slug,
+      title: songs.title,
+      artistName: artists.name,
+      videoId: visibleVideoId,
+      waiting: count(requests.id),
+    })
+    .from(requests)
+    .innerJoin(songs, eq(songs.id, requests.songId))
+    .innerJoin(artists, eq(artists.id, songs.artistId))
+    .where(
+      and(
+        ne(requests.status, "canceled"),
+        gte(requests.createdAt, sql`now() - make_interval(days => ${TOP_DAYS})`),
+        isNull(songs.mergedIntoId),
+      ),
+    )
+    .groupBy(songs.id, artists.name)
+    .orderBy(desc(count(requests.id)), desc(max(requests.createdAt)))
+    .limit(limit);
 }

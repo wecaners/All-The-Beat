@@ -1,6 +1,9 @@
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { artists, songs } from "@/db/schema";
+
+// 화면에 보여줄 영상 id. 퍼가기가 막힌 영상은 숨긴다 (06 문서). 곡 상세·클래스 상세·홈이 같이 쓴다
+export const visibleVideoId = sql<string | null>`case when ${songs.videoEmbeddable} is not false then ${songs.ytVideoId} end`;
 
 export type SongDetail = {
   id: number;
@@ -24,11 +27,10 @@ export async function getSongBySlug(slug: string): Promise<SongLookup> {
       artistName: artists.name,
       releaseDate: songs.releaseDate,
       mergedIntoId: songs.mergedIntoId,
-      ytVideoId: songs.ytVideoId,
+      videoId: visibleVideoId,
       videoType: songs.videoType,
       videoTitle: songs.videoTitle,
       videoChannel: songs.videoChannel,
-      videoEmbeddable: songs.videoEmbeddable,
     })
     .from(songs)
     .innerJoin(artists, eq(artists.id, songs.artistId))
@@ -50,11 +52,7 @@ export async function getSongBySlug(slug: string): Promise<SongLookup> {
       title: row.title,
       artistName: row.artistName,
       releaseDate: row.releaseDate,
-      // 퍼가기가 막힌 영상은 화면에서 숨긴다 (06 문서)
-      video:
-        row.ytVideoId && row.videoEmbeddable !== false
-          ? { id: row.ytVideoId, type: row.videoType, title: row.videoTitle, channel: row.videoChannel }
-          : null,
+      video: row.videoId ? { id: row.videoId, type: row.videoType, title: row.videoTitle, channel: row.videoChannel } : null,
     },
   };
 }

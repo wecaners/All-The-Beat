@@ -35,11 +35,13 @@
 
 | 컴포넌트 | 쓰는 곳 |
 | --- | --- |
-| `StickerButton` | 모든 주요 버튼. 변형: `pink`(추가요 제출) `lime`(주 행동) `white`(보조·완료 상태) `soft`(취소처럼 한발 물러선 행동) `ink`(외부로 나가기·예약) `kakao` |
+| `Logo` | 수강생 화면 상단. 영문 "All the Beat" + 모서리에 비스듬히 "올빗". 누르면 홈. 모서리 글씨가 위로 나오니 감싸는 쪽 위 여백은 `pt-7` |
+| `StickerButton` | 모든 주요 버튼. 변형: `pink`(추가요 제출) `lime`(주 행동) `white`(보조·완료 상태) `soft`(취소처럼 한발 물러선 행동) `ink`(외부로 나가기·예약) `kakao`. 링크에는 `stickerButtonClass()` |
 | `ChoiceChip`, `InfoChip` | 고르는 칩(라디오), 보기만 하는 칩 |
 | `BottomSheet` | 입력·로그인 시트 |
 | `VideoCard` | 곡 영상. 누르기 전엔 썸네일, 누르면 YouTube 임베드 |
 | `ClassTicket` | 클래스 목록 항목 |
+| `SongCard` | 곡 포토카드(정지). 누르면 곡 상세. 가로로 넘기는 줄·순위·검색 결과 |
 | `StarBurst`, `StickerLabel`, `Tape` | 별 스티커, 작은 라벨, 테이프 |
 | `Celebration`, `Toast` | 감정 순간 오버레이, 짧은 안내 |
 | `motion.ts` | `play`, `confetti`, `buzz`, `reducedMotion` |
