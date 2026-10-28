@@ -460,6 +460,7 @@ createClass(...) 후:
   - `encore_rounds.encore_class_id` UNIQUE (앵콜 클래스 하나는 한 라운드에만)
   - 삭제 규칙: 사용자 삭제 → 추가요·앵콜 같이 삭제, 이벤트는 user_id만 NULL / 클래스 삭제 → class_songs·앵콜·라운드 같이 삭제, 추가요의 fulfilled_class_id는 NULL / 곡·권역·강사는 참조가 있으면 삭제 막힘
   - 모든 PK는 identity(자동 증가). `regions.id`만 시드로 고정값
+- 기준 데이터 마이그레이션: `0003` 권역 8개, `0004` 서울 25개 구 → 권역 매핑(구 단위만, 동 단위는 나중에) [가정]
 
 ## 9. 열린 질문
 

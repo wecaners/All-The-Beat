@@ -1,0 +1,175 @@
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
+import { useActionState, useState } from "react";
+import { LEVEL_LABEL } from "@/lib/format";
+import type { AdminPlace, ClassSongOption } from "@/server/admin/classes";
+import type { AdminInstructorRow } from "@/server/admin/instructors";
+import type { Region } from "@/server/regions";
+import { type AdminActionState, createClassAction } from "../../actions";
+import { buttonClass, Field, inputClass, Result } from "../../ui";
+
+const BOOKING_TYPE_LABEL = {
+  naver: "네이버 예약",
+  kakao_openchat: "카카오 오픈채팅",
+  insta_dm: "인스타 DM",
+  google_form: "구글폼",
+  other: "기타",
+} as const;
+
+// 30분 단위 06:00 ~ 23:30 (F-12)
+const TIMES = Array.from({ length: 36 }, (_, i) => {
+  const minutes = 6 * 60 + i * 30;
+  return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${minutes % 60 === 0 ? "00" : "30"}`;
+});
+
+type Props = {
+  instructors: AdminInstructorRow[];
+  instructorId: number | null;
+  places: AdminPlace[];
+  songs: ClassSongOption[];
+  regions: Region[];
+  today: string;
+};
+
+export function ClassForm({ instructors, instructorId, places, songs, regions, today }: Props) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [state, action, pending] = useActionState<AdminActionState, FormData>(createClassAction, { ok: false });
+  const [placeId, setPlaceId] = useState<string>(places[0] ? String(places[0].id) : "");
+  const selected = instructors.find((i) => i.id === instructorId);
+
+  return (
+    <form action={action} className="mt-4 space-y-5">
+      <Field label="강사 *" hint={selected?.isProxy && !selected.consentAt ? "⏸ 게재 동의 전 — 등록해도 아직 공개되지 않아요" : undefined}>
+        <select
+          name="instructorId"
+          required
+          value={instructorId ?? ""}
+          onChange={(e) => router.replace(`${pathname}?instructor=${e.target.value}`)}
+          className={inputClass}
+        >
+          <option value="" disabled>
+            강사를 골라 주세요
+          </option>
+          {instructors.map((i) => (
+            <option key={i.id} value={i.id}>
+              {i.displayName} (@{i.instagramHandle}){i.isProxy && !i.consentAt ? " · 동의 전" : ""}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <fieldset className="grid gap-3 sm:grid-cols-3">
+        <legend className="mb-1 text-sm font-semibold">배우는 곡 * (1~3개, 첫 곡이 대표)</legend>
+        {[0, 1, 2].map((n) => (
+          <select key={n} name="songIds" required={n === 0} defaultValue="" className={inputClass}>
+            <option value="">{n === 0 ? "곡 선택" : "(선택)"}</option>
+            {songs.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        ))}
+      </fieldset>
+
+      <Field label="클래스 이름" hint="비우면 '첫 곡명 원데이 클래스'">
+        <input name="title" maxLength={30} className={inputClass} />
+      </Field>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Field label="날짜 *">
+          <input type="date" name="date" required min={today} className={inputClass} />
+        </Field>
+        <Field label="시작 *">
+          <select name="startTime" required defaultValue="19:00" className={inputClass}>
+            {TIMES.map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="종료 *">
+          <select name="endTime" required defaultValue="21:00" className={inputClass}>
+            {TIMES.map((t) => (
+              <option key={t}>{t}</option>
+            ))}
+          </select>
+        </Field>
+      </div>
+
+      <fieldset className="space-y-3">
+        <legend className="text-sm font-semibold">장소 *</legend>
+        {places.length > 0 && (
+          <select name="placeId" value={placeId} onChange={(e) => setPlaceId(e.target.value)} className={inputClass}>
+            {places.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.studioName} · {p.address}
+              </option>
+            ))}
+            <option value="">+ 새 장소 입력</option>
+          </select>
+        )}
+        {(places.length === 0 || placeId === "") && (
+          <div className="grid gap-3 sm:grid-cols-[12rem_1fr]">
+            <input name="studioName" placeholder="스튜디오 이름" maxLength={60} className={inputClass} />
+            <input name="address" placeholder="서울 마포구 양화로 100 3층" maxLength={200} className={inputClass} />
+          </div>
+        )}
+      </fieldset>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Field label="권역" hint="비우면 주소로 추정">
+          <select name="regionId" defaultValue="" className={inputClass}>
+            <option value="">주소로 자동</option>
+            {regions.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.shortName}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label="가격(원) *">
+          <input type="number" name="price" required min={0} step={1000} placeholder="30000" className={inputClass} />
+        </Field>
+        <Field label="정원">
+          <input type="number" name="capacity" min={1} className={inputClass} />
+        </Field>
+      </div>
+
+      <fieldset className="flex flex-wrap gap-4 text-sm">
+        <legend className="mb-1 text-sm font-semibold">난이도 *</legend>
+        {Object.entries(LEVEL_LABEL).map(([value, label]) => (
+          <label key={value} className="flex items-center gap-1">
+            <input type="radio" name="level" value={value} required /> {label}
+          </label>
+        ))}
+      </fieldset>
+
+      <div className="grid gap-4 sm:grid-cols-[1fr_12rem]">
+        <Field label="예약 링크 *" hint="http(s) 주소">
+          <input type="url" name="bookingUrl" required placeholder="https://booking.naver.com/..." className={inputClass} />
+        </Field>
+        <Field label="링크 유형">
+          <select name="bookingType" defaultValue="" className={inputClass}>
+            <option value="">주소로 자동</option>
+            {Object.entries(BOOKING_TYPE_LABEL).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </Field>
+      </div>
+
+      <Field label="설명" hint="1,000자까지. 준비물·주의사항">
+        <textarea name="description" maxLength={1000} rows={4} className={inputClass} />
+      </Field>
+
+      <Result state={state} />
+      <button disabled={pending || !instructorId} className={buttonClass}>
+        {pending ? "등록 중…" : "클래스 등록"}
+      </button>
+    </form>
+  );
+}
