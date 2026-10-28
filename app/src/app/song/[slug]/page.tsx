@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { cacheLife, cacheTag } from "next/cache";
-import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { ClassTicket } from "@/components/class-ticket";
+import { Logo } from "@/components/logo";
 import { StickerLabel } from "@/components/sticker-label";
 import { Tape } from "@/components/tape";
 import { VideoCard } from "@/components/video-card";
@@ -89,10 +89,8 @@ async function SongContent({ params }: Props) {
 function SongHeader({ song }: { song: SongDetail }) {
   return (
     <header>
-      <div className="flex items-center justify-between px-5 pt-3">
-        <Link href="/" className="font-display text-[26px] leading-none text-pink text-sticker">
-          올빗
-        </Link>
+      <div className="flex items-center justify-between px-5 pt-7">
+        <Logo />
         <span className="font-zine text-[11px] font-extrabold uppercase tracking-[.04em]">Song</span>
       </div>
       <div className="px-[22px] pt-5">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/logo";
 import { StickerLabel } from "@/components/sticker-label";
 import { stickerButtonClass } from "@/components/sticker-button";
 import { VideoCard } from "@/components/video-card";
@@ -26,10 +27,8 @@ export function ClassView({ c }: { c: ClassDetail }) {
 
   return (
     <>
-      <div className="flex items-center justify-between px-5 pt-3">
-        <Link href="/" className="font-display text-[26px] leading-none text-pink text-sticker">
-          올빗
-        </Link>
+      <div className="flex items-center justify-between px-5 pt-7">
+        <Logo />
         <span className="font-zine text-[11px] font-extrabold uppercase tracking-[.04em]">Class</span>
       </div>
 

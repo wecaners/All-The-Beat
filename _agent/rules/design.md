@@ -35,6 +35,7 @@
 
 | 컴포넌트 | 쓰는 곳 |
 | --- | --- |
+| `Logo` | 수강생 화면 상단. 영문 "All the Beat" + 모서리에 비스듬히 "올빗". 누르면 홈. 모서리 글씨가 위로 나오니 감싸는 쪽 위 여백은 `pt-7` |
 | `StickerButton` | 모든 주요 버튼. 변형: `pink`(추가요 제출) `lime`(주 행동) `white`(보조·완료 상태) `soft`(취소처럼 한발 물러선 행동) `ink`(외부로 나가기·예약) `kakao`. 링크에는 `stickerButtonClass()` |
 | `ChoiceChip`, `InfoChip` | 고르는 칩(라디오), 보기만 하는 칩 |
 | `BottomSheet` | 입력·로그인 시트 |
