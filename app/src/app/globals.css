@@ -91,6 +91,9 @@ body {
   color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-tap-highlight-color: transparent;
+  /* 한글은 어절 단위로 줄바꿈. 한 줄보다 긴 어절(URL 등)만 글자 단위로 끊는다 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* 동작 줄이기: 장식 움직임을 끈다 (FR-5) */
