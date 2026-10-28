@@ -22,8 +22,9 @@ import {
 } from "@/server/admin/studios";
 import { kakaoConfigured, searchKakaoAddresses, searchKakaoPlaces, type StudioCandidate } from "@/server/kakao";
 import { MEDIA_BUCKET, type MediaStore } from "@/server/media";
+import { searchSongs } from "@/server/songs/search";
 import { createClient } from "@/lib/supabase/server";
-import { clearSongVideo, saveSong, setSongVideo, songInput, videoInput } from "@/server/admin/songs";
+import { clearSongVideo, findOrCreateSong, quickSongInput, saveSong, setSongVideo, songInput, videoInput } from "@/server/admin/songs";
 
 export type AdminActionState = { ok: boolean; error?: string; message?: string };
 
@@ -310,6 +311,32 @@ export async function removeInstructorPhotoAction(instructorId: number): Promise
     return { ok: true };
   } catch (e) {
     return toState(e, "removeInstructorPhoto");
+  }
+}
+
+// ── 클래스 등록 곡 고르기 (specs/search FR-8) ─────────────────────────
+
+export type SongOption = { id: number; label: string };
+
+// 수강생 검색과 같은 곡 검색. 운영자만 (FR-9)
+export async function searchSongsForClassAction(query: string): Promise<SongOption[]> {
+  await requireAdmin();
+  const results = await searchSongs(query, 8);
+  return results.map((s) => ({ id: s.id, label: `${s.title} - ${s.artistName}` }));
+}
+
+export type QuickSongState = { ok: boolean; error?: string; song?: SongOption; existed?: boolean };
+
+// 곡 고르기에서 찾는 곡이 없을 때 그 자리에서 만든다 (F-13). 같은 곡이 이미 있으면 그 곡을 고른다
+export async function createSongForClassAction(title: string, artistName: string): Promise<QuickSongState> {
+  await requireAdmin();
+  try {
+    const input = parse(quickSongInput, { title, artistName });
+    const song = await findOrCreateSong(input);
+    return { ok: true, existed: song.existed, song: { id: song.id, label: `${song.title} - ${song.artistName}` } };
+  } catch (e) {
+    const state = toState(e, "createSongForClass");
+    return { ok: false, error: state.error };
   }
 }
 
