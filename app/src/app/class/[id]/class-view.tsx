@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { InfoChip } from "@/components/chip";
 import { Logo } from "@/components/logo";
 import { StickerLabel } from "@/components/sticker-label";
 import { stickerButtonClass } from "@/components/sticker-button";
 import { VideoCard } from "@/components/video-card";
 import { BOOKING_TYPE_LABEL, formatClassDate, formatDuration, formatPrice, formatTimeRange, LEVEL_LABEL } from "@/lib/format";
 import type { ClassDetail, ClassDisplayStatus } from "@/server/classes";
+import { CopyAddressButton } from "./copy-address";
 
 const STATUS_LABEL: Record<ClassDisplayStatus, { text: string; tone: "lime" | "butter" | "white" }> = {
   open: { text: "모집 중", tone: "lime" },
@@ -77,6 +79,9 @@ export function ClassView({ c }: { c: ClassDetail }) {
             </p>
           </section>
         )}
+
+        <InstructorSection c={c} />
+        <PlaceSection c={c} />
       </div>
 
       <ActionBar c={c} />
@@ -84,9 +89,8 @@ export function ClassView({ c }: { c: ClassDetail }) {
   );
 }
 
+// 언제·몇 명. 강사·장소는 아래에 섹션을 따로 둔다 (강사는 자기를 알리고, 수강생은 연습실 위치를 꼼꼼히 본다)
 function ClassFacts({ c }: { c: ClassDetail }) {
-  const mapUrl = `https://map.naver.com/p/search/${encodeURIComponent(c.address)}`;
-  const instaUrl = `https://www.instagram.com/${encodeURIComponent(c.instructor.instagramHandle)}/`;
   return (
     <dl className="sticker-edge mt-6 divide-y-2 divide-dashed divide-ink/15 rounded-2xl bg-card px-4">
       <Fact label="일시">
@@ -94,23 +98,68 @@ function ClassFacts({ c }: { c: ClassDetail }) {
         <br />
         {formatTimeRange(c.startsAt, c.endsAt)} <span className="text-sub">· {formatDuration(c.startsAt, c.endsAt)}</span>
       </Fact>
-      <Fact label="장소">
-        {c.studioName}
-        <a href={mapUrl} target="_blank" rel="noopener" className="mt-0.5 block text-[13px] font-semibold text-sub">
-          {c.address} <span className="font-extrabold text-ink">· 지도 열기 ›</span>
-        </a>
-      </Fact>
-      <Fact label="권역">{c.regionName}</Fact>
       {/* 예약이 외부라 남은 자리는 모른다. 정원만 보여준다 (specs/class-detail CON-1) */}
       {c.capacity && <Fact label="정원">{c.capacity}명</Fact>}
-      <Fact label="강사">
-        <a href={instaUrl} target="_blank" rel="noopener" className="block">
-          {c.instructor.displayName}
-          <span className="ml-1.5 text-[13px] font-semibold text-sub">@{c.instructor.instagramHandle}</span>
-          <span className="ml-1 text-[13px] font-extrabold">· 인스타 ›</span>
-        </a>
-      </Fact>
     </dl>
+  );
+}
+
+function SectionTitle({ title, zine }: { title: string; zine: string }) {
+  return (
+    <div className="flex items-center justify-between">
+      <h2 className="font-display text-[23px]">
+        <span className="mark-lime">{title}</span>
+      </h2>
+      <span className="font-zine text-xs font-extrabold uppercase">{zine}</span>
+    </div>
+  );
+}
+
+// 강사. 프로필 사진·소개·포트폴리오는 아직 받지 않아 이름 첫 글자 동그라미와 인스타로 둔다 (2단계에서 채운다)
+function InstructorSection({ c }: { c: ClassDetail }) {
+  const instaUrl = `https://www.instagram.com/${encodeURIComponent(c.instructor.instagramHandle)}/`;
+  return (
+    <section className="mt-8">
+      <SectionTitle title="강사" zine="Instructor" />
+      <div className="sticker-edge mt-2.5 rounded-2xl bg-card p-4">
+        <div className="flex items-center gap-3.5">
+          <span aria-hidden className="grid h-14 w-14 flex-none place-items-center rounded-full border-2 border-ink bg-pink-soft font-display text-2xl">
+            {c.instructor.displayName.slice(0, 1)}
+          </span>
+          <div className="min-w-0">
+            <p className="truncate font-display text-[22px] leading-tight">{c.instructor.displayName}</p>
+            <p className="truncate text-[13px] font-semibold text-sub">@{c.instructor.instagramHandle}</p>
+          </div>
+        </div>
+        <a href={instaUrl} target="_blank" rel="noopener" className={`mt-3.5 ${stickerButtonClass({ variant: "white", size: "md", display: false })}`}>
+          인스타그램에서 더 보기
+        </a>
+      </div>
+    </section>
+  );
+}
+
+// 장소. 지도는 카카오맵 앱·웹으로 연다 (지도 미리보기를 카카오로 붙일 예정이라 같은 지도로 맞춘다, specs/class-detail findings).
+// 주소는 길게 눌러도 복사되게 일반 글자로 둔다
+function PlaceSection({ c }: { c: ClassDetail }) {
+  const mapUrl = `https://map.kakao.com/link/search/${encodeURIComponent(c.address)}`;
+  return (
+    <section className="mt-8">
+      <SectionTitle title="장소" zine="Studio" />
+      <div className="sticker-edge mt-2.5 rounded-2xl bg-card p-4">
+        <p className="font-display text-[22px] leading-tight">{c.studioName}</p>
+        <p className="mt-1 text-[14px] font-semibold text-sub">{c.address}</p>
+        <div className="mt-2.5">
+          <InfoChip>{c.regionName}</InfoChip>
+        </div>
+        <div className="mt-3.5 flex gap-2.5">
+          <a href={mapUrl} target="_blank" rel="noopener" className={stickerButtonClass({ variant: "white", size: "md", display: false })}>
+            카카오맵
+          </a>
+          <CopyAddressButton address={c.address} />
+        </div>
+      </div>
+    </section>
   );
 }
 
