@@ -3,11 +3,12 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 import { LEVEL_LABEL } from "@/lib/format";
-import type { AdminPlace, ClassSongOption } from "@/server/admin/classes";
+import type { AdminPlace } from "@/server/admin/classes";
 import type { AdminInstructorRow } from "@/server/admin/instructors";
 import type { Region } from "@/server/regions";
 import { type AdminActionState, createClassAction } from "../../actions";
 import { StudioPicker } from "../../instructors/studio-forms";
+import { SongPicker } from "./song-picker";
 import { buttonClass, Field, inputClass, Result } from "../../ui";
 
 const BOOKING_TYPE_LABEL = {
@@ -28,12 +29,11 @@ type Props = {
   instructors: AdminInstructorRow[];
   instructorId: number | null;
   places: AdminPlace[];
-  songs: ClassSongOption[];
   regions: Region[];
   today: string;
 };
 
-export function ClassForm({ instructors, instructorId, places, songs, regions, today }: Props) {
+export function ClassForm({ instructors, instructorId, places, regions, today }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const [state, action, pending] = useActionState<AdminActionState, FormData>(createClassAction, { ok: false });
@@ -61,19 +61,7 @@ export function ClassForm({ instructors, instructorId, places, songs, regions, t
         </select>
       </Field>
 
-      <fieldset className="grid gap-3 sm:grid-cols-3">
-        <legend className="mb-1 text-sm font-semibold">배우는 곡 * (1~3개, 첫 곡이 대표)</legend>
-        {[0, 1, 2].map((n) => (
-          <select key={n} name="songIds" required={n === 0} defaultValue="" className={inputClass}>
-            <option value="">{n === 0 ? "곡 선택" : "(선택)"}</option>
-            {songs.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.label}
-              </option>
-            ))}
-          </select>
-        ))}
-      </fieldset>
+      <SongPicker />
 
       <Field label="클래스 이름" hint="비우면 '첫 곡명 원데이 클래스'">
         <input name="title" maxLength={30} className={inputClass} />

@@ -93,17 +93,6 @@ export async function listPlacesForInstructor(instructorId: number): Promise<Adm
     .orderBy(sql`${instructorPlaces.lastUsedAt} desc nulls last`, desc(instructorPlaces.id));
 }
 
-export type ClassSongOption = { id: number; label: string };
-
-export async function listSongOptions(): Promise<ClassSongOption[]> {
-  const rows = await getDb()
-    .select({ id: songs.id, title: songs.title, artist: sql<string>`(select name from artists where artists.id = ${songs.artistId})` })
-    .from(songs)
-    .where(isNull(songs.mergedIntoId))
-    .orderBy(asc(songs.title));
-  return rows.map((r) => ({ id: r.id, label: `${r.title} - ${r.artist}` }));
-}
-
 // 클래스 대리 등록 (F-15). 공개 조건을 만족하면 그 자리에서 추가요를 연다 (FR-14)
 export async function createClassByAdmin(input: ClassInput): Promise<{ id: number; isPublic: boolean; openedRequests: number }> {
   const startsAt = kstDateTime(input.date, input.startTime);

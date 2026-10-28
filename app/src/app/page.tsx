@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { Logo } from "@/components/logo";
@@ -6,7 +7,7 @@ import { listHotSongsThisWeek, listUpcomingClasses } from "@/server/classes";
 import { listTopRequestedSongs } from "@/server/requests";
 import { HomeView } from "./home-view";
 
-// F-01 홈 (U-01). 검색창·탭바·더보기는 갈 화면이 생길 때 붙인다 (specs/home, MVP 원칙 6)
+// F-01 홈 (U-01). 탭바·더보기는 갈 화면이 생길 때 붙인다 (specs/home, MVP 원칙 6). 검색 입구는 specs/search
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-md pb-16">
@@ -17,6 +18,14 @@ export default function Home() {
       <p className="mt-3 px-5 text-[15px] font-bold text-sub">
         지금 뜨는 K-pop 곡의 원데이 댄스 클래스 <Twinkle size={16} className="ml-0.5 align-[-2px]" />
       </p>
+      {/* 검색 입구 (F-01·F-02). 누르면 검색 화면에서 바로 친다 */}
+      <Link href="/search" className="press sticker-edge mx-5 mt-4 flex items-center gap-2.5 rounded-full bg-card px-5 py-3 text-[16px] font-bold text-sub">
+        <svg aria-hidden width="18" height="18" viewBox="0 0 24 24" className="flex-none text-ink">
+          <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="2.4" />
+          <path d="M15.5 15.5 L21 21" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
+        </svg>
+        추고 싶은 곡이나 아티스트
+      </Link>
       <Suspense fallback={<HomeSkeleton />}>
         <HomeSections />
       </Suspense>

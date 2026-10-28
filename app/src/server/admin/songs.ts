@@ -1,4 +1,4 @@
-import { asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db";
 import { artistAliases, artists, songAliases, songs, videoType } from "@/db/schema";
@@ -231,3 +231,40 @@ export async function clearSongVideo(songId: number): Promise<{ slug: string } |
     .returning({ slug: songs.slug });
   return updated ?? null;
 }
+
+// 클래스 등록 곡 고르기에서 바로 새 곡 만들기 (F-13, specs/search). 곡명·아티스트만 받고, 별칭·영상은 곡 화면에서 나중에 채운다
+export const quickSongInput = z.object({
+  title: z.string().trim().min(1, "곡명을 입력해 주세요").max(100, "곡명은 100자까지예요"),
+  artistName: z.string().trim().min(1, "아티스트를 입력해 주세요").max(100, "아티스트는 100자까지예요"),
+});
+
+// 같은 아티스트(다른 이름 포함)에 같은 곡명(다른 이름 포함)이 이미 있으면 그 곡을 돌려준다. 표기만 다른 중복을 만들지 않는다
+export async function findOrCreateSong(input: z.output<typeof quickSongInput>): Promise<{ id: number; title: string; artistName: string; existed: boolean }> {
+  const db = getDb();
+  const [same] = await db
+    .select({ id: songs.id, title: songs.title, artistName: artists.name })
+    .from(songs)
+    .innerJoin(artists, eq(artists.id, songs.artistId))
+    .innerJoin(songAliases, eq(songAliases.songId, songs.id))
+    .innerJoin(artistAliases, eq(artistAliases.artistId, artists.id))
+    .where(
+      and(
+        eq(songAliases.aliasNorm, normalizeAlias(input.title)),
+        eq(artistAliases.aliasNorm, normalizeAlias(input.artistName)),
+        isNull(songs.mergedIntoId),
+      ),
+    )
+    .limit(1);
+  if (same) return { ...same, existed: true };
+
+  const saved = await saveSong({ id: null, title: input.title, artistName: input.artistName, artistAliases: [], songAliases: [], slug: "", releaseDate: null });
+  // 아티스트는 다른 이름으로 쳐도 기존 아티스트로 묶이므로, 보여줄 이름은 저장된 대표 이름으로
+  const [row] = await db
+    .select({ title: songs.title, artistName: artists.name })
+    .from(songs)
+    .innerJoin(artists, eq(artists.id, songs.artistId))
+    .where(eq(songs.id, saved.id))
+    .limit(1);
+  return { id: saved.id, title: row.title, artistName: row.artistName, existed: false };
+}
+
