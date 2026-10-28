@@ -35,7 +35,7 @@
 
 | 컴포넌트 | 쓰는 곳 |
 | --- | --- |
-| `StickerButton` | 모든 주요 버튼. 변형: `pink`(추가요 제출) `lime`(주 행동) `white`(보조·완료 상태) `soft`(취소처럼 한발 물러선 행동) `ink`(외부로 나가기·예약) `kakao` |
+| `StickerButton` | 모든 주요 버튼. 변형: `pink`(추가요 제출) `lime`(주 행동) `white`(보조·완료 상태) `soft`(취소처럼 한발 물러선 행동) `ink`(외부로 나가기·예약) `kakao`. 링크에는 `stickerButtonClass()` |
 | `ChoiceChip`, `InfoChip` | 고르는 칩(라디오), 보기만 하는 칩 |
 | `BottomSheet` | 입력·로그인 시트 |
 | `VideoCard` | 곡 영상. 누르기 전엔 썸네일, 누르면 YouTube 임베드 |

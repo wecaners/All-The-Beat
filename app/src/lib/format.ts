@@ -20,6 +20,23 @@ export function formatTicketDate(d: Date): { month: string; day: string; weekday
   return { month, day, weekday };
 }
 
+// "10월 29일 (목)" (KST)
+export function formatClassDate(d: Date): string {
+  const parts = new Intl.DateTimeFormat("ko-KR", { timeZone: KST, month: "numeric", day: "numeric", weekday: "short" })
+    .formatToParts(d)
+    .reduce<Record<string, string>>((acc, p) => ({ ...acc, [p.type]: p.value }), {});
+  return `${parts.month}월 ${parts.day}일 (${parts.weekday})`;
+}
+
+// "90분", "2시간", "1시간 30분"
+export function formatDuration(startsAt: Date, endsAt: Date): string {
+  const minutes = Math.round((endsAt.getTime() - startsAt.getTime()) / 60000);
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m}분`;
+  return m === 0 ? `${h}시간` : `${h}시간 ${m}분`;
+}
+
 // "19:00~21:00" (KST)
 export function formatTimeRange(startsAt: Date, endsAt: Date): string {
   const time = (d: Date) => new Intl.DateTimeFormat("ko-KR", { timeZone: KST, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(d);
@@ -43,3 +60,12 @@ export const VIDEO_TYPE_LABEL = { dance_practice: "안무 연습", performance: 
 
 // 포토카드 아래 팬진 라벨용 영문
 export const VIDEO_TYPE_ZINE = { dance_practice: "DANCE PRACTICE", performance: "PERFORMANCE", mv: "MUSIC VIDEO" } as const;
+
+// "예약은 강사님의 ○○에서 진행돼요"의 ○○ (03 명세 F-05·F-06). 그 밖은 문구를 따로 쓴다
+export const BOOKING_TYPE_LABEL = {
+  naver: "네이버 예약",
+  kakao_openchat: "카카오 오픈채팅",
+  insta_dm: "인스타그램 DM",
+  google_form: "구글 폼",
+  other: null,
+} as const;

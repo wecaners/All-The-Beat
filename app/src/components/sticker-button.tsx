@@ -19,14 +19,16 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   display?: boolean;
 };
 
-// 스티커 버튼: 굵은 테두리 + 딱 떨어지는 그림자, 누르면 도장처럼 눌린다
-export function StickerButton({ variant = "lime", size = "lg", display = true, className = "", ...rest }: Props) {
+type Look = Pick<Props, "variant" | "size" | "display">;
+
+// 링크(<a>, <Link>)도 같은 모양을 쓸 때
+export function stickerButtonClass({ variant = "lime", size = "lg", display = true }: Look = {}) {
   const sizing = size === "lg" ? "h-14 text-[22px]" : "h-12 text-[17px]";
   const font = display ? "font-display" : "font-sans font-extrabold text-base";
-  return (
-    <button
-      {...rest}
-      className={`press sticker-edge flex w-full items-center justify-center gap-2 rounded-[18px] ${sizing} ${font} ${VARIANT[variant]} disabled:opacity-50 ${className}`}
-    />
-  );
+  return `press sticker-edge flex w-full items-center justify-center gap-2 rounded-[18px] ${sizing} ${font} ${VARIANT[variant]}`;
+}
+
+// 스티커 버튼: 굵은 테두리 + 딱 떨어지는 그림자, 누르면 도장처럼 눌린다
+export function StickerButton({ variant, size, display, className = "", ...rest }: Props) {
+  return <button {...rest} className={`${stickerButtonClass({ variant, size, display })} disabled:opacity-50 ${className}`} />;
 }
