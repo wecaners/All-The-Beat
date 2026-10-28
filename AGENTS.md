@@ -25,6 +25,7 @@
 ## 읽기 원칙
 
 - **`core-principles.md`는 세션 시작 시 항상 읽는다.**
+- **새 세션은 `_agent/handoff.md`(지금 상태·남은 일·조심할 것)를 이어서 읽는다.** 큰 작업이 끝나거나 상태가 바뀌면 이 파일을 고친다.
 - 기능을 기획하거나 화면 문구를 쓸 때는 `product.md`를 읽는다.
 - 수강생 화면을 만들거나 고칠 때는 `design.md`를 읽는다.
 - `app/` 작업 전에 `tech-stack.md`와 `app.md`를 읽는다. Next.js API를 쓰기 전에는 `app/AGENTS.md`가 가리키는 `app/node_modules/next/dist/docs/`의 해당 가이드를 읽는다.
