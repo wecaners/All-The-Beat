@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, inArray, isNotNull, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, inArray, isNotNull, isNull, lt, min, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db";
 import { artists, bookingType, classes, classSongs, classStatus, instructorProfiles, regions, songs } from "@/db/schema";
@@ -157,4 +157,72 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
     instructor: { displayName: row.instructorName, instagramHandle: row.instagramHandle },
     songs: songRows,
   };
+}
+
+// 홈에 보여줄 수 있는 클래스: 공개 + 모집 중·마감 임박 + 아직 시작 전 (F-01)
+const upcomingAndOpen = and(inArray(classes.status, ["open", "closing_soon"]), gt(classes.startsAt, sql`now()`), publiclyVisible);
+
+export type UpcomingClassCard = {
+  id: number;
+  startsAt: Date;
+  endsAt: Date;
+  regionName: string;
+  price: number;
+  level: "intro" | "beginner" | "intermediate_plus";
+  status: "open" | "closing_soon";
+  /** 대표 곡 (position 1) */
+  songTitle: string;
+  artistName: string;
+  videoId: string | null;
+};
+
+// 홈 "다가오는 클래스" (F-01): 시작이 가까운 순
+export async function listUpcomingClasses(limit = 10): Promise<UpcomingClassCard[]> {
+  const rows = await getDb()
+    .select({
+      id: classes.id,
+      startsAt: classes.startsAt,
+      endsAt: classes.endsAt,
+      regionName: regions.shortName,
+      price: classes.price,
+      level: classes.level,
+      status: classes.status,
+      songTitle: songs.title,
+      artistName: artists.name,
+      videoId: visibleVideoId,
+    })
+    .from(classes)
+    .innerJoin(instructorProfiles, eq(instructorProfiles.id, classes.instructorId))
+    .innerJoin(regions, eq(regions.id, classes.regionId))
+    .innerJoin(classSongs, and(eq(classSongs.classId, classes.id), eq(classSongs.position, 1)))
+    .innerJoin(songs, eq(songs.id, classSongs.songId))
+    .innerJoin(artists, eq(artists.id, songs.artistId))
+    .where(upcomingAndOpen)
+    .orderBy(asc(classes.startsAt), asc(classes.id))
+    .limit(limit);
+
+  return rows as UpcomingClassCard[];
+}
+
+export type HotSong = { slug: string; title: string; artistName: string; videoId: string | null; classCount: number };
+
+// 홈 "이번 주 핫한 곡" (F-01): 지금부터 7일 안에 시작하는 클래스가 많은 곡. 같으면 더 빨리 열리는 곡 먼저
+export async function listHotSongsThisWeek(limit = 10): Promise<HotSong[]> {
+  return getDb()
+    .select({
+      slug: songs.slug,
+      title: songs.title,
+      artistName: artists.name,
+      videoId: visibleVideoId,
+      classCount: count(classes.id),
+    })
+    .from(classSongs)
+    .innerJoin(classes, eq(classes.id, classSongs.classId))
+    .innerJoin(instructorProfiles, eq(instructorProfiles.id, classes.instructorId))
+    .innerJoin(songs, eq(songs.id, classSongs.songId))
+    .innerJoin(artists, eq(artists.id, songs.artistId))
+    .where(and(upcomingAndOpen, lt(classes.startsAt, sql`now() + interval '7 days'`), isNull(songs.mergedIntoId)))
+    .groupBy(songs.id, artists.name)
+    .orderBy(desc(count(classes.id)), asc(min(classes.startsAt)))
+    .limit(limit);
 }

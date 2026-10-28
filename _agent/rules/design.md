@@ -41,6 +41,7 @@
 | `BottomSheet` | 입력·로그인 시트 |
 | `VideoCard` | 곡 영상. 누르기 전엔 썸네일, 누르면 YouTube 임베드 |
 | `ClassTicket` | 클래스 목록 항목 |
+| `SongCard` | 곡 포토카드(정지). 누르면 곡 상세. 가로로 넘기는 줄·순위·검색 결과 |
 | `StarBurst`, `StickerLabel`, `Tape` | 별 스티커, 작은 라벨, 테이프 |
 | `Celebration`, `Toast` | 감정 순간 오버레이, 짧은 안내 |
 | `motion.ts` | `play`, `confetti`, `buzz`, `reducedMotion` |

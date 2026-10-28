@@ -2,7 +2,7 @@ import { eq, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import { artists, songs } from "@/db/schema";
 
-// 화면에 보여줄 영상 id. 퍼가기가 막힌 영상은 숨긴다 (06 문서). 곡 상세·클래스 상세가 같이 쓴다
+// 화면에 보여줄 영상 id. 퍼가기가 막힌 영상은 숨긴다 (06 문서). 곡 상세·클래스 상세·홈이 같이 쓴다
 export const visibleVideoId = sql<string | null>`case when ${songs.videoEmbeddable} is not false then ${songs.ytVideoId} end`;
 
 export type SongDetail = {
