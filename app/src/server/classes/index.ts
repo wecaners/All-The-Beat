@@ -2,6 +2,7 @@ import { and, asc, eq, gt, inArray, isNotNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db";
 import { artists, bookingType, classes, classSongs, classStatus, instructorProfiles, regions, songs } from "@/db/schema";
+import { visibleVideoId } from "@/server/songs";
 
 export type ClassCard = {
   id: number;
@@ -130,7 +131,7 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
   if (!row) return null;
 
   const songRows = await db
-    .select({ slug: songs.slug, title: songs.title, artistName: artists.name, videoId: songs.ytVideoId })
+    .select({ slug: songs.slug, title: songs.title, artistName: artists.name, videoId: visibleVideoId })
     .from(classSongs)
     .innerJoin(songs, eq(songs.id, classSongs.songId))
     .innerJoin(artists, eq(artists.id, songs.artistId))
