@@ -13,6 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "db:seed:dev": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed-dev.mts",
+    "db:seed:showcase": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/seed-showcase.mts",
+    "db:clean:showcase": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/clean-showcase.mts",
     "admin:grant": "node scripts/admin-grant.mts"
   },
   "dependencies": {
