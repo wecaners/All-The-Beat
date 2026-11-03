@@ -6,7 +6,7 @@ import type { z } from "zod";
 import { requireAdmin } from "@/lib/auth/admin";
 import { classInput, createClassByAdmin } from "@/server/admin/classes";
 import { respondToEncore, setClassClosed } from "@/server/admin/encores";
-import { consentInput, createProxyInstructor, instructorInput, recordConsent } from "@/server/admin/instructors";
+import { approveInstructor, consentInput, createProxyInstructor, instructorInput, issueVerifyCode, recordConsent, rejectInput, rejectInstructor } from "@/server/admin/instructors";
 import { AdminInputError } from "@/server/admin/shared";
 import {
   addStudioPhoto,
@@ -368,5 +368,42 @@ export async function setClassClosedAction(classId: number, closed: boolean): Pr
     return { ok: true };
   } catch (e) {
     return toState(e, "setClassClosed");
+  }
+}
+
+// ── 강사 신청 승인 (F-14, specs/instructor-apply) ────────────────────────
+
+// 6자리 코드를 발급해 한 번 보여준다. 운영자가 강사 인스타로 DM을 보낸다
+export async function issueVerifyCodeAction(instructorId: number): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    const code = await issueVerifyCode(instructorId);
+    refresh();
+    return { ok: true, message: `인증 코드 ${code} — 강사 인스타 DM으로 보내 주세요. 24시간 동안 유효해요` };
+  } catch (e) {
+    return toState(e, "issueVerifyCode");
+  }
+}
+
+export async function approveInstructorAction(instructorId: number): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    await approveInstructor(instructorId);
+    refresh();
+    return { ok: true, message: "승인했어요" };
+  } catch (e) {
+    return toState(e, "approveInstructor");
+  }
+}
+
+export async function rejectInstructorAction(_prev: AdminActionState, fd: FormData): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    const input = parse(rejectInput, { instructorId: Number(text(fd, "instructorId")), reason: text(fd, "reason") });
+    await rejectInstructor(input);
+    refresh();
+    return { ok: true, message: "반려했어요. 강사가 사유를 보고 다시 신청할 수 있어요" };
+  } catch (e) {
+    return toState(e, "rejectInstructor");
   }
 }

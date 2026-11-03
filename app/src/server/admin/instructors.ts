@@ -1,3 +1,4 @@
+import { createHash, randomInt } from "node:crypto";
 import { and, asc, count, desc, eq, gt, inArray, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db";
@@ -31,6 +32,9 @@ export type AdminInstructorRow = {
   isProxy: boolean;
   consentAt: Date | null;
   classCount: number;
+  /** 신청 상태 (F-14). 대리 강사는 approved로 만들어진다 */
+  status: "pending" | "verified" | "approved" | "rejected" | "suspended";
+  createdAt: Date;
 };
 
 export async function listInstructorsForAdmin(): Promise<AdminInstructorRow[]> {
@@ -42,14 +46,22 @@ export async function listInstructorsForAdmin(): Promise<AdminInstructorRow[]> {
       isProxy: instructorProfiles.isProxy,
       consentAt: instructorProfiles.consentAt,
       classCount: sql<number>`(select count(*)::int from ${classes} where ${classes.instructorId} = ${instructorProfiles.id})`,
+      status: instructorProfiles.status,
+      createdAt: instructorProfiles.createdAt,
     })
     .from(instructorProfiles)
-    .orderBy(desc(instructorProfiles.createdAt));
+    // 승인을 기다리는 신청(대기·확인됨)이 위로 (F-14)
+    .orderBy(sql`case when ${instructorProfiles.status} in ('pending', 'verified') then 0 else 1 end`, desc(instructorProfiles.createdAt));
 }
 
 export type AdminInstructorDetail = AdminInstructorRow & {
   consentNote: string | null;
   regionNames: string[];
+  bio: string | null;
+  rejectedReason: string | null;
+  approvedAt: Date | null;
+  /** 발급된 코드가 아직 유효한가 */
+  codeValid: boolean;
 };
 
 export async function getInstructorForAdmin(id: number): Promise<AdminInstructorDetail | null> {
@@ -62,6 +74,12 @@ export async function getInstructorForAdmin(id: number): Promise<AdminInstructor
       isProxy: instructorProfiles.isProxy,
       consentAt: instructorProfiles.consentAt,
       consentNote: instructorProfiles.consentNote,
+      status: instructorProfiles.status,
+      createdAt: instructorProfiles.createdAt,
+      bio: instructorProfiles.bio,
+      rejectedReason: instructorProfiles.rejectedReason,
+      approvedAt: instructorProfiles.approvedAt,
+      codeValid: sql<boolean>`coalesce(${instructorProfiles.verifyCodeExpiresAt} > now(), false)`,
     })
     .from(instructorProfiles)
     .where(eq(instructorProfiles.id, id))
@@ -135,4 +153,50 @@ export async function recordConsent(input: z.infer<typeof consentInput>): Promis
     }
     return { publishedClasses: upcoming.length, openedRequests };
   });
+}
+
+// ── 강사 신청 승인 (F-14, specs/instructor-apply) ────────────────────────
+
+export const VERIFY_CODE_HOURS = 24;
+
+// 코드 해시: 원문은 저장하지 않는다. 강사 id를 섞어 같은 코드라도 해시가 다르게. 강사 쪽 확인(src/server/instructors)도 이 함수를 쓴다
+export function hashVerifyCode(instructorId: number, code: string): string {
+  return createHash("sha256").update(`${instructorId}:${code}`).digest("hex");
+}
+
+// 6자리 코드를 만들어 해시·만료(24시간)만 저장하고 원문을 돌려준다. 운영자가 인스타 DM으로 옮겨 적는다. 다시 발급하면 이전 코드는 무효
+export async function issueVerifyCode(instructorId: number): Promise<string> {
+  const code = String(randomInt(0, 1_000_000)).padStart(6, "0");
+  const [updated] = await getDb()
+    .update(instructorProfiles)
+    .set({ verifyCodeHash: hashVerifyCode(instructorId, code), verifyCodeExpiresAt: sql`now() + make_interval(hours => ${VERIFY_CODE_HOURS})` })
+    .where(and(eq(instructorProfiles.id, instructorId), eq(instructorProfiles.isProxy, false), eq(instructorProfiles.status, "pending")))
+    .returning({ id: instructorProfiles.id });
+  if (!updated) throw new AdminInputError("승인 대기 중인 직접 신청 강사에게만 코드를 발급할 수 있어요");
+  return code;
+}
+
+// 승인: 대기·확인됨 → 승인. 확인 전에도 운영자 판단으로 할 수 있다
+export async function approveInstructor(instructorId: number): Promise<void> {
+  const [updated] = await getDb()
+    .update(instructorProfiles)
+    .set({ status: "approved", approvedAt: sql`now()`, rejectedReason: null, verifyCodeHash: null, verifyCodeExpiresAt: null })
+    .where(and(eq(instructorProfiles.id, instructorId), inArray(instructorProfiles.status, ["pending", "verified"])))
+    .returning({ id: instructorProfiles.id });
+  if (!updated) throw new AdminInputError("대기·확인됨 상태의 강사만 승인할 수 있어요");
+}
+
+export const rejectInput = z.object({
+  instructorId: z.number().int().positive(),
+  reason: z.string().trim().min(2, "반려 사유를 적어 주세요").max(200, "사유는 200자까지예요"),
+});
+
+// 반려: 대기·확인됨 → 반려 + 사유. 강사가 고쳐 다시 신청할 수 있다
+export async function rejectInstructor(input: z.infer<typeof rejectInput>): Promise<void> {
+  const [updated] = await getDb()
+    .update(instructorProfiles)
+    .set({ status: "rejected", rejectedReason: input.reason, verifyCodeHash: null, verifyCodeExpiresAt: null })
+    .where(and(eq(instructorProfiles.id, input.instructorId), inArray(instructorProfiles.status, ["pending", "verified"])))
+    .returning({ id: instructorProfiles.id });
+  if (!updated) throw new AdminInputError("대기·확인됨 상태의 강사만 반려할 수 있어요");
 }
