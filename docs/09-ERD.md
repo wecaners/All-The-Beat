@@ -371,6 +371,14 @@ erDiagram
 
 > IP·기기 정보는 저장하지 않는다 (08 문서 3절).
 
+**user_visits** — 로그인 사용자의 접속 날짜 (F-18 재방문, 2026-11-03)
+| 컬럼 | 타입 | 제약 | 설명 |
+|---|---|---|---|
+| user_id | uuid | PK, FK → profiles (cascade) | |
+| visited_on | date | PK | KST 날짜. 사용자 × 날짜 = 1행 |
+
+> 방문한 주소·IP·기기는 저장하지 않는다. Proxy가 로그인 확인 직후 하루 한 번 남긴다 (`specs/admin-metrics`).
+
 ---
 
 ## 4. 인덱스
@@ -463,6 +471,7 @@ createClass(...) 후:
 - 기준 데이터 마이그레이션: `0003` 권역 8개, `0004` 서울 25개 구 → 권역 매핑(구 단위만, 동 단위는 나중에) [가정]
 - `0005_instructor_studio` (2026-10-28, `specs/instructor-studio`): `instructor_places`를 강사의 스튜디오로 넓힘 — `kakao_place_id`·`kakao_place_url`·`lat`·`lng`(카카오 검색에서 한 번 저장, 위도·경도는 둘 다 있거나 둘 다 없음)·`facilities text[]`·`archived_at`(목록에서 빼기, 지우지 않음), (강사, 카카오 장소) 유니크. 새 테이블 `studio_photos`(스튜디오 사진, 큰 사진·작은 사진 경로, 스튜디오 삭제 시 같이 삭제). `instructor_profiles`에 `photo_path`·`photo_thumb_path`·`portfolio_video_ids text[]`(최대 2)·`media_consent`(대리 등록 강사의 사진·영상 게재 동의)
 - `0006_media_storage`: Supabase Storage 공개 버킷 `media`(이미지, 2MB). 쓰기·지우기는 `public.is_admin()`(정의자 권한 함수, authenticated만 실행) 정책으로 운영자만. 읽기는 공개 주소
+- `0007_user_visits` (2026-11-03, `specs/admin-metrics`): 새 테이블 `user_visits`(사용자 × KST 날짜 복합 PK, 사용자 삭제 시 같이 삭제). 권한은 `0002`의 기본 권한 회수로 막힌다
 
 ## 9. 열린 질문
 

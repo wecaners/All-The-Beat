@@ -4,10 +4,12 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { listUpcomingClassesForAdmin } from "@/server/admin/classes";
 import { countEncoresAwaitingResponse } from "@/server/admin/encores";
 import { listInstructorsForAdmin } from "@/server/admin/instructors";
+import { getAdminMetrics } from "@/server/admin/metrics";
 
 import { countPendingSongs, listSongsForAdmin } from "@/server/admin/songs";
 import { ActionButton } from "./action-button";
 import { setClassClosedAction } from "./actions";
+import { MetricsView } from "./metrics";
 import { linkButtonClass, Section, Table, Td } from "./ui";
 
 // 직접 신청한 강사의 상태 (F-14). 대기·확인됨은 승인을 기다리는 것
@@ -19,10 +21,21 @@ const KST_SHORT = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", mon
 
 export default function AdminHome() {
   return (
-    <Suspense fallback={<p className="mt-8 text-sm text-zinc-500">불러오는 중…</p>}>
-      <Overview />
-    </Suspense>
+    <>
+      <Suspense fallback={<p className="mt-8 text-sm text-zinc-500">지표 세는 중…</p>}>
+        <Metrics />
+      </Suspense>
+      <Suspense fallback={<p className="mt-8 text-sm text-zinc-500">불러오는 중…</p>}>
+        <Overview />
+      </Suspense>
+    </>
   );
+}
+
+// 운영 첫 화면 맨 위 (F-18, A-06). 할 일 목록과 따로 불러와 서로 기다리지 않는다
+async function Metrics() {
+  await requireAdmin();
+  return <MetricsView m={await getAdminMetrics()} />;
 }
 
 async function Overview() {

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { bigint, check, index, integer, pgTable, smallint, text, unique, uuid } from "drizzle-orm/pg-core";
+import { bigint, check, date, index, integer, pgTable, primaryKey, smallint, text, unique, uuid } from "drizzle-orm/pg-core";
 import { classes } from "./classes";
 import { createdAt, timestamptz, updatedAt } from "./columns";
 import { encoreRoundStatus, eventType, requestStatus, timePref } from "./enums";
@@ -103,4 +103,16 @@ export const events = pgTable(
     index("events_type_class_created_idx").on(t.type, t.classId, t.createdAt),
     index("events_type_song_created_idx").on(t.type, t.songId, t.createdAt),
   ],
+).enableRLS();
+
+// 로그인 사용자의 접속 날짜 (F-18 재방문). 사용자 × KST 날짜 = 1행. 방문한 주소·IP·기기는 남기지 않는다
+export const userVisits = pgTable(
+  "user_visits",
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    visitedOn: date({ mode: "string" }).notNull(), // KST 날짜
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.visitedOn] })],
 ).enableRLS();
