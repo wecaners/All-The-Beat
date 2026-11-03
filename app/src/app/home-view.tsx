@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ClassTicket } from "@/components/class-ticket";
 import { stagger } from "@/components/motion";
+import { RankSticker } from "@/components/rank-sticker";
 import { SongCard } from "@/components/song-card";
 import { StarBurst } from "@/components/star-burst";
 import { StickerLabel } from "@/components/sticker-label";
@@ -29,14 +30,15 @@ export function HomeView({ hot, upcoming, top }: { hot: HotSong[]; upcoming: Upc
   );
 }
 
-function SectionHead({ title, label, zine }: { title: string; label?: ReactNode; zine: string }) {
+// 오른쪽은 영문 라벨 또는 더보기 링크(action) 하나만
+function SectionHead({ title, label, zine, action }: { title: string; label?: ReactNode; zine?: string; action?: ReactNode }) {
   return (
     <div className="mb-1 flex items-center justify-between px-5">
       <h2 className="font-display text-[23px]">
         {title}
         {label}
       </h2>
-      <span className="font-zine text-xs font-extrabold uppercase">{zine}</span>
+      {action ?? <span className="font-zine text-xs font-extrabold uppercase">{zine}</span>}
     </div>
   );
 }
@@ -103,19 +105,23 @@ function UpcomingClasses({ classes }: { classes: UpcomingClassCard[] }) {
   );
 }
 
-const RANK_TONE = ["bg-pink text-white", "bg-sky", "bg-butter", "bg-lilac", "bg-lime"];
-
 function TopRequests({ songs }: { songs: TopRequestedSong[] }) {
   return (
     <section className="mt-9">
-      <SectionHead title="추가요 TOP 5" zine="Last 30 days" />
-      <p className="px-5 text-[13px] font-semibold text-sub">누가 요청했는지는 보이지 않아요</p>
+      {/* 더보기 → 추가요 랭킹 (F-08). 3명 미만인 곡은 랭킹에는 없다 */}
+      <SectionHead
+        title="추가요 TOP 5"
+        action={
+          <Link href="/requests" className="press rounded-full border-2 border-ink bg-card px-3.5 py-1 text-[13px] font-black shadow-sticker-sm">
+            랭킹 더보기
+          </Link>
+        }
+      />
+      <p className="px-5 text-[13px] font-semibold text-sub">최근 30일 · 누가 요청했는지는 보이지 않아요</p>
       <ol className="mt-3 space-y-2.5 px-5">
         {songs.map((s, i) => (
           <li key={s.slug} style={stagger(i)} className="animate-stick-in sticker-edge flex items-center gap-3 rounded-[18px] bg-card py-2 pr-2.5 pl-2">
-            <span className={`grid h-9 w-9 flex-none place-items-center rounded-full border-2 border-ink font-display text-lg leading-none ${RANK_TONE[i]}`}>
-              {i + 1}
-            </span>
+            <RankSticker rank={i + 1} />
             <Link href={`/song/${s.slug}`} className="min-w-0 flex-1">
               <span className="block truncate text-[15px] font-extrabold">{s.title}</span>
               <span className="block truncate text-xs font-semibold text-sub">
