@@ -453,7 +453,7 @@ createClass(...) 후:
 
 | 대상 | 규칙 |
 |---|---|
-| 회원 탈퇴 (F-09) | `profiles.deleted_at` 기록, 닉네임 익명화. 추가요·앵콜 **삭제**(집계에서 빠짐). 강사면 클래스 `is_hidden=true` 후 30일 뒤 삭제 |
+| 회원 탈퇴 (F-09) | `auth.users` 행 삭제 → `profiles`·추가요·앵콜·`user_visits` 같이 **삭제**(집계에서 빠짐), `events.user_id`·`songs.created_by`·`instructor_profiles.user_id`는 NULL. 강사면 같은 트랜잭션에서 클래스 `is_hidden=true`, 강사 `suspended`. 30일 뒤 삭제는 예약 작업이 생길 때. `profiles.deleted_at`은 쓰지 않는다 (2026-11-03 `specs/account-withdrawal`, 익명화 대신 삭제: 소프트 삭제면 같은 카카오로 재가입할 때 익명 프로필로 들어간다) |
 | 곡 병합 | 원 곡 행은 남기고 `merged_into_id`만 채움 (URL 리다이렉트). 별칭·클래스·추가요는 대상 곡으로 이동, 같은 사용자 추가요 중복은 최신 1건만 |
 | events | 무기한 보관 [가정] → 데이터가 커지면 월별 집계 테이블로 요약 후 원본 정리 |
 | YouTube 영상 정보 | 30일마다 갱신 (정책) |

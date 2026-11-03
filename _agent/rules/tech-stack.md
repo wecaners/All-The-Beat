@@ -47,6 +47,7 @@ app/scripts/       db-check, seed-dev 같은 로컬 스크립트
 | `MIGRATION_DATABASE_URL` | 로컬 전용 | 넣지 않음 | 세션 풀러 5432, drizzle-kit용 |
 | `NEXT_PUBLIC_KAKAO_JS_KEY` | 브라우저 | Config | 카카오맵 JS SDK. 카카오 콘솔에 도메인 등록 필수 |
 | `KAKAO_REST_API_KEY` | 서버 전용 | Secret | 카카오 로컬 API(연습실 검색) |
+| `KAKAO_ADMIN_KEY` | 서버 전용 | Secret | 회원 탈퇴 때 카카오 연결 끊기. 없으면 끊기를 건너뛰고 로그를 남긴다 |
 
 새 환경변수를 만들면 이 표, `app/.env.local.example`, PR 본문의 "머지 전 할 일"을 같이 고친다.
 
