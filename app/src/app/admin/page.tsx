@@ -77,7 +77,7 @@ async function Overview() {
       </Section>
 
       <Section title={`곡 ${songs.length}`} action={<Link href="/admin/songs/new" className={linkButtonClass}>+ 곡</Link>}>
-        <Table head={["곡", "아티스트", "주소", "영상"]} empty={songs.length === 0}>
+        <Table head={["곡", "아티스트", "주소", "영상", "검수"]} empty={songs.length === 0}>
           {songs.map((s) => (
             <tr key={s.id}>
               <Td>
@@ -92,6 +92,8 @@ async function Overview() {
                 </a>
               </Td>
               <Td>{s.hasVideo ? "✅" : "—"}</Td>
+              {/* 수강생이 만든 곡 (F-13). 중복이면 병합, 승인은 F-16과 함께 */}
+              <Td>{s.pendingReview ? <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-bold text-amber-900">검수 대기</span> : "—"}</Td>
             </tr>
           ))}
         </Table>

@@ -40,7 +40,7 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export type AdminSongRow = { id: number; title: string; artistName: string; slug: string; hasVideo: boolean };
+export type AdminSongRow = { id: number; title: string; artistName: string; slug: string; hasVideo: boolean; pendingReview: boolean };
 
 export async function listSongsForAdmin(): Promise<AdminSongRow[]> {
   return getDb()
@@ -50,6 +50,7 @@ export async function listSongsForAdmin(): Promise<AdminSongRow[]> {
       artistName: artists.name,
       slug: songs.slug,
       hasVideo: sql<boolean>`${songs.ytVideoId} is not null`,
+      pendingReview: sql<boolean>`${songs.reviewStatus} = 'pending'`,
     })
     .from(songs)
     .innerJoin(artists, eq(artists.id, songs.artistId))
@@ -142,8 +143,11 @@ async function addAliases<T extends "artist" | "song">(tx: Tx, kind: T, ownerId:
   }
 }
 
-// 곡 등록·수정 (F-16). 운영자가 만든 곡은 검수 완료 상태다
-export async function saveSong(input: SongInput): Promise<{ id: number; slug: string; previousSlug: string | null }> {
+// 수강생이 만든 곡은 검수 대기 + 만든 사람 (F-13, specs/song-register). 운영자가 만든 곡은 검수 완료
+export type SongOrigin = { reviewStatus?: "pending" | "confirmed"; createdBy?: string | null };
+
+// 곡 등록·수정 (F-16). 기본은 운영자가 만든 검수 완료 곡. 수정할 때는 검수 상태·만든 사람을 건드리지 않는다
+export async function saveSong(input: SongInput, origin: SongOrigin = {}): Promise<{ id: number; slug: string; previousSlug: string | null }> {
   const slug = slugify(input.slug || `${input.artistName}-${input.title}`);
   if (!slug) throw new AdminInputError("곡 주소(slug)를 확인해 주세요");
 
@@ -152,17 +156,20 @@ export async function saveSong(input: SongInput): Promise<{ id: number; slug: st
       const artistId = await findOrCreateArtist(tx, input.artistName);
       await addAliases(tx, "artist", artistId, input.artistName, input.artistAliases);
 
-      const values = { artistId, title: input.title, slug, releaseDate: input.releaseDate, reviewStatus: "confirmed" as const };
+      const values = { artistId, title: input.title, slug, releaseDate: input.releaseDate };
       let id: number;
       let previousSlug: string | null = null;
       if (input.id) {
         const [before] = await tx.select({ slug: songs.slug }).from(songs).where(eq(songs.id, input.id)).limit(1);
         if (!before) throw new AdminInputError("없는 곡이에요");
         previousSlug = before.slug;
-        await tx.update(songs).set(values).where(eq(songs.id, input.id));
+        await tx.update(songs).set({ ...values, reviewStatus: "confirmed" }).where(eq(songs.id, input.id));
         id = input.id;
       } else {
-        const [created] = await tx.insert(songs).values(values).returning({ id: songs.id });
+        const [created] = await tx
+          .insert(songs)
+          .values({ ...values, reviewStatus: origin.reviewStatus ?? "confirmed", createdBy: origin.createdBy ?? null })
+          .returning({ id: songs.id });
         id = created.id;
       }
 
@@ -238,11 +245,15 @@ export const quickSongInput = z.object({
   artistName: z.string().trim().min(1, "아티스트를 입력해 주세요").max(100, "아티스트는 100자까지예요"),
 });
 
-// 같은 아티스트(다른 이름 포함)에 같은 곡명(다른 이름 포함)이 이미 있으면 그 곡을 돌려준다. 표기만 다른 중복을 만들지 않는다
-export async function findOrCreateSong(input: z.output<typeof quickSongInput>): Promise<{ id: number; title: string; artistName: string; existed: boolean }> {
+// 같은 아티스트(다른 이름 포함)에 같은 곡명(다른 이름 포함)이 이미 있으면 그 곡을 돌려준다. 표기만 다른 중복을 만들지 않는다.
+// 수강생이 만들 때는 origin으로 검수 대기·만든 사람을 남긴다 (specs/song-register)
+export async function findOrCreateSong(
+  input: z.output<typeof quickSongInput>,
+  origin: SongOrigin = {},
+): Promise<{ id: number; slug: string; title: string; artistName: string; existed: boolean }> {
   const db = getDb();
   const [same] = await db
-    .select({ id: songs.id, title: songs.title, artistName: artists.name })
+    .select({ id: songs.id, slug: songs.slug, title: songs.title, artistName: artists.name })
     .from(songs)
     .innerJoin(artists, eq(artists.id, songs.artistId))
     .innerJoin(songAliases, eq(songAliases.songId, songs.id))
@@ -257,7 +268,7 @@ export async function findOrCreateSong(input: z.output<typeof quickSongInput>): 
     .limit(1);
   if (same) return { ...same, existed: true };
 
-  const saved = await saveSong({ id: null, title: input.title, artistName: input.artistName, artistAliases: [], songAliases: [], slug: "", releaseDate: null });
+  const saved = await saveSong({ id: null, title: input.title, artistName: input.artistName, artistAliases: [], songAliases: [], slug: "", releaseDate: null }, origin);
   // 아티스트는 다른 이름으로 쳐도 기존 아티스트로 묶이므로, 보여줄 이름은 저장된 대표 이름으로
   const [row] = await db
     .select({ title: songs.title, artistName: artists.name })
@@ -265,6 +276,6 @@ export async function findOrCreateSong(input: z.output<typeof quickSongInput>): 
     .innerJoin(artists, eq(artists.id, songs.artistId))
     .where(eq(songs.id, saved.id))
     .limit(1);
-  return { id: saved.id, title: row.title, artistName: row.artistName, existed: false };
+  return { id: saved.id, slug: saved.slug, title: row.title, artistName: row.artistName, existed: false };
 }
 
