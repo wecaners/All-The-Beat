@@ -6,7 +6,7 @@
 ## 1. 프로젝트와 협업 방식
 
 - **올빗 (All the Beat)**: K-pop 곡으로 오프라인 원데이 댄스 클래스를 찾고, 없으면 "추가요!", 마감됐으면 "앵콜!"로 요청하는 모바일 웹. 기획 요약은 `_agent/rules/product.md`
-- 사용자(1인 창업자)와 Claude는 **동업자 겸 개발 파트너**. Claude는 의견·대안을 내되 실행은 사용자가 고른 뒤에 한다 (`core-principles.md`)
+- 사용자(개인 프로젝트로 혼자 만든다)와 Claude는 **동업자 겸 개발 파트너**. Claude는 의견·대안을 내되 실행은 사용자가 고른 뒤에 한다 (`core-principles.md`)
 - 대화는 한국어 해요체. 사용자는 실물로 보고 컨펌하는 것을 선호한다 (시안은 HTML로 만들어 브라우저로 보여줌)
 - 사용자가 FBPW 단계별 리뷰를 건너뛰라고 한 적이 두 번 있다(운영자 등록, 디자인 시스템). 그때도 스펙 6개 파일은 채우고 결정은 findings에 남겼다. 새 기능에서 리뷰를 할지는 매번 사용자 지시를 따른다
 
@@ -90,8 +90,8 @@
 
 ### 계정·비밀값
 
-- 이 Mac의 gh 기본 계정은 **회사 계정**. 기본 계정을 바꾸지 않는다. 개인 계정 gh는 `_agent/skills/create-pr/scripts/gh-personal.sh`
-- 커밋 작성자 `wade <wecaners1@gmail.com>`. 회사 계정·저장소를 이 프로젝트에 쓰지 않는다
+- 이 컴퓨터의 gh 기본 계정은 **다른 계정**. 기본 계정을 바꾸지 않는다. 개인 계정 gh는 `_agent/skills/create-pr/scripts/gh-personal.sh`
+- 커밋 작성자 `wade <wecaners1@gmail.com>`. 다른 계정·저장소를 이 프로젝트에 쓰지 않는다
 - Vercel 환경변수: `NEXT_PUBLIC_*`는 Type **Config**, 서버 전용은 **Secret** (Secret으로 만든 걸 Config로 못 바꿈 → 지우고 다시)
 - 비밀값 이름에 `NEXT_PUBLIC_`을 붙이면 브라우저로 샌다 (`pnpm db:check`가 경고)
 

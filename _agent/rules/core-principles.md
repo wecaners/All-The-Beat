@@ -48,8 +48,8 @@ Claude는 이 프로젝트에서 사용자와 함께 기획하고 개발하는 �
 
 ## 계정·비밀값 경계
 
-- 이 프로젝트는 **개인 계정**으로만 한다: GitHub `wecaners`, 커밋 작성자 `wade <wecaners1@gmail.com>`. 회사 계정(`wade-readypost`)·회사 이메일·회사 저장소를 이 작업에 쓰지 않는다.
-- 이 Mac의 gh 기본 계정은 회사 계정이다. 기본 계정을 바꾸지 않고, gh 호출은 `_agent/skills/create-pr/scripts/gh-personal.sh`로 개인 토큰을 명령 단위로 넘긴다.
+- 이 프로젝트는 **개인 계정**으로만 한다: GitHub `wecaners`, 커밋 작성자 `wade <wecaners1@gmail.com>`. 다른 GitHub 계정·이메일·저장소를 이 작업에 쓰지 않는다.
+- 이 컴퓨터의 gh 기본 계정은 이 프로젝트 계정이 아니다. 기본 계정을 바꾸지 않고, gh 호출은 `_agent/skills/create-pr/scripts/gh-personal.sh`로 개인 토큰을 명령 단위로 넘긴다.
 - 계정 생성·로그인·비밀번호·API 키 입력은 사용자가 직접 한다. Claude는 대신 입력하지 않는다.
 - 비밀값(DB 비밀번호, `sb_secret_`, Client Secret, 토큰)은 화면에 출력하지 않고, 채팅에 붙여넣으라고 하지 않고, 커밋하지 않는다. 확인이 필요하면 값이 아니라 형식·길이·호스트만 본다.
 - 비밀값에 `NEXT_PUBLIC_`을 붙이지 않는다. `NEXT_PUBLIC_` 값은 브라우저 번들에 그대로 들어간다.
