@@ -7,13 +7,16 @@ import { listHotSongsThisWeek, listUpcomingClasses } from "@/server/classes";
 import { listTopRequestedSongs } from "@/server/requests";
 import { HomeView } from "./home-view";
 
-// F-01 홈 (U-01). 탭바·더보기는 갈 화면이 생길 때 붙인다 (specs/home, MVP 원칙 6). 검색 입구는 specs/search
+// F-01 홈 (U-01). 탭바·더보기는 갈 화면이 생길 때 붙인다 (specs/home, MVP 원칙 6). 검색 입구는 specs/search, 마이 입구는 specs/my-page
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-md pb-16">
       <div className="flex items-center justify-between px-5 pt-7">
         <Logo />
-        <span className="font-zine text-[11px] font-extrabold uppercase tracking-[.04em]">Home</span>
+        {/* 마이 입구 (F-10). 하단 탭바가 생기기 전까지 홈 머리에 둔다 */}
+        <Link href="/me" className="press rounded-full border-2 border-ink bg-card px-3.5 py-1 text-[13px] font-black shadow-sticker-sm">
+          마이
+        </Link>
       </div>
       <p className="mt-3 px-5 text-[15px] font-bold text-sub">
         지금 뜨는 K-pop 곡의 원데이 댄스 클래스 <Twinkle size={16} className="ml-0.5 align-[-2px]" />

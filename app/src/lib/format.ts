@@ -28,6 +28,14 @@ export function formatClassDate(d: Date): string {
   return `${parts.month}월 ${parts.day}일 (${parts.weekday})`;
 }
 
+// "10월 29일" (KST). 요청을 남긴 날처럼 요일이 필요 없는 날짜
+export function formatShortDate(d: Date): string {
+  const parts = new Intl.DateTimeFormat("ko-KR", { timeZone: KST, month: "numeric", day: "numeric" })
+    .formatToParts(d)
+    .reduce<Record<string, string>>((acc, p) => ({ ...acc, [p.type]: p.value }), {});
+  return `${parts.month}월 ${parts.day}일`;
+}
+
 // "90분", "2시간", "1시간 30분"
 export function formatDuration(startsAt: Date, endsAt: Date): string {
   const minutes = Math.round((endsAt.getTime() - startsAt.getTime()) / 60000);
