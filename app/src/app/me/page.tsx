@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { ClassTicket } from "@/components/class-ticket";
 import { Logo } from "@/components/logo";
+import { TabBar } from "@/components/tab-bar";
 import { stickerButtonClass } from "@/components/sticker-button";
 import { SongRow } from "@/components/song-row";
 import { getCurrentUser } from "@/lib/auth/current-user";
@@ -17,7 +18,7 @@ export const metadata: Metadata = { title: "마이 | 올빗", robots: { index: f
 // F-10 마이 (U-09). 알림이 없는 지금, 내 추가요·앵콜이 어떻게 됐는지 보는 곳이다. 수정·취소는 곡·클래스 상세에서 (와이어프레임 U-09b)
 export default function MyPage() {
   return (
-    <main className="mx-auto w-full max-w-md pb-16">
+    <main className="mx-auto w-full max-w-md pb-32">
       <div className="flex items-center justify-between px-5 pt-7">
         <Logo />
         <span className="font-zine text-[11px] font-extrabold uppercase tracking-[.04em]">My</span>
@@ -25,6 +26,7 @@ export default function MyPage() {
       <Suspense fallback={<MySkeleton />}>
         <MyContent />
       </Suspense>
+      <TabBar />
     </main>
   );
 }
