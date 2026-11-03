@@ -1,4 +1,4 @@
-// 운영 화면 공용 UI. 운영자만 쓰는 화면이라 꾸밈보다 빠른 입력을 우선한다
+// 운영 화면 공용 UI. 운영자만 쓰는 화면이라 꾸밈보다 빠른 입력을 우선한다. 색은 zinc로 쓰고, 다크는 layout의 .admin-dark가 변수로 뒤집는다
 import type { ReactNode } from "react";
 
 export function Section({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
@@ -24,11 +24,11 @@ export function Field({ label, hint, children }: { label: string; hint?: string;
 }
 
 export const inputClass =
-  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900";
+  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm";
 
-export const buttonClass = "h-10 rounded-lg bg-zinc-900 px-4 text-sm font-bold text-white disabled:opacity-50 dark:bg-white dark:text-zinc-900";
+export const buttonClass = "h-10 rounded-lg bg-zinc-900 px-4 text-sm font-bold text-white disabled:opacity-50";
 
-export const linkButtonClass = "rounded-lg border border-zinc-300 px-3 py-1.5 text-sm font-semibold dark:border-zinc-700";
+export const linkButtonClass = "rounded-lg border border-zinc-300 px-3 py-1.5 text-sm font-semibold";
 
 export function Result({ state }: { state: { ok: boolean; error?: string; message?: string } }) {
   if (state.error) return <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{state.error}</p>;
@@ -38,9 +38,9 @@ export function Result({ state }: { state: { ok: boolean; error?: string; messag
 
 export function Table({ head, children, empty }: { head: string[]; children: ReactNode; empty?: boolean }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
+    <div className="overflow-x-auto rounded-lg border border-zinc-200">
       <table className="w-full text-left text-sm">
-        <thead className="bg-zinc-50 text-xs text-zinc-500 dark:bg-zinc-900">
+        <thead className="bg-zinc-50 text-xs text-zinc-500">
           <tr>
             {head.map((h) => (
               <th key={h} className="px-3 py-2 font-semibold">
@@ -49,7 +49,7 @@ export function Table({ head, children, empty }: { head: string[]; children: Rea
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+        <tbody className="divide-y divide-zinc-200">
           {empty ? (
             <tr>
               <td colSpan={head.length} className="px-3 py-6 text-center text-zinc-500">

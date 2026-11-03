@@ -104,3 +104,31 @@ body {
     transition-duration: 1ms !important;
   }
 }
+
+/* ═════════ 운영 화면 다크 (내부 도구, 눈 피로를 줄인다) ═════════
+   운영 화면은 Tailwind 기본 zinc 팔레트로 쓰여 있다. 화면마다 dark: 짝을 붙이는 대신
+   이 범위 안에서 색 변수를 뒤집는다: 흰 바탕 → 거의 검정, zinc 50↔950 … 500↔400.
+   안내 색(amber·red·emerald)은 옅은 바탕·진한 글씨를 진한 바탕·옅은 글씨로 바꾼다. */
+.admin-dark {
+  color-scheme: dark;
+  color: oklch(96.7% 0.001 286.375);
+  --color-white: oklch(14.1% 0.005 285.823);
+  --color-zinc-50: oklch(21% 0.006 285.885);
+  --color-zinc-100: oklch(27.4% 0.006 286.033);
+  --color-zinc-200: oklch(37% 0.013 285.805);
+  --color-zinc-300: oklch(44.2% 0.017 285.786);
+  --color-zinc-400: oklch(55.2% 0.016 285.938);
+  --color-zinc-500: oklch(70.5% 0.015 286.067);
+  --color-zinc-600: oklch(87.1% 0.006 286.286);
+  --color-zinc-700: oklch(92% 0.004 286.32);
+  --color-zinc-800: oklch(96.7% 0.001 286.375);
+  --color-zinc-900: oklch(98.5% 0 none);
+  --color-zinc-950: #fff;
+  --color-amber-50: oklch(27.9% 0.077 45.635);
+  --color-amber-100: oklch(41.4% 0.112 45.904);
+  --color-amber-900: oklch(92.4% 0.12 95.746);
+  --color-red-50: oklch(25.8% 0.092 26.042);
+  --color-red-700: oklch(80.8% 0.114 19.571);
+  --color-emerald-50: oklch(26.2% 0.051 172.552);
+  --color-emerald-800: oklch(90.5% 0.093 164.15);
+}

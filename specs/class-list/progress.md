@@ -52,6 +52,19 @@
 2. 375px 브라우저: `/classes`, 권역 칩·마감 포함 누르기(주소 바뀜), `?closed=1&region=1,2&date=week`, `?q=zzzz&level=intro`(빈 화면), 검색 엔터, 홈 전체 보기, 임시 페이지에서 이어 붙이기(서버 액션 POST 200, 3개 추가). 가로 넘침 없음
 3. `pnpm check`, `pnpm db:check`, `pnpm db:generate`
 
+### 날짜 고르기를 달력 시트로 (사용자 피드백) ✅
+
+**작업 내역**:
+
+1. 사용자 피드백 "날짜 고르기 UI가 너무 기본 UI 같다" → `<input type="date">`를 다이어리 달력 시트로 교체. `Calendar` 부품(월 넘기기 석 달, 오늘 전 비활성, 오늘 라벨, 고르면 핑크 도장)을 `BottomSheet`에 넣고 "날짜 조건 지우기"
+2. 375px 브라우저: 시트 열림, 11월 6일 고르면 `?date=2026-11-06`·칩 "11월 6일"·목록 1개, 다시 열면 도장과 지우기 버튼, 다음 달 넘기기. 가로 넘침·서버 로그 오류 없음
+3. README·spec CON-1·findings 결정·design.md 갱신
+
+**생성/수정 파일**:
+
+- `app/src/components/calendar.tsx` (새로 생성)
+- `app/src/app/classes/date-pick.tsx`, `_agent/rules/design.md`, `specs/class-list/README.md`, `spec.md`, `findings.md` (수정)
+
 ## Test Results
 
 | Test | Input | Expected | Actual | Status |

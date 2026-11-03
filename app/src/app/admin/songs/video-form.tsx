@@ -14,7 +14,7 @@ export function VideoForm({ songId, video }: { songId: number; video: Video }) {
   return (
     <div className="space-y-4">
       {video ? (
-        <div className="rounded-lg border border-zinc-200 p-3 text-sm dark:border-zinc-800">
+        <div className="rounded-lg border border-zinc-200 p-3 text-sm">
           <p className="font-semibold">{video.title}</p>
           <p className="text-zinc-500">
             {video.channel} · {video.type ? VIDEO_TYPE_LABEL[video.type as keyof typeof VIDEO_TYPE_LABEL] : "종류 없음"} ·{" "}

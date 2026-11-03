@@ -96,3 +96,18 @@ export async function searchSongs(raw: string, limit = 20): Promise<SongSearchRe
     )
     .slice(0, limit);
 }
+
+// 아티스트 이름 제안 (F-13 신규 곡의 아티스트 칸). 별칭으로 찾고 대표 이름을 돌려준다. 정확 > 앞부분 > 포함
+export async function searchArtists(raw: string, limit = 5): Promise<string[]> {
+  const q = normalizeAlias(raw.slice(0, 50));
+  if (!q) return [];
+  const rows = await getDb().execute<{ name: string }>(sql`
+    select a.name, min(case when aa.alias_norm = ${q} then 0 when aa.alias_norm like ${`${q}%`} then 1 else 2 end) as rank
+    from artist_aliases aa join artists a on a.id = aa.artist_id
+    where aa.alias_norm like ${`%${q}%`} and a.merged_into_id is null
+    group by a.id, a.name
+    order by rank, a.name
+    limit ${limit}
+  `);
+  return rows.map((r) => r.name);
+}

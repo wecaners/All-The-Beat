@@ -1,7 +1,7 @@
 # 디자인 규칙 — 덕질 스크랩북
 
 수강생 화면(UI)을 만들거나 고칠 때 읽는다. 결정 과정과 시안은 `design/README.md`, `design/concepts/`에 있다.
-운영 화면(`/admin`)은 내부 도구라 이 규칙을 따르지 않고 흰 배경의 단순한 폼을 쓴다.
+운영 화면(`/admin`)은 내부 도구라 이 규칙을 따르지 않고 단순한 폼을 쓴다. 오래 보는 화면이라 어둡게 둔다(`globals.css`의 `.admin-dark`가 zinc 색 변수를 뒤집는다. 운영 화면은 Tailwind zinc 색만 쓰고 `dark:` 짝은 붙이지 않는다).
 
 ## 컨셉
 
@@ -50,6 +50,7 @@
 | `PhotoStrip` | 작은 사진 목록 + 크게 보기(`<dialog>`, 넘기기·닫기·Esc·뒤로 가기) |
 | `Lightstick` | 응원봉 스티커(앵콜). `glow`면 머리 뒤가 빛난다 |
 | `Celebration`, `Toast` | 감정 순간 오버레이, 짧은 안내 |
+| `Calendar` | 다이어리 월간 달력(KST 날짜 문자열). 오늘 전은 못 고르고 앞으로 석 달, 고르면 핑크 도장. 날짜 입력은 브라우저 기본 위젯 대신 이걸 `BottomSheet`에 넣는다 |
 | `TabBar` | 하단 탭바(홈·찾기·추가요·마이). 탭바가 보이는 네 화면(홈·클래스 목록·추가요 랭킹·마이)이 각자 `main` 끝에 붙이고 `main`은 `pb-32`. 상세·입력·검색·운영 화면에는 두지 않는다(04 IA) |
 | `LegalDoc` | 약관·개인정보처리방침 문서 틀(`Section`, `List`, 빈칸 `Blank`) |
 | `motion.ts` | `play`, `confetti`, `buzz`, `reducedMotion`, `stagger` |
