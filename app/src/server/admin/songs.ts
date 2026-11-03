@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getDb } from "@/db";
 import { artistAliases, artists, classSongs, events, instructorProfiles, profiles, requests, songAliases, songs, videoType } from "@/db/schema";
 import { normalizeAlias } from "@/lib/normalize";
-import { lookupVideo, parseYouTubeVideoId } from "@/server/youtube";
+import { lookupVideo, parseYouTubeVideoId, VIDEO_ERROR } from "@/server/youtube";
 import { AdminInputError, isUniqueViolation, type Tx } from "./shared";
 
 const aliasList = z
@@ -230,16 +230,10 @@ export const videoInput = z.object({
   type: z.enum(videoType.enumValues, { message: "영상 종류를 골라 주세요" }),
 });
 
-const VIDEO_ERROR = {
-  embed_blocked: "다른 곳에 퍼가기가 막힌 영상이에요. 다른 영상을 골라 주세요",
-  not_found: "영상을 찾을 수 없어요. 비공개이거나 삭제된 영상일 수 있어요",
-  unavailable: "YouTube에서 영상 정보를 가져오지 못했어요. 잠시 후 다시 시도해 주세요",
-} as const;
-
 // 대표 영상 지정. 퍼가기 가능한 영상만 받는다 (FR-4)
 export async function setSongVideo(input: z.infer<typeof videoInput>): Promise<{ slug: string; title: string; channel: string }> {
   const videoId = parseYouTubeVideoId(input.url);
-  if (!videoId) throw new AdminInputError("YouTube 영상 링크가 아니에요");
+  if (!videoId) throw new AdminInputError(VIDEO_ERROR.not_youtube);
 
   const lookup = await lookupVideo(videoId);
   if (!lookup.ok) throw new AdminInputError(VIDEO_ERROR[lookup.reason]);

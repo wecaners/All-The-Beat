@@ -12,6 +12,9 @@ import { SongPicker } from "./song-picker";
 import { StudioPicker } from "./studio-picker";
 import { DateField, pickChip, TimeField } from "./time-sheet";
 
+// 저장된 영상 ID를 사람이 읽을 수 있는 링크로
+const teaserUrlOf = (id: string | null | undefined) => (id ? `https://youtu.be/${id}` : "");
+
 const inputClass = "mt-2 w-full rounded-2xl border-2 border-ink bg-card px-3 py-2.5 text-[16px] font-bold outline-none focus:shadow-sticker-pink";
 
 type Props = {
@@ -125,6 +128,15 @@ export function ClassForm({ regions, places, source = null, presetSong = null, e
           설명 <small className="font-semibold text-sub">(선택 · 1,000자)</small>
         </span>
         <textarea name="description" defaultValue={source?.description ?? ""} maxLength={1000} rows={3} placeholder="준비물, 주차, 레벨 안내…" className={`${inputClass} resize-none`} />
+      </label>
+
+      {/* 티저 영상 (F-25): 저장할 때 퍼갈 수 있는 YouTube 영상인지 확인한다 */}
+      <label className="block">
+        <span className="text-sm font-black">
+          티저 영상 링크 <small className="font-semibold text-sub">(선택 · YouTube 영상·쇼츠)</small>
+        </span>
+        <input name="teaserUrl" type="url" defaultValue={teaserUrlOf(source?.teaserVideoId)} placeholder="https://youtu.be/…" autoCapitalize="none" className={inputClass} />
+        <span className="mt-1.5 block text-[12px] font-semibold text-sub">내 수업 영상을 붙이면 클래스 맨 위에 보여요. 퍼가기가 막힌 영상은 안 돼요.</span>
       </label>
 
       {state.error && <p className="text-sm font-bold text-[#d6246e]">{state.error}</p>}

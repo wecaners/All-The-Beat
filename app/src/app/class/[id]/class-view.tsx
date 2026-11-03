@@ -42,11 +42,17 @@ export function ClassView({ c, encore }: { c: ClassDetail; encore: ClassEncore |
         <span className="font-zine text-[11px] font-extrabold uppercase tracking-[.04em]">Class</span>
       </div>
 
-      {/* 클래스 이미지를 올리는 곳이 아직 없어 대표 곡의 안무 영상 썸네일을 쓴다 (06 문서 4.1) */}
-      {mainSong?.videoId && (
+      {/* 맨 위: 강사 티저 영상이 있으면 그것(F-25), 없으면 대표 곡의 안무 영상 썸네일 (06 문서 4.1) */}
+      {c.teaserVideoId ? (
         <div className="px-[22px] pt-5">
-          <VideoCard videoId={mainSong.videoId} title={`${mainSong.title} 안무 영상`} leftLabel="YOUTUBE" rightLabel={mainSong.title} />
+          <VideoCard videoId={c.teaserVideoId} title={`${c.instructor.displayName} 강사 티저 영상`} leftLabel="TEASER · YOUTUBE" rightLabel={c.instructor.displayName} />
         </div>
+      ) : (
+        mainSong?.videoId && (
+          <div className="px-[22px] pt-5">
+            <VideoCard videoId={mainSong.videoId} title={`${mainSong.title} 안무 영상`} leftLabel="YOUTUBE" rightLabel={mainSong.title} />
+          </div>
+        )
       )}
 
       <div className="px-5 pt-6">

@@ -95,6 +95,16 @@ async function ClassDetail({ params }: Props) {
               <dd className="whitespace-pre-wrap">{c.description}</dd>
             </>
           )}
+          {c.teaserVideoId && (
+            <>
+              <dt className="text-zinc-500">티저 영상</dt>
+              <dd>
+                <a href={`https://www.youtube.com/watch?v=${c.teaserVideoId}`} target="_blank" rel="noreferrer" className="underline">
+                  youtu.be/{c.teaserVideoId}
+                </a>
+              </dd>
+            </>
+          )}
         </dl>
       </Section>
 

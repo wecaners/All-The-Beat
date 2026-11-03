@@ -47,3 +47,29 @@ export async function lookupVideo(videoId: string): Promise<VideoLookup> {
     info: { title: body.title ?? "", channel: body.author_name ?? "", thumbnailUrl: body.thumbnail_url ?? null },
   };
 }
+
+// 거절 이유를 사용자 문구로 (곡 대표 영상 F-16, 클래스 티저 F-25가 같이 쓴다)
+export const VIDEO_ERROR = {
+  not_youtube: "YouTube 영상 링크가 아니에요",
+  embed_blocked: "다른 곳에 퍼가기가 막힌 영상이에요. 다른 영상을 골라 주세요",
+  not_found: "영상을 찾을 수 없어요. 비공개이거나 삭제된 영상일 수 있어요",
+  unavailable: "YouTube에서 영상 정보를 가져오지 못했어요. 잠시 후 다시 시도해 주세요",
+} as const;
+
+export class VideoError extends Error {
+  constructor(readonly reason: keyof typeof VIDEO_ERROR) {
+    super(VIDEO_ERROR[reason]);
+  }
+}
+
+// 선택 입력용: 비어 있으면 null, 아니면 ID를 뽑고 퍼가기 가능한지 확인한다. 실패는 VideoError
+export async function resolveVideoId(url: string | null | undefined): Promise<string | null> {
+  const text = url?.trim();
+  if (!text) return null;
+  const videoId = parseYouTubeVideoId(text);
+  if (!videoId) throw new VideoError("not_youtube");
+  const lookup = await lookupVideo(videoId);
+  if (!lookup.ok) throw new VideoError(lookup.reason);
+  return videoId;
+}
+

@@ -47,6 +47,7 @@ function readForm(fd: FormData) {
     bookingUrl: text(fd, "bookingUrl"),
     bookingType: null,
     description: text(fd, "description"),
+    teaserUrl: text(fd, "teaserUrl"),
     encoreOfClassId: numberOrNull(fd, "encoreOfClassId"),
   };
 }

@@ -174,6 +174,10 @@ export function ClassForm({ instructors, instructorId, places, regions, today, e
         <textarea name="description" maxLength={1000} rows={4} defaultValue={encore?.description ?? undefined} className={inputClass} />
       </Field>
 
+      <Field label="티저 영상 링크" hint="선택. 강사의 YouTube 영상·쇼츠. 퍼가기가 막힌 영상은 거절돼요 (F-25)">
+        <input name="teaserUrl" type="url" placeholder="https://youtu.be/…" defaultValue={encore?.teaserVideoId ? `https://youtu.be/${encore.teaserVideoId}` : undefined} className={inputClass} />
+      </Field>
+
       <Result state={state} />
       <button disabled={pending || !instructorId} className={buttonClass}>
         {pending ? "등록 중…" : encore ? "앵콜 클래스 등록" : "클래스 등록"}
