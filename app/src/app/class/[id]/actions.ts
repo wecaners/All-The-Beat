@@ -2,11 +2,13 @@
 
 import { refresh } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { hasConsented } from "@/server/consent";
 import { cancelEncore, EncoreError, encoreInput, saveEncore } from "@/server/encores";
 import { ensureProfile } from "@/server/profiles";
 
 // isNew: 첫 앵콜(응원봉을 흔들지), delivered: 이 앵콜로 기준에 닿아 강사님께 전달됐는지 (서버 계산)
-export type EncoreActionState = { ok: boolean; error?: string; isNew?: boolean; delivered?: boolean };
+// consentRequired: 약관 동의 전이라 저장하지 않았다. 화면이 동의 화면으로 보낸다 (specs/terms-consent FR-5)
+export type EncoreActionState = { ok: boolean; error?: string; consentRequired?: boolean; isNew?: boolean; delivered?: boolean };
 
 const validId = (id: number) => Number.isSafeInteger(id) && id > 0;
 
@@ -25,6 +27,7 @@ export async function saveEncoreAction(classId: number, _prev: EncoreActionState
   let saved: Awaited<ReturnType<typeof saveEncore>>;
   try {
     await ensureProfile(user.id, user.metadata);
+    if (!(await hasConsented(user.id))) return { ok: false, consentRequired: true, error: "약관 동의가 필요해요" };
     saved = await saveEncore(user.id, classId, parsed.data);
   } catch (e) {
     if (e instanceof EncoreError) return { ok: false, error: e.message };

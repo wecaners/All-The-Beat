@@ -11,6 +11,7 @@ import { StickerButton } from "@/components/sticker-button";
 import { Toast } from "@/components/toast";
 import { startKakaoLogin } from "@/lib/auth/kakao-login";
 import { TIME_PREF_LABEL } from "@/lib/format";
+import { consentPath } from "@/lib/consent-path";
 import type { Region } from "@/server/regions";
 import type { MyRequest, RequestSummary } from "@/server/requests";
 import { cancelRequestAction, type RequestActionState, saveRequestAction } from "./actions";
@@ -59,6 +60,8 @@ export function RequestPanel({ songId, songTitle, summary, loggedIn, myRequest, 
   const [state, formAction, saving] = useActionState(
     async (prev: RequestActionState, formData: FormData) => {
       const result = await saveRequestAction(songId, prev, formData);
+      // 약관 동의 전이면 동의 화면으로. 동의하면 이 화면으로 돌아와 시트가 다시 열린다
+      if (result.consentRequired) router.push(consentPath(`${pathname}?${AUTO_OPEN_PARAM}=open`));
       if (result.ok) {
         setSheet("none");
         if (result.isNew && result.position) setCelebrate(result.position);

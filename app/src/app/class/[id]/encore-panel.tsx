@@ -11,6 +11,7 @@ import { StickerButton, stickerButtonClass } from "@/components/sticker-button";
 import { Toast } from "@/components/toast";
 import { startKakaoLogin } from "@/lib/auth/kakao-login";
 import { TIME_PREF_LABEL } from "@/lib/format";
+import { consentPath } from "@/lib/consent-path";
 import type { EncoreStatus, EncoreSummary, MyEncore } from "@/server/encores";
 import { cancelEncoreAction, type EncoreActionState, saveEncoreAction } from "./actions";
 
@@ -92,6 +93,8 @@ export function EncorePanel({ classId, classTitle, classStatus, summary, loggedI
   const [state, formAction, saving] = useActionState(
     async (prev: EncoreActionState, formData: FormData) => {
       const result = await saveEncoreAction(classId, prev, formData);
+      // 약관 동의 전이면 동의 화면으로. 동의하면 이 화면으로 돌아와 시트가 다시 열린다
+      if (result.consentRequired) router.push(consentPath(`${pathname}?${AUTO_OPEN_PARAM}=open`));
       if (result.ok) {
         setSheet("none");
         if (result.isNew) setCheering(true);
