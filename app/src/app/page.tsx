@@ -2,21 +2,18 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { Logo } from "@/components/logo";
+import { TabBar } from "@/components/tab-bar";
 import { Twinkle } from "@/components/twinkle";
 import { listHotSongsThisWeek, listUpcomingClasses } from "@/server/classes";
 import { listTopRequestedSongs } from "@/server/requests";
 import { HomeView } from "./home-view";
 
-// F-01 홈 (U-01). 탭바·더보기는 갈 화면이 생길 때 붙인다 (specs/home, MVP 원칙 6). 검색 입구는 specs/search, 마이 입구는 specs/my-page
+// F-01 홈 (U-01). 검색 입구는 specs/search, 더보기는 specs/request-ranking·class-list, 탭바는 specs/tab-bar
 export default function Home() {
   return (
-    <main className="mx-auto w-full max-w-md pb-16">
-      <div className="flex items-center justify-between px-5 pt-7">
+    <main className="mx-auto w-full max-w-md pb-32">
+      <div className="px-5 pt-7">
         <Logo />
-        {/* 마이 입구 (F-10). 하단 탭바가 생기기 전까지 홈 머리에 둔다 */}
-        <Link href="/me" className="press rounded-full border-2 border-ink bg-card px-3.5 py-1 text-[13px] font-black shadow-sticker-sm">
-          마이
-        </Link>
       </div>
       <p className="mt-3 px-5 text-[15px] font-bold text-sub">
         지금 뜨는 K-pop 곡의 원데이 댄스 클래스 <Twinkle size={16} className="ml-0.5 align-[-2px]" />
@@ -32,6 +29,7 @@ export default function Home() {
       <Suspense fallback={<HomeSkeleton />}>
         <HomeSections />
       </Suspense>
+      <TabBar />
     </main>
   );
 }

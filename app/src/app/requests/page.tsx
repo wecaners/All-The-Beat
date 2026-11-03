@@ -3,6 +3,7 @@ import { cacheLife } from "next/cache";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Logo } from "@/components/logo";
+import { TabBar } from "@/components/tab-bar";
 import { stickerButtonClass } from "@/components/sticker-button";
 import { listRegions, type Region } from "@/server/regions";
 import { listRequestRanking } from "@/server/requests";
@@ -31,7 +32,7 @@ async function readRegion(searchParams: Props["searchParams"], regions: Region[]
 // F-08 추가요 랭킹 (U-06). 탭바가 생기면 추가요 탭이 이 화면이다 (04 IA)
 export default function RequestsPage({ searchParams }: Props) {
   return (
-    <main className="mx-auto w-full max-w-md pb-16">
+    <main className="mx-auto w-full max-w-md pb-32">
       <div className="flex items-center justify-between px-5 pt-7">
         <Logo />
         <span className="font-zine text-[11px] font-extrabold uppercase tracking-[.04em]">Ranking</span>
@@ -41,6 +42,7 @@ export default function RequestsPage({ searchParams }: Props) {
       <Suspense fallback={<RankingSkeleton />}>
         <Ranking searchParams={searchParams} />
       </Suspense>
+      <TabBar />
     </main>
   );
 }

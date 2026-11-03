@@ -4,6 +4,7 @@ import Link from "next/link";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { Logo } from "@/components/logo";
+import { TabBar } from "@/components/tab-bar";
 import { stickerButtonClass } from "@/components/sticker-button";
 import { LEVEL_LABEL } from "@/lib/format";
 import { type ClassListQuery, classListSearch, countClasses, DATE_PRESETS, LEVELS, listClasses, parseClassListQuery } from "@/server/classes/list";
@@ -40,7 +41,7 @@ async function readQuery(searchParams: Props["searchParams"]): Promise<ClassList
 // F-03 클래스 목록 (U-03). 탭바가 생기면 찾기 탭이 검색·목록이 된다 (04 IA)
 export default function ClassesPage({ searchParams }: Props) {
   return (
-    <main className="mx-auto w-full max-w-md pb-16">
+    <main className="mx-auto w-full max-w-md pb-32">
       <div className="flex items-center justify-between px-5 pt-7">
         <Logo />
         <span className="font-zine text-[11px] font-extrabold uppercase tracking-[.04em]">Classes</span>
@@ -49,6 +50,7 @@ export default function ClassesPage({ searchParams }: Props) {
       <Suspense fallback={<ListSkeleton />}>
         <Classes searchParams={searchParams} />
       </Suspense>
+      <TabBar />
     </main>
   );
 }
