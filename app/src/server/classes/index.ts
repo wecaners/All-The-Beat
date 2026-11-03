@@ -115,6 +115,8 @@ export type ClassDetail = {
   songs: { slug: string; title: string; artistName: string; videoId: string | null }[];
   /** 앵콜 클래스면 원 클래스 id (원 클래스가 공개일 때만, F-24) */
   encoreOfClassId: number | null;
+  /** 강사가 일시·장소를 바꾼 지 24시간 안 (F-12 "변경됨") */
+  changedRecently: boolean;
 };
 
 // 클래스 상세 (F-05). 공개되지 않았거나 없으면 null — 존재 여부를 드러내지 않는다
@@ -153,6 +155,7 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
       kakaoPlaceUrl: instructorPlaces.kakaoPlaceUrl,
       facilities: instructorPlaces.facilities,
       encoreOfClassId: classes.encoreOfClassId,
+      changedRecently: sql<boolean>`coalesce(${classes.scheduleChangedAt} > now() - interval '24 hours', false)`,
     })
     .from(classes)
     .innerJoin(instructorProfiles, eq(instructorProfiles.id, classes.instructorId))
@@ -202,6 +205,7 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
     description: row.description,
     status,
     canBook: canBook(status),
+    changedRecently: row.changedRecently,
     instructor: {
       displayName: row.instructorName,
       instagramHandle: row.instagramHandle,
