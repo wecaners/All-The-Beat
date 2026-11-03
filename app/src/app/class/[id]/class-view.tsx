@@ -169,7 +169,11 @@ function InstructorSection({ c }: { c: ClassDetail }) {
           </div>
         </div>
         {instructor.bio && <p className="mt-3 text-[15px] font-semibold leading-relaxed">{instructor.bio}</p>}
-        <a href={instaUrl} target="_blank" rel="noopener" className={`mt-3.5 ${stickerButtonClass({ variant: "white", size: "md", display: false })}`}>
+        {/* 이 강사의 다른 클래스·가르쳐 온 곡 (F-21) */}
+        <Link href={`/teacher/${encodeURIComponent(instructor.instagramHandle)}`} className={`mt-3.5 ${stickerButtonClass({ variant: "lime", size: "md", display: false })}`}>
+          강사 프로필 보기
+        </Link>
+        <a href={instaUrl} target="_blank" rel="noopener" className={`mt-2.5 ${stickerButtonClass({ variant: "white", size: "md", display: false })}`}>
           인스타그램에서 더 보기
         </a>
       </div>
