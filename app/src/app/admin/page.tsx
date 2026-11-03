@@ -5,12 +5,13 @@ import { listUpcomingClassesForAdmin } from "@/server/admin/classes";
 import { countEncoresAwaitingResponse } from "@/server/admin/encores";
 import { listInstructorsForAdmin } from "@/server/admin/instructors";
 
-// 직접 신청한 강사의 상태 (F-14). 대기·확인됨은 승인을 기다리는 것
-const INSTRUCTOR_STATUS_TEXT = { pending: "⏳ 승인 대기", verified: "⏳ 확인됨 · 승인 대기", approved: "승인", rejected: "반려", suspended: "정지" } as const;
-import { listSongsForAdmin } from "@/server/admin/songs";
+import { countPendingSongs, listSongsForAdmin } from "@/server/admin/songs";
 import { ActionButton } from "./action-button";
 import { setClassClosedAction } from "./actions";
 import { linkButtonClass, Section, Table, Td } from "./ui";
+
+// 직접 신청한 강사의 상태 (F-14). 대기·확인됨은 승인을 기다리는 것
+const INSTRUCTOR_STATUS_TEXT = { pending: "⏳ 승인 대기", verified: "⏳ 확인됨 · 승인 대기", approved: "승인", rejected: "반려", suspended: "정지" } as const;
 
 const STATUS_TEXT = { open: "모집 중", closing_soon: "마감 임박", closed: "마감", ended: "끝남", canceled: "취소" } as const;
 
@@ -26,15 +27,21 @@ export default function AdminHome() {
 
 async function Overview() {
   await requireAdmin();
-  const [songs, instructors, classes, awaitingEncores] = await Promise.all([
+  const [songs, instructors, classes, awaitingEncores, pendingSongs] = await Promise.all([
     listSongsForAdmin(),
     listInstructorsForAdmin(),
     listUpcomingClassesForAdmin(),
     countEncoresAwaitingResponse(),
+    countPendingSongs(),
   ]);
 
   return (
     <>
+      {pendingSongs > 0 && (
+        <Link href="/admin/songs?review=pending" className="mt-6 block rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-900">
+          검수 대기 곡 {pendingSongs}곡 — 중복이면 기존 곡으로 합쳐 주세요 ›
+        </Link>
+      )}
       {awaitingEncores > 0 && (
         <Link href="/admin/encores" className="mt-6 block rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-900">
           기준 인원에 닿은 앵콜 {awaitingEncores}건 — 강사님께 전하고 답을 남겨 주세요 ›
