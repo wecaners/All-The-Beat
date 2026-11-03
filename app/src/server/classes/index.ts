@@ -113,6 +113,8 @@ export type ClassDetail = {
   };
   /** position 순. 첫 곡이 대표 곡 */
   songs: { slug: string; title: string; artistName: string; videoId: string | null }[];
+  /** 앵콜 클래스면 원 클래스 id (원 클래스가 공개일 때만, F-24) */
+  encoreOfClassId: number | null;
 };
 
 // 클래스 상세 (F-05). 공개되지 않았거나 없으면 null — 존재 여부를 드러내지 않는다
@@ -150,6 +152,7 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
       lng: instructorPlaces.lng,
       kakaoPlaceUrl: instructorPlaces.kakaoPlaceUrl,
       facilities: instructorPlaces.facilities,
+      encoreOfClassId: classes.encoreOfClassId,
     })
     .from(classes)
     .innerJoin(instructorProfiles, eq(instructorProfiles.id, classes.instructorId))
@@ -174,6 +177,14 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
     .innerJoin(artists, eq(artists.id, songs.artistId))
     .where(eq(classSongs.classId, id))
     .orderBy(asc(classSongs.position));
+
+  const [encoreOf] = row.encoreOfClassId
+    ? await db
+        .select({ id: classes.id })
+        .from(classes)
+        .innerJoin(instructorProfiles, eq(instructorProfiles.id, classes.instructorId))
+        .where(and(eq(classes.id, row.encoreOfClassId), publiclyVisible))
+    : [];
 
   const status = displayStatusOf(row.status, row.ended);
   return {
@@ -207,6 +218,7 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
       photos: showMedia ? photoRows.map((p) => ({ url: mediaUrl(p.path), thumbUrl: mediaUrl(p.thumbPath) })) : [],
     },
     songs: songRows,
+    encoreOfClassId: encoreOf?.id ?? null,
   };
 }
 

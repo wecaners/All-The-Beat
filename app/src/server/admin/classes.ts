@@ -2,16 +2,20 @@ import { and, asc, desc, eq, gt, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db";
 import {
+  artists,
   bookingType,
   classes,
   classLevel,
   classSongs,
+  classStatus,
+  encoreRounds,
   instructorPlaces,
   instructorProfiles,
   regionMappings,
   regions,
   songs,
 } from "@/db/schema";
+import { openEncoreRound } from "./encores";
 import { AdminInputError, kstDateTime, openRequestsForClass, todayKst, type Tx } from "./shared";
 
 const FALLBACK_REGION_ID = 8; // 기타 서울 (0003 시드)
@@ -48,6 +52,7 @@ export const classInput = z
     bookingUrl: z.string().trim().url("예약 링크를 확인해 주세요").regex(/^https?:\/\//i, "예약 링크는 http(s) 주소여야 해요"),
     bookingType: z.enum(bookingType.enumValues).nullable(), // null = 주소로 추정
     description: optionalText(1000, "설명은 1,000자까지예요"),
+    encoreOfClassId: z.number().int().positive().nullable().default(null), // 앵콜 클래스면 원 클래스 (F-24)
   })
   .refine((v) => v.date >= todayKst(), { message: "오늘 이후 날짜만 등록할 수 있어요", path: ["date"] })
   .refine((v) => v.endTime > v.startTime, { message: "종료 시간이 시작 시간보다 늦어야 해요", path: ["endTime"] })
@@ -94,7 +99,7 @@ export async function listPlacesForInstructor(instructorId: number): Promise<Adm
 }
 
 // 클래스 대리 등록 (F-15). 공개 조건을 만족하면 그 자리에서 추가요를 연다 (FR-14)
-export async function createClassByAdmin(input: ClassInput): Promise<{ id: number; isPublic: boolean; openedRequests: number }> {
+export async function createClassByAdmin(input: ClassInput): Promise<{ id: number; isPublic: boolean; openedRequests: number; isEncore: boolean }> {
   const startsAt = kstDateTime(input.date, input.startTime);
   const endsAt = kstDateTime(input.date, input.endTime);
   if (startsAt <= new Date()) throw new AdminInputError("이미 지난 시간이에요");
@@ -162,14 +167,18 @@ export async function createClassByAdmin(input: ClassInput): Promise<{ id: numbe
         bookingType: input.bookingType ?? guessBookingType(input.bookingUrl),
         description: input.description,
         createdByAdmin: true,
+        encoreOfClassId: input.encoreOfClassId,
       })
       .returning({ id: classes.id });
+
+    // 앵콜 클래스: 원 클래스의 앵콜을 오픈으로. 조건이 안 맞으면 등록도 되돌린다
+    if (input.encoreOfClassId) await openEncoreRound(tx, input.encoreOfClassId, input.instructorId, created.id);
 
     await tx.insert(classSongs).values(input.songIds.map((songId, i) => ({ classId: created.id, songId, position: i + 1 })));
 
     const isPublic = instructor.status === "approved" && (!instructor.isProxy || instructor.consentAt !== null);
     const openedRequests = isPublic ? await openRequestsForClass(tx, created.id, input.songIds) : 0;
-    return { id: created.id, isPublic, openedRequests };
+    return { id: created.id, isPublic, openedRequests, isEncore: input.encoreOfClassId !== null };
   });
 }
 
@@ -180,6 +189,9 @@ export type AdminClassRow = {
   instructorName: string;
   regionName: string;
   isPublic: boolean;
+  status: (typeof classStatus.enumValues)[number];
+  /** 앵콜이 한 번이라도 있었는지 (있으면 마감을 풀 수 없다) */
+  hasEncore: boolean;
 };
 
 export async function listUpcomingClassesForAdmin(limit = 30): Promise<AdminClassRow[]> {
@@ -191,6 +203,8 @@ export async function listUpcomingClassesForAdmin(limit = 30): Promise<AdminClas
       instructorName: instructorProfiles.displayName,
       regionName: regions.shortName,
       isPublic: sql<boolean>`not ${classes.isHidden} and ${instructorProfiles.status} = 'approved' and (not ${instructorProfiles.isProxy} or ${instructorProfiles.consentAt} is not null)`,
+      status: classes.status,
+      hasEncore: sql<boolean>`exists (select 1 from ${encoreRounds} where ${encoreRounds.classId} = ${classes.id})`,
     })
     .from(classes)
     .innerJoin(instructorProfiles, eq(instructorProfiles.id, classes.instructorId))
@@ -198,4 +212,57 @@ export async function listUpcomingClassesForAdmin(limit = 30): Promise<AdminClas
     .where(gt(classes.endsAt, sql`now()`))
     .orderBy(asc(classes.startsAt))
     .limit(limit);
+}
+
+export type EncoreSource = {
+  classId: number;
+  instructorId: number;
+  title: string;
+  songs: { id: number; label: string }[];
+  placeId: number | null;
+  studioName: string;
+  address: string;
+  regionId: number;
+  price: number;
+  level: (typeof classLevel.enumValues)[number];
+  capacity: number | null;
+  bookingUrl: string;
+  bookingType: (typeof bookingType.enumValues)[number];
+  description: string | null;
+  startTime: string;
+  endTime: string;
+};
+
+// 앵콜 클래스 등록 폼에 미리 채울 원 클래스 값 (F-12 복사해서 만들기). 날짜만 새로 넣는다
+export async function getEncoreSource(classId: number): Promise<EncoreSource | null> {
+  const db = getDb();
+  const [c] = await db
+    .select({
+      classId: classes.id,
+      instructorId: classes.instructorId,
+      title: classes.title,
+      placeId: classes.placeId,
+      studioName: classes.studioName,
+      address: classes.address,
+      regionId: classes.regionId,
+      price: classes.price,
+      level: classes.level,
+      capacity: classes.capacity,
+      bookingUrl: classes.bookingUrl,
+      bookingType: classes.bookingType,
+      description: classes.description,
+      startTime: sql<string>`to_char(${classes.startsAt} at time zone 'Asia/Seoul', 'HH24:MI')`,
+      endTime: sql<string>`to_char(${classes.endsAt} at time zone 'Asia/Seoul', 'HH24:MI')`,
+    })
+    .from(classes)
+    .where(eq(classes.id, classId));
+  if (!c) return null;
+  const songRows = await db
+    .select({ id: songs.id, title: songs.title, artistName: artists.name })
+    .from(classSongs)
+    .innerJoin(songs, eq(songs.id, classSongs.songId))
+    .innerJoin(artists, eq(artists.id, songs.artistId))
+    .where(eq(classSongs.classId, classId))
+    .orderBy(asc(classSongs.position));
+  return { ...c, songs: songRows.map((s) => ({ id: s.id, label: `${s.title} - ${s.artistName}` })) };
 }

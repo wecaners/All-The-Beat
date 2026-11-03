@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import type { z } from "zod";
 import { requireAdmin } from "@/lib/auth/admin";
 import { classInput, createClassByAdmin } from "@/server/admin/classes";
+import { respondToEncore, setClassClosed } from "@/server/admin/encores";
 import { consentInput, createProxyInstructor, instructorInput, recordConsent } from "@/server/admin/instructors";
 import { AdminInputError } from "@/server/admin/shared";
 import {
@@ -164,6 +165,7 @@ export async function createClassAction(_prev: AdminActionState, fd: FormData): 
       bookingUrl: text(fd, "bookingUrl"),
       bookingType: text(fd, "bookingType") || null,
       description: text(fd, "description"),
+      encoreOfClassId: numberOrNull(fd, "encoreOfClassId"),
     });
     result = await createClassByAdmin(input);
   } catch (e) {
@@ -173,7 +175,9 @@ export async function createClassAction(_prev: AdminActionState, fd: FormData): 
   refresh();
   return {
     ok: true,
-    message: result.isPublic
+    message: result.isEncore
+      ? `앵콜 클래스를 등록했어요 (#${result.id}). 원 클래스에 앵콜한 사람들에게 "앵콜 클래스가 열렸어요"가 보여요`
+      : result.isPublic
       ? `클래스를 등록했어요 (#${result.id}). 바로 공개됐고, "열렸어요"가 된 추가요는 ${result.openedRequests}건이에요`
       : `클래스를 등록했어요 (#${result.id}). 강사의 게재 동의 기록이 없어 아직 수강생에게 보이지 않아요`,
   };
@@ -340,3 +344,29 @@ export async function createSongForClassAction(title: string, artistName: string
   }
 }
 
+
+// ── 앵콜 (specs/encore) ─────────────────────────────────────────────────
+
+// 강사에게 DM으로 전한 뒤 강사의 답을 대신 남긴다
+export async function respondToEncoreAction(classId: number, answer: "review" | "decline"): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    if (answer !== "review" && answer !== "decline") throw new AdminInputError("알 수 없는 응답이에요");
+    await respondToEncore(classId, answer);
+    refresh();
+    return { ok: true };
+  } catch (e) {
+    return toState(e, "respondToEncore");
+  }
+}
+
+export async function setClassClosedAction(classId: number, closed: boolean): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    await setClassClosed(classId, closed === true);
+    refresh();
+    return { ok: true };
+  } catch (e) {
+    return toState(e, "setClassClosed");
+  }
+}

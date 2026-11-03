@@ -25,6 +25,7 @@ async function AdminShell({ children }: { children: ReactNode }) {
         <Link href="/admin/songs/new">곡 등록</Link>
         <Link href="/admin/instructors/new">강사 등록</Link>
         <Link href="/admin/classes/new">클래스 등록</Link>
+        <Link href="/admin/encores">앵콜</Link>
       </nav>
       {children}
     </div></div>
