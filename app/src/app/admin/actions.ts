@@ -25,7 +25,7 @@ import { kakaoConfigured, searchKakaoAddresses, searchKakaoPlaces, type StudioCa
 import { MEDIA_BUCKET, type MediaStore } from "@/server/media";
 import { searchSongs } from "@/server/songs/search";
 import { createClient } from "@/lib/supabase/server";
-import { clearSongVideo, findOrCreateSong, quickSongInput, saveSong, setSongVideo, songInput, videoInput } from "@/server/admin/songs";
+import { clearSongVideo, confirmSong, findOrCreateSong, mergeArtist, mergeSong, quickSongInput, renameArtist, renameArtistInput, saveSong, setSongVideo, songInput, videoInput } from "@/server/admin/songs";
 
 export type AdminActionState = { ok: boolean; error?: string; message?: string };
 
@@ -405,5 +405,59 @@ export async function rejectInstructorAction(_prev: AdminActionState, fd: FormDa
     return { ok: true, message: "반려했어요. 강사가 사유를 보고 다시 신청할 수 있어요" };
   } catch (e) {
     return toState(e, "rejectInstructor");
+  }
+}
+
+// ── 곡 검수·병합, 아티스트 (F-16, specs/song-review) ───────────────────
+
+export async function confirmSongAction(songId: number): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    const { slug } = await confirmSong(songId);
+    updateTag(`song:${slug}`);
+    refresh();
+    return { ok: true, message: "검수를 끝냈어요" };
+  } catch (e) {
+    return toState(e, "confirmSong");
+  }
+}
+
+// 성공하면 대상 곡 상세로 간다
+export async function mergeSongAction(fromId: number, intoId: number): Promise<AdminActionState> {
+  await requireAdmin();
+  let result: Awaited<ReturnType<typeof mergeSong>>;
+  try {
+    result = await mergeSong(fromId, intoId);
+  } catch (e) {
+    return toState(e, "mergeSong");
+  }
+  updateTag(`song:${result.fromSlug}`);
+  updateTag(`song:${result.intoSlug}`);
+  refresh();
+  redirect(`/admin/songs/${intoId}?merged=${result.movedClasses},${result.movedRequests},${result.droppedRequests},${result.movedAliases}`);
+}
+
+export async function renameArtistAction(_prev: AdminActionState, fd: FormData): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    const input = parse(renameArtistInput, { artistId: Number(text(fd, "artistId")), name: text(fd, "name") });
+    const slugs = await renameArtist(input);
+    slugs.forEach((slug) => updateTag(`song:${slug}`));
+    refresh();
+    return { ok: true, message: "이름을 바꿨어요" };
+  } catch (e) {
+    return toState(e, "renameArtist");
+  }
+}
+
+export async function mergeArtistAction(fromId: number, intoId: number): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    const result = await mergeArtist(fromId, intoId);
+    result.slugs.forEach((slug) => updateTag(`song:${slug}`));
+    refresh();
+    return { ok: true, message: `합쳤어요. 곡 ${result.movedSongs}개, 별칭 ${result.movedAliases}개가 옮겨졌어요` };
+  } catch (e) {
+    return toState(e, "mergeArtist");
   }
 }

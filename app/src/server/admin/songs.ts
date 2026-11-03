@@ -1,7 +1,7 @@
-import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db";
-import { artistAliases, artists, songAliases, songs, videoType } from "@/db/schema";
+import { artistAliases, artists, classSongs, events, instructorProfiles, profiles, requests, songAliases, songs, videoType } from "@/db/schema";
 import { normalizeAlias } from "@/lib/normalize";
 import { lookupVideo, parseYouTubeVideoId } from "@/server/youtube";
 import { AdminInputError, isUniqueViolation, type Tx } from "./shared";
@@ -40,9 +40,14 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export type AdminSongRow = { id: number; title: string; artistName: string; slug: string; hasVideo: boolean; pendingReview: boolean };
+export type SongCreator = "admin" | "member" | "instructor";
+export type AdminSongRow = { id: number; title: string; artistName: string; slug: string; hasVideo: boolean; pendingReview: boolean; creator: SongCreator; createdAt: Date };
 
-export async function listSongsForAdmin(): Promise<AdminSongRow[]> {
+// 만든 사람 종류: 운영자(createdBy 없음) / 강사(승인된 강사 프로필) / 수강생
+const creatorKind = sql<SongCreator>`case when ${songs.createdBy} is null then 'admin' when exists (select 1 from ${instructorProfiles} where ${instructorProfiles.userId} = ${songs.createdBy} and ${instructorProfiles.status} = 'approved') then 'instructor' else 'member' end`;
+
+// 병합된 곡은 뺀다. pendingOnly면 검수 대기만 (F-16)
+export async function listSongsForAdmin(pendingOnly = false): Promise<AdminSongRow[]> {
   return getDb()
     .select({
       id: songs.id,
@@ -51,11 +56,18 @@ export async function listSongsForAdmin(): Promise<AdminSongRow[]> {
       slug: songs.slug,
       hasVideo: sql<boolean>`${songs.ytVideoId} is not null`,
       pendingReview: sql<boolean>`${songs.reviewStatus} = 'pending'`,
+      creator: creatorKind,
+      createdAt: songs.createdAt,
     })
     .from(songs)
     .innerJoin(artists, eq(artists.id, songs.artistId))
-    .where(sql`${songs.mergedIntoId} is null`)
+    .where(and(isNull(songs.mergedIntoId), pendingOnly ? eq(songs.reviewStatus, "pending") : undefined))
     .orderBy(desc(songs.createdAt));
+}
+
+export async function countPendingSongs(): Promise<number> {
+  const [{ n }] = await getDb().select({ n: count() }).from(songs).where(and(isNull(songs.mergedIntoId), eq(songs.reviewStatus, "pending")));
+  return n;
 }
 
 export type AdminSongDetail = {
@@ -67,6 +79,14 @@ export type AdminSongDetail = {
   artistAliases: string[];
   songAliases: string[];
   video: { id: string; type: string | null; title: string | null; channel: string | null } | null;
+  pendingReview: boolean;
+  creator: SongCreator;
+  creatorNickname: string | null;
+  createdAt: Date;
+  merged: boolean;
+  /** 병합하면 옮겨질 것 (미리보기) */
+  classCount: number;
+  requestCount: number;
 };
 
 export async function getSongForAdmin(id: number): Promise<AdminSongDetail | null> {
@@ -83,9 +103,17 @@ export async function getSongForAdmin(id: number): Promise<AdminSongDetail | nul
       videoType: songs.videoType,
       videoTitle: songs.videoTitle,
       videoChannel: songs.videoChannel,
+      pendingReview: sql<boolean>`${songs.reviewStatus} = 'pending'`,
+      creator: creatorKind,
+      creatorNickname: profiles.nickname,
+      createdAt: songs.createdAt,
+      merged: sql<boolean>`${songs.mergedIntoId} is not null`,
+      classCount: sql<number>`(select count(*)::int from ${classSongs} where ${classSongs.songId} = ${songs.id})`,
+      requestCount: sql<number>`(select count(*)::int from ${requests} where ${requests.songId} = ${songs.id})`,
     })
     .from(songs)
     .innerJoin(artists, eq(artists.id, songs.artistId))
+    .leftJoin(profiles, eq(profiles.id, songs.createdBy))
     .where(eq(songs.id, id))
     .limit(1);
   if (!row) return null;
@@ -104,6 +132,13 @@ export async function getSongForAdmin(id: number): Promise<AdminSongDetail | nul
     artistAliases: aAliases.map((a) => a.alias).filter((a) => a !== row.artistName),
     songAliases: sAliases.filter((a) => !a.isPrimary).map((a) => a.alias),
     video: row.ytVideoId ? { id: row.ytVideoId, type: row.videoType, title: row.videoTitle, channel: row.videoChannel } : null,
+    pendingReview: row.pendingReview,
+    creator: row.creator,
+    creatorNickname: row.creatorNickname,
+    createdAt: row.createdAt,
+    merged: row.merged,
+    classCount: row.classCount,
+    requestCount: row.requestCount,
   };
 }
 
@@ -139,7 +174,11 @@ async function addAliases<T extends "artist" | "song">(tx: Tx, kind: T, ownerId:
       .values(rows.map((r) => ({ ...r, artistId: ownerId })))
       .onConflictDoNothing({ target: [artistAliases.artistId, artistAliases.aliasNorm] });
   } else {
-    await tx.insert(songAliases).values(rows.map((r) => ({ ...r, songId: ownerId })));
+    // 병합처럼 이미 별칭이 있는 곡에 더할 때도 쓴다 (specs/song-review)
+    await tx
+      .insert(songAliases)
+      .values(rows.map((r) => ({ ...r, songId: ownerId })))
+      .onConflictDoNothing({ target: [songAliases.songId, songAliases.aliasNorm] });
   }
 }
 
@@ -279,3 +318,125 @@ export async function findOrCreateSong(
   return { id: saved.id, slug: saved.slug, title: row.title, artistName: row.artistName, existed: false };
 }
 
+// ── 검수·병합 (F-16, specs/song-review) ────────────────────────────────
+
+// 검수 확인: 운영자가 봤다는 표시만 남긴다
+export async function confirmSong(songId: number): Promise<{ slug: string }> {
+  const [updated] = await getDb()
+    .update(songs)
+    .set({ reviewStatus: "confirmed" })
+    .where(and(eq(songs.id, songId), isNull(songs.mergedIntoId)))
+    .returning({ slug: songs.slug });
+  if (!updated) throw new AdminInputError("없거나 이미 합쳐진 곡이에요");
+  return updated;
+}
+
+export type MergeSongResult = { fromSlug: string; intoSlug: string; movedClasses: number; movedRequests: number; droppedRequests: number; movedAliases: number };
+
+// 곡 병합 A→B. 클래스 연결·추가요·별칭·이벤트를 B로 옮기고 A는 "합쳐짐"으로 남긴다(옛 주소 리다이렉트).
+// 겹치는 것(같은 클래스·같은 사용자·같은 별칭)은 B 것을 남긴다. 되돌리지 않는다
+export async function mergeSong(fromId: number, intoId: number): Promise<MergeSongResult> {
+  if (fromId === intoId) throw new AdminInputError("자기 자신으로는 합칠 수 없어요");
+  return getDb().transaction(async (tx) => {
+    const rows = await tx
+      .select({ id: songs.id, slug: songs.slug, title: songs.title, mergedIntoId: songs.mergedIntoId })
+      .from(songs)
+      .where(inArray(songs.id, [fromId, intoId]))
+      .for("update");
+    const from = rows.find((r) => r.id === fromId);
+    const into = rows.find((r) => r.id === intoId);
+    if (!from || !into) throw new AdminInputError("없는 곡이에요");
+    if (from.mergedIntoId) throw new AdminInputError("이미 합쳐진 곡이에요");
+    if (into.mergedIntoId) throw new AdminInputError("이미 다른 곡으로 합쳐진 곡으로는 합칠 수 없어요");
+
+    // 클래스: B를 이미 배우는 클래스의 A 행은 버린다
+    await tx.delete(classSongs).where(and(eq(classSongs.songId, fromId), inArray(classSongs.classId, tx.select({ id: classSongs.classId }).from(classSongs).where(eq(classSongs.songId, intoId)))));
+    const movedClassRows = await tx.update(classSongs).set({ songId: intoId }).where(eq(classSongs.songId, fromId)).returning({ id: classSongs.classId });
+
+    // 추가요: B에 이미 있는 사용자의 A 행은 버린다 (사용자 × 곡 1건)
+    const dropped = await tx
+      .delete(requests)
+      .where(and(eq(requests.songId, fromId), inArray(requests.userId, tx.select({ id: requests.userId }).from(requests).where(eq(requests.songId, intoId)))))
+      .returning({ id: requests.id });
+    const movedRequestRows = await tx.update(requests).set({ songId: intoId }).where(eq(requests.songId, fromId)).returning({ id: requests.id });
+
+    // 별칭: B에 같은 것이 있으면 버리고, 나머지는 B의 보조 별칭으로. A 제목도 별칭으로
+    await tx.delete(songAliases).where(and(eq(songAliases.songId, fromId), inArray(songAliases.aliasNorm, tx.select({ n: songAliases.aliasNorm }).from(songAliases).where(eq(songAliases.songId, intoId)))));
+    const movedAliasRows = await tx.update(songAliases).set({ songId: intoId, isPrimary: false }).where(eq(songAliases.songId, fromId)).returning({ id: songAliases.id });
+    await addAliases(tx, "song", intoId, into.title, [from.title]);
+
+    await tx.update(events).set({ songId: intoId }).where(eq(events.songId, fromId));
+    await tx.update(songs).set({ mergedIntoId: intoId, reviewStatus: "confirmed" }).where(eq(songs.id, fromId));
+
+    return { fromSlug: from.slug, intoSlug: into.slug, movedClasses: movedClassRows.length, movedRequests: movedRequestRows.length, droppedRequests: dropped.length, movedAliases: movedAliasRows.length };
+  });
+}
+
+// ── 아티스트 (F-16) ─────────────────────────────────────────────────────
+
+export type AdminArtistRow = { id: number; name: string; slug: string; songCount: number; aliases: string[] };
+
+export async function listArtistsForAdmin(): Promise<AdminArtistRow[]> {
+  const db = getDb();
+  const base = await db.select({ id: artists.id, name: artists.name, slug: artists.slug }).from(artists).where(isNull(artists.mergedIntoId)).orderBy(asc(artists.name));
+  if (base.length === 0) return [];
+  // 곡 수는 따로 묶어 센다 (병합된 곡 제외). sql 템플릿의 상관 서브쿼리가 바깥 artists와 묶이지 않아 전체 수가 나왔다 (findings Issues 1)
+  const counts = await db
+    .select({ artistId: songs.artistId, n: count() })
+    .from(songs)
+    .where(and(inArray(songs.artistId, base.map((r) => r.id)), isNull(songs.mergedIntoId)))
+    .groupBy(songs.artistId);
+  const countOf = new Map(counts.map((c) => [c.artistId, c.n]));
+  const rows = base.map((r) => ({ ...r, songCount: countOf.get(r.id) ?? 0 }));
+  const aliasRows = await db
+    .select({ artistId: artistAliases.artistId, alias: artistAliases.alias, isPrimary: artistAliases.isPrimary })
+    .from(artistAliases)
+    .where(inArray(artistAliases.artistId, rows.map((r) => r.id)))
+    .orderBy(asc(artistAliases.id));
+  return rows.map((r) => ({ ...r, aliases: aliasRows.filter((a) => a.artistId === r.id && !a.isPrimary).map((a) => a.alias) }));
+}
+
+export const renameArtistInput = z.object({
+  artistId: z.number().int().positive(),
+  name: z.string().trim().min(1, "이름을 넣어 주세요").max(100, "이름은 100자까지예요"),
+});
+
+// 대표 이름 수정: artists.name과 대표 별칭 행을 같이 바꾼다. 다른 별칭과 같아지면 그 별칭을 대표로 올린다
+export async function renameArtist(input: z.infer<typeof renameArtistInput>): Promise<string[]> {
+  return getDb().transaction(async (tx) => {
+    const [artist] = await tx.select({ id: artists.id, mergedIntoId: artists.mergedIntoId }).from(artists).where(eq(artists.id, input.artistId)).limit(1);
+    if (!artist || artist.mergedIntoId) throw new AdminInputError("없거나 합쳐진 아티스트예요");
+    const norm = normalizeAlias(input.name);
+    if (!norm) throw new AdminInputError("이름을 확인해 주세요");
+    await tx.update(artists).set({ name: input.name }).where(eq(artists.id, input.artistId));
+    await tx.update(artistAliases).set({ isPrimary: false }).where(eq(artistAliases.artistId, input.artistId));
+    const [existing] = await tx.select({ id: artistAliases.id }).from(artistAliases).where(and(eq(artistAliases.artistId, input.artistId), eq(artistAliases.aliasNorm, norm))).limit(1);
+    if (existing) await tx.update(artistAliases).set({ alias: input.name, isPrimary: true }).where(eq(artistAliases.id, existing.id));
+    else await tx.insert(artistAliases).values({ artistId: input.artistId, alias: input.name, aliasNorm: norm, isPrimary: true });
+    // 곡 상세 캐시를 비울 slug 목록
+    const slugs = await tx.select({ slug: songs.slug }).from(songs).where(eq(songs.artistId, input.artistId));
+    return slugs.map((s) => s.slug);
+  });
+}
+
+export type MergeArtistResult = { movedSongs: number; movedAliases: number; slugs: string[] };
+
+// 아티스트 병합 A→B: 곡·별칭을 B로. 곡 slug는 그대로 (주소 안정). A는 "합쳐짐"
+export async function mergeArtist(fromId: number, intoId: number): Promise<MergeArtistResult> {
+  if (fromId === intoId) throw new AdminInputError("자기 자신으로는 합칠 수 없어요");
+  return getDb().transaction(async (tx) => {
+    const rows = await tx.select({ id: artists.id, name: artists.name, mergedIntoId: artists.mergedIntoId }).from(artists).where(inArray(artists.id, [fromId, intoId])).for("update");
+    const from = rows.find((r) => r.id === fromId);
+    const into = rows.find((r) => r.id === intoId);
+    if (!from || !into) throw new AdminInputError("없는 아티스트예요");
+    if (from.mergedIntoId) throw new AdminInputError("이미 합쳐진 아티스트예요");
+    if (into.mergedIntoId) throw new AdminInputError("이미 다른 아티스트로 합쳐진 아티스트로는 합칠 수 없어요");
+
+    const moved = await tx.update(songs).set({ artistId: intoId }).where(eq(songs.artistId, fromId)).returning({ slug: songs.slug });
+    await tx.delete(artistAliases).where(and(eq(artistAliases.artistId, fromId), inArray(artistAliases.aliasNorm, tx.select({ n: artistAliases.aliasNorm }).from(artistAliases).where(eq(artistAliases.artistId, intoId)))));
+    const movedAliases = await tx.update(artistAliases).set({ artistId: intoId, isPrimary: false }).where(eq(artistAliases.artistId, fromId)).returning({ id: artistAliases.id });
+    await addAliases(tx, "artist", intoId, into.name, [from.name]);
+    await tx.update(artists).set({ mergedIntoId: intoId }).where(eq(artists.id, fromId));
+    return { movedSongs: moved.length, movedAliases: movedAliases.length, slugs: moved.map((m) => m.slug) };
+  });
+}
