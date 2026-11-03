@@ -9,7 +9,9 @@ import { VideoCard } from "@/components/video-card";
 import { FACILITIES } from "@/lib/facilities";
 import { BOOKING_TYPE_LABEL, formatClassDate, formatDuration, formatPrice, formatTimeRange, LEVEL_LABEL } from "@/lib/format";
 import type { ClassDetail, ClassDisplayStatus } from "@/server/classes";
+import type { EncoreSummary, MyEncore } from "@/server/encores";
 import { CopyAddressButton } from "./copy-address";
+import { EncorePanel } from "./encore-panel";
 
 const STATUS_LABEL: Record<ClassDisplayStatus, { text: string; tone: "lime" | "butter" | "white" }> = {
   open: { text: "모집 중", tone: "lime" },
@@ -19,15 +21,18 @@ const STATUS_LABEL: Record<ClassDisplayStatus, { text: string; tone: "lime" | "b
   canceled: { text: "취소", tone: "white" },
 };
 
-// 예약할 수 없는 이유 (F-05 상태별 버튼). 앵콜은 F-24가 생기면 이 자리에 넣는다 (MVP 원칙 6)
+// 예약할 수 없는 이유 (F-05 상태별 버튼). 마감·종료 클래스는 앵콜 패널이 하단 막대를 대신한다 (F-24)
 const UNAVAILABLE_TEXT: Record<"closed" | "ended" | "canceled", string> = {
   closed: "마감됐어요",
   ended: "끝난 클래스예요",
   canceled: "취소됐어요",
 };
 
+export type ClassEncore = { summary: EncoreSummary; loggedIn: boolean; mine: MyEncore | null };
+
 // 클래스 상세 화면. 데이터만 받아 그린다 (상태별 화면을 가짜 데이터로도 확인할 수 있게)
-export function ClassView({ c }: { c: ClassDetail }) {
+// encore: 마감·종료 클래스일 때만 (F-24)
+export function ClassView({ c, encore }: { c: ClassDetail; encore: ClassEncore | null }) {
   const mainSong = c.songs[0];
 
   return (
@@ -52,6 +57,11 @@ export function ClassView({ c }: { c: ClassDetail }) {
           <StickerLabel tone="sky" tilt={2}>
             {LEVEL_LABEL[c.level]}
           </StickerLabel>
+          {c.encoreOfClassId && (
+            <Link href={`/class/${c.encoreOfClassId}`} className="press inline-block -rotate-2 rounded-full border-2 border-ink bg-lilac px-2.5 py-0.5 text-[11px] font-black leading-tight">
+              앵콜 클래스 · 원래 클래스 보기 ›
+            </Link>
+          )}
         </div>
         <h1 className="mt-3 font-display text-[32px] leading-[1.15]">{c.title}</h1>
 
@@ -72,6 +82,18 @@ export function ClassView({ c }: { c: ClassDetail }) {
 
         <ClassFacts c={c} />
 
+        {encore && (c.status === "closed" || c.status === "ended") && (
+          <EncorePanel
+            classId={c.id}
+            classTitle={c.title}
+            classStatus={c.status}
+            summary={encore.summary}
+            loggedIn={encore.loggedIn}
+            mine={encore.mine}
+            mainSongSlug={mainSong?.slug ?? null}
+          />
+        )}
+
         {c.description && (
           <section className="mt-7">
             <h2 className="font-display text-[23px]">
@@ -87,7 +109,7 @@ export function ClassView({ c }: { c: ClassDetail }) {
         <PlaceSection c={c} />
       </div>
 
-      <ActionBar c={c} />
+      {!encore && <ActionBar c={c} />}
     </>
   );
 }

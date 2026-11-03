@@ -9,9 +9,10 @@ const MAX_SONGS = 3;
 // 배우는 곡 고르기 (specs/search FR-8). 수강생 검색과 같은 검색으로 찾는다.
 // 기본은 한 곡, 메들리 같은 클래스만 "다른 곡도 배워요"로 최대 세 곡. 첫 곡이 대표. 고른 곡은 숨은 값 songIds로 보낸다.
 // 찾는 곡이 없으면 그 자리에서 새 곡을 만든다 (F-13)
-export function SongPicker() {
-  const [picked, setPicked] = useState<SongOption[]>([]);
-  const [searching, setSearching] = useState(true);
+// initial: 미리 골라 둘 곡 (앵콜 클래스는 원 클래스의 곡)
+export function SongPicker({ initial = [] }: { initial?: SongOption[] }) {
+  const [picked, setPicked] = useState<SongOption[]>(initial);
+  const [searching, setSearching] = useState(initial.length === 0);
 
   return (
     <fieldset className="space-y-2">
