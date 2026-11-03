@@ -144,7 +144,7 @@
 | API-1 | Apple 프로모션 콘텐츠 현재 약관 원문 | Apple Services Performance Partners 가입 후 약관 확인 |
 | API-2 | Apple 검색 요청 제한 실제 수치 | 개발 시 측정, 캐시 설계 |
 | API-3 | Deezer 이용약관의 상업적 이용·이미지 조항 | developers.deezer.com 이용약관 원문 |
-| API-4 | 안무 영상 기능을 MVP에 넣을지 | 공동 결정 (기능명세서 F-04 확장) |
+| API-4 | 안무 영상 기능을 MVP에 넣을지 | 기획 결정 (기능명세서 F-04 확장) |
 | API-5 | 출시 전 법률 검토 | 커버·영상 사용 방식 최종 점검 |
 
 ## 출처

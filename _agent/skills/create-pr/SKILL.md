@@ -9,7 +9,7 @@ description: 올빗(All the Beat) 저장소에서 현재 브랜치로 GitHub PR�
 
 ## 왜 그냥 `gh pr create`를 쓰면 안 되나
 
-이 Mac의 gh 기본 계정은 **회사 계정(`wade-readypost`)**이고, 이 저장소는 **개인 계정(`wecaners/All-The-Beat`)** 것이다. 그냥 gh를 부르면 회사 계정 이름으로 PR이 올라가거나 권한 오류가 난다. 기본 계정을 바꾸면(gh auth switch) 회사 작업이 깨지므로, 모든 gh 호출은 개인 토큰을 명령 단위로 넘기는 스크립트로 한다:
+이 컴퓨터의 gh 기본 계정은 **다른 계정**이고, 이 저장소는 **개인 계정(`wecaners/All-The-Beat`)** 것이다. 그냥 gh를 부르면 다른 계정 이름으로 PR이 올라가거나 권한 오류가 난다. 기본 계정을 바꾸면(gh auth switch) 그 계정으로 하는 다른 작업이 깨지므로, 모든 gh 호출은 개인 토큰을 명령 단위로 넘기는 스크립트로 한다:
 
 ```bash
 _agent/skills/create-pr/scripts/gh-personal.sh <gh 인자...>
