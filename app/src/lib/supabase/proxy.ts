@@ -2,10 +2,10 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isSupabaseConfigured, supabaseKey, supabaseUrl } from "./env";
 
-// 요청마다 Supabase 세션 토큰을 갱신해서 서버 컴포넌트와 브라우저 양쪽에 넘긴다
-export async function updateSession(request: NextRequest) {
+// 요청마다 Supabase 세션 토큰을 갱신해서 서버 컴포넌트와 브라우저 양쪽에 넘긴다. 로그인 사용자면 id도 돌려준다
+export async function updateSession(request: NextRequest): Promise<{ response: NextResponse; userId: string | null }> {
   let response = NextResponse.next({ request });
-  if (!isSupabaseConfigured) return response;
+  if (!isSupabaseConfigured) return { response, userId: null };
 
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
@@ -24,7 +24,7 @@ export async function updateSession(request: NextRequest) {
   });
 
   // getClaims가 토큰 서명을 검증하면서 필요하면 갱신한다. 이 호출과 createServerClient 사이에 다른 코드를 넣지 않는다
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
 
-  return response;
+  return { response, userId: data?.claims?.sub ?? null };
 }
