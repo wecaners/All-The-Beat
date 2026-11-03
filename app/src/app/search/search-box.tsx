@@ -40,11 +40,14 @@ export function SearchBox() {
   return (
     <form
       role="search"
+      // 엔터는 검색어를 담아 클래스 목록으로 (F-02 → F-03). 빈 칸이면 그대로
       onSubmit={(e) => {
         e.preventDefault();
         if (timer.current) clearTimeout(timer.current);
-        go(value);
+        const q = value.trim();
         (document.activeElement as HTMLElement | null)?.blur(); // 휴대폰 키보드를 내린다
+        if (q) router.push(`/classes?q=${encodeURIComponent(q)}`);
+        else go(value);
       }}
       className="relative mt-3"
     >

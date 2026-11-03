@@ -18,15 +18,14 @@ export type SongSearchResult = {
   waiting: number;
 };
 
-// 곡 검색 (F-02, F-13). 수강생 검색 화면과 운영자 곡 고르기가 같이 쓴다 (specs/search).
+// 검색어에 걸리는 곡 id → 점수. 검색 결과(F-02)와 클래스 목록의 검색어 필터(F-03)가 같이 쓴다.
 // 제목·대표 이름도 별칭 행이라 곡 별칭과 아티스트 별칭만 보면 된다. 정규화 결과에는 %·_가 남지 않아 LIKE에 그대로 넣는다
-export async function searchSongs(raw: string, limit = 20): Promise<SongSearchResult[]> {
+export async function matchSongIds(raw: string): Promise<Map<number, number>> {
   const q = normalizeAlias(raw.slice(0, 50));
-  if (!q) return [];
-  const db = getDb();
+  if (!q) return new Map();
 
   // 점수: 곡 이름 정확 6 > 아티스트 정확 5 > 곡 앞부분 4 > 아티스트 앞부분 3 > 곡 포함 2 > 아티스트 포함 1
-  const hits = await db.execute<{ song_id: string | number; score: number }>(sql`
+  const hits = await getDb().execute<{ song_id: string | number; score: number }>(sql`
     select song_id, max(score)::int as score from (
       select sa.song_id,
         case when sa.alias_norm = ${q} then 6 when sa.alias_norm like ${`${q}%`} then 4 else 2 end as score
@@ -40,8 +39,14 @@ export async function searchSongs(raw: string, limit = 20): Promise<SongSearchRe
     ) h
     group by song_id
   `);
-  if (hits.length === 0) return [];
-  const scoreOf = new Map(hits.map((h) => [Number(h.song_id), h.score]));
+  return new Map(hits.map((h) => [Number(h.song_id), h.score]));
+}
+
+// 곡 검색 (F-02, F-13). 수강생 검색 화면과 운영자 곡 고르기가 같이 쓴다 (specs/search)
+export async function searchSongs(raw: string, limit = 20): Promise<SongSearchResult[]> {
+  const scoreOf = await matchSongIds(raw);
+  if (scoreOf.size === 0) return [];
+  const db = getDb();
   const ids = [...scoreOf.keys()];
 
   const [rows, upcoming, waiting] = await Promise.all([
