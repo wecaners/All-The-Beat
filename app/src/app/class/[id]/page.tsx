@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth/current-user";
 import { formatClassDate, formatTimeRange } from "@/lib/format";
 import { getPublicClass } from "@/server/classes";
 import { getEncoreSummary, getMyEncore, isEncoreTarget } from "@/server/encores";
+import { isFavorite } from "@/server/favorites";
 import { type ClassEncore, ClassView } from "./class-view";
 
 type Props = { params: Promise<{ id: string }> };
@@ -40,12 +41,14 @@ async function ClassContent({ params }: Props) {
   const { id } = await params;
   const c = await getPublicClass(id);
   if (!c) notFound();
-  return <ClassView c={c} encore={isEncoreTarget(c.status) ? await readEncore(c.id) : null} />;
+  const user = await getCurrentUser();
+  const [encore, favoriteOn] = await Promise.all([isEncoreTarget(c.status) ? readEncore(c.id, user) : null, user ? isFavorite(user.id, c.id) : false]);
+  return <ClassView c={c} encore={encore} favorite={{ loggedIn: !!user, on: favoriteOn }} />;
 }
 
 // 앵콜 인원·진행 상태와 내 앵콜. 로그인은 앵콜을 남길 때만 필요해서, 로그인하지 않아도 진행 상태는 보인다
-async function readEncore(classId: number): Promise<ClassEncore | null> {
-  const [summary, user] = await Promise.all([getEncoreSummary(classId), getCurrentUser()]);
+async function readEncore(classId: number, user: Awaited<ReturnType<typeof getCurrentUser>>): Promise<ClassEncore | null> {
+  const summary = await getEncoreSummary(classId);
   if (!summary) return null;
   return { summary, loggedIn: !!user, mine: user ? await getMyEncore(user.id, classId) : null };
 }
