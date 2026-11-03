@@ -8,7 +8,7 @@ import { listRegions } from "@/server/regions";
 import { todayKst } from "@/server/admin/shared";
 import { linkButtonClass, Section } from "../../ui";
 import { approveInstructorAction } from "../../actions";
-import { ApproveButton, IssueCodeButton, RejectForm } from "../apply-forms";
+import { ApproveButton, CancelClaimButton, IssueCodeButton, RejectForm } from "../apply-forms";
 import { ConsentForm } from "../instructor-forms";
 import { InstructorMediaForm } from "../profile-forms";
 import { StudioCard, StudioPicker } from "../studio-forms";
@@ -16,6 +16,7 @@ import { StudioCard, StudioPicker } from "../studio-forms";
 type Props = { params: Promise<{ id: string }> };
 
 const KST_DATE = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric" });
+const KST_DATETIME = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 const APPLY_STATUS_TEXT = { pending: "승인 대기", verified: "확인됨 · 승인 대기", approved: "승인", rejected: "반려", suspended: "정지" } as const;
 
 export default function InstructorPage({ params }: Props) {
@@ -108,6 +109,27 @@ async function Instructor({ params }: Props) {
               <RejectForm instructorId={instructor.id} />
             </div>
           )}
+        </Section>
+      )}
+
+      {instructor.isProxy && instructor.claim && (
+        <Section title="가져오기 신청 (F-19)">
+          <dl className="grid grid-cols-[6rem_1fr] gap-y-1 text-sm">
+            <dt className="text-zinc-500">신청한 회원</dt>
+            <dd>{instructor.claim.nickname}</dd>
+            <dt className="text-zinc-500">신청 시각</dt>
+            <dd>{KST_DATETIME.format(instructor.claim.requestedAt)}</dd>
+            <dt className="text-zinc-500">인증 코드</dt>
+            <dd>{instructor.codeValid ? "발급됨 (24시간 안)" : "없음 또는 만료"}</dd>
+          </dl>
+          <p className="mt-4 mb-2 text-sm text-zinc-500">
+            코드를 발급해 이 강사의 인스타(@{instructor.instagramHandle})로 DM을 보내 주세요. 회원이 코드를 넣으면 바로 그 계정에 연결되고, 동의 전이던 클래스도
+            공개돼요.
+          </p>
+          <div className="space-y-3">
+            <IssueCodeButton instructorId={instructor.id} hasValidCode={instructor.codeValid} />
+            <CancelClaimButton instructorId={instructor.id} />
+          </div>
         </Section>
       )}
 

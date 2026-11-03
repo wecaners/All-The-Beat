@@ -193,6 +193,8 @@ erDiagram
 | verify_code_hash | text | | 인증 코드 해시 (원문 저장 안 함) |
 | verify_code_expires_at | timestamptz | | 24시간 |
 | approved_at, rejected_reason | timestamptz, text | | |
+| claim_user_id | uuid | FK → profiles (탈퇴 시 NULL), UK, NULL 허용 | 대리 강사 가져오기를 신청한 회원 (F-19). 코드 확인 전에는 소유가 바뀌지 않는다 |
+| claim_requested_at | timestamptz | | 가져오기 신청 시각 |
 
 **instructor_regions** — 강사 주 활동 권역 (다대다)
 | 컬럼 | 타입 | 제약 |
@@ -472,6 +474,7 @@ createClass(...) 후:
 - `0005_instructor_studio` (2026-10-28, `specs/instructor-studio`): `instructor_places`를 강사의 스튜디오로 넓힘 — `kakao_place_id`·`kakao_place_url`·`lat`·`lng`(카카오 검색에서 한 번 저장, 위도·경도는 둘 다 있거나 둘 다 없음)·`facilities text[]`·`archived_at`(목록에서 빼기, 지우지 않음), (강사, 카카오 장소) 유니크. 새 테이블 `studio_photos`(스튜디오 사진, 큰 사진·작은 사진 경로, 스튜디오 삭제 시 같이 삭제). `instructor_profiles`에 `photo_path`·`photo_thumb_path`·`portfolio_video_ids text[]`(최대 2)·`media_consent`(대리 등록 강사의 사진·영상 게재 동의)
 - `0006_media_storage`: Supabase Storage 공개 버킷 `media`(이미지, 2MB). 쓰기·지우기는 `public.is_admin()`(정의자 권한 함수, authenticated만 실행) 정책으로 운영자만. 읽기는 공개 주소
 - `0007_user_visits` (2026-11-03, `specs/admin-metrics`): 새 테이블 `user_visits`(사용자 × KST 날짜 복합 PK, 사용자 삭제 시 같이 삭제). 권한은 `0002`의 기본 권한 회수로 막힌다
+- `0008_instructor_claim` (2026-11-03, `specs/instructor-claim`): `instructor_profiles`에 `claim_user_id`(FK → profiles, 탈퇴 시 NULL, unique)·`claim_requested_at`. 코드는 `verify_code_*`를 같이 쓴다
 
 ## 9. 열린 질문
 

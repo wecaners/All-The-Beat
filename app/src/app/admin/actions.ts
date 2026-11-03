@@ -6,7 +6,17 @@ import type { z } from "zod";
 import { requireAdmin } from "@/lib/auth/admin";
 import { adminCancelReason, cancelClassByAdmin, classInput, createClassByAdmin, endClass, setClassHidden, updateBookingUrl } from "@/server/admin/classes";
 import { respondToEncore, setClassClosed } from "@/server/admin/encores";
-import { approveInstructor, consentInput, createProxyInstructor, instructorInput, issueVerifyCode, recordConsent, rejectInput, rejectInstructor } from "@/server/admin/instructors";
+import {
+  approveInstructor,
+  cancelClaimByAdmin,
+  consentInput,
+  createProxyInstructor,
+  instructorInput,
+  issueVerifyCode,
+  recordConsent,
+  rejectInput,
+  rejectInstructor,
+} from "@/server/admin/instructors";
 import { AdminInputError } from "@/server/admin/shared";
 import {
   addStudioPhoto,
@@ -382,6 +392,18 @@ export async function issueVerifyCodeAction(instructorId: number): Promise<Admin
     return { ok: true, message: `인증 코드 ${code} — 강사 인스타 DM으로 보내 주세요. 24시간 동안 유효해요` };
   } catch (e) {
     return toState(e, "issueVerifyCode");
+  }
+}
+
+// 대리 강사 가져오기 신청 취소 (F-19). 발급한 코드도 무효
+export async function cancelClaimByAdminAction(instructorId: number): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    await cancelClaimByAdmin(instructorId);
+    refresh();
+    return { ok: true, message: "가져오기 신청을 취소했어요" };
+  } catch (e) {
+    return toState(e, "cancelClaimByAdmin");
   }
 }
 

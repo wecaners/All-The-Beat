@@ -27,3 +27,4 @@
 | [design-system](design-system/) | 디자인 시스템 (덕질 스크랩북) + 곡 상세 적용 | 구현 완료, 로그인 흐름 확인 대기 |
 | [admin-metrics](admin-metrics/) | 운영자 지표 (F-18) | 구현 완료, 운영자 화면은 사용자 확인 대기 |
 | [account-withdrawal](account-withdrawal/) | 회원 탈퇴 (F-09, F-10) | 구현 완료, 실제 탈퇴·카카오 연결 끊기는 사용자 확인 대기 |
+| [instructor-claim](instructor-claim/) | 대리 등록 강사의 계정 연결 (F-19) | 구현 완료, 실제 흐름은 사용자 확인 대기 |

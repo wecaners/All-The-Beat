@@ -2,7 +2,7 @@
 
 import { useActionState, useState, useTransition } from "react";
 import { ActionButton } from "../action-button";
-import { type AdminActionState, issueVerifyCodeAction, rejectInstructorAction } from "../actions";
+import { type AdminActionState, cancelClaimByAdminAction, issueVerifyCodeAction, rejectInstructorAction } from "../actions";
 import { buttonClass, Field, inputClass, Result } from "../ui";
 
 // 코드 발급: 결과(원문)는 이 자리에 한 번만 보인다. 서버는 해시만 둔다
@@ -22,6 +22,11 @@ export function IssueCodeButton({ instructorId, hasValidCode }: { instructorId: 
       {state && <Result state={state} />}
     </div>
   );
+}
+
+// 대리 강사 가져오기 신청 취소 (F-19)
+export function CancelClaimButton({ instructorId }: { instructorId: number }) {
+  return <ActionButton label="가져오기 신청 취소" confirm="이 가져오기 신청을 취소할까요? 발급한 코드도 무효가 돼요" run={() => cancelClaimByAdminAction(instructorId)} />;
 }
 
 export function ApproveButton({ instructorId, run }: { instructorId: number; run: (id: number) => Promise<AdminActionState> }) {

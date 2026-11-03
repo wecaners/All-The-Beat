@@ -23,7 +23,7 @@ export function StatusView({ me }: { me: MyInstructor }) {
   );
 }
 
-function Step({ n, state, title, children }: { n: number; state: "done" | "now" | "todo"; title: string; children: React.ReactNode }) {
+export function Step({ n, state, title, children }: { n: number; state: "done" | "now" | "todo"; title: string; children: React.ReactNode }) {
   const badge = state === "done" ? "bg-lime" : state === "now" ? "bg-pink text-white" : "bg-card text-sub";
   return (
     <li className={`flex gap-3 rounded-2xl border-2 p-3.5 ${state === "now" ? "border-ink bg-card shadow-sticker" : "border-ink/30 bg-card/60"}`}>

@@ -57,6 +57,13 @@
       "when": 1793690116624,
       "tag": "0007_user_visits",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793694187125,
+      "tag": "0008_instructor_claim",
+      "breakpoints": true
     }
   ]
 }
