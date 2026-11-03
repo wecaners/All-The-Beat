@@ -79,10 +79,15 @@ function HotSongs({ songs }: { songs: HotSong[] }) {
 function UpcomingClasses({ classes }: { classes: UpcomingClassCard[] }) {
   return (
     <section className="mt-6">
+      {/* 전체 보기 → 클래스 목록 (F-03) */}
       <SectionHead
         title="다가오는 클래스"
         label={<StickerLabel tone="sky" className="ml-1.5 align-[4px]">{classes.length}</StickerLabel>}
-        zine="Tickets"
+        action={
+          <Link href="/classes" className="press rounded-full border-2 border-ink bg-card px-3.5 py-1 text-[13px] font-black shadow-sticker-sm">
+            전체 보기
+          </Link>
+        }
       />
       <ul className="mt-2.5 space-y-4 px-5">
         {classes.map((c, i) => (
