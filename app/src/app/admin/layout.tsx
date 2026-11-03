@@ -23,6 +23,7 @@ async function AdminShell({ children }: { children: ReactNode }) {
         <Link href="/admin" className="font-extrabold">
           올빗 운영
         </Link>
+        <Link href="/admin/classes">클래스</Link>
         <Link href="/admin/songs">곡</Link>
         <Link href="/admin/artists">아티스트</Link>
         <Link href="/admin/instructors/new">강사 등록</Link>

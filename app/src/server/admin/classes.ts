@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, inArray, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { getDb } from "@/db";
 import {
@@ -9,6 +9,7 @@ import {
   classSongs,
   classStatus,
   encoreRounds,
+  events,
   instructorPlaces,
   instructorProfiles,
   regionMappings,
@@ -273,4 +274,169 @@ export async function getEncoreSource(classId: number): Promise<EncoreSource | n
     .where(eq(classSongs.classId, classId))
     .orderBy(asc(classSongs.position));
   return { ...c, songs: songRows.map((s) => ({ id: s.id, label: `${s.title} - ${s.artistName}` })) };
+}
+
+// ── 클래스 관리 (F-17, specs/admin-classes) ─────────────────────────────
+
+export type AdminClassStatus = (typeof classStatus.enumValues)[number];
+export const ADMIN_CLASS_STATUSES = classStatus.enumValues;
+
+// 화면 상태: 취소 > 종료 시각 지남 = ended > DB 상태 (자동 종료 배치가 없다)
+const displayStatus = sql<AdminClassStatus>`case when ${classes.status} = 'canceled' then 'canceled' when ${classes.endsAt} <= now() then 'ended' else ${classes.status}::text end`;
+const isPublicSql = sql<boolean>`not ${classes.isHidden} and ${instructorProfiles.status} = 'approved' and (not ${instructorProfiles.isProxy} or ${instructorProfiles.consentAt} is not null)`;
+const bookingClicksSql = sql<number>`(select count(*)::int from ${events} where ${events.classId} = ${classes.id} and ${events.type} = 'booking_click')`;
+const encoreCountSql = sql<number>`(select count(*)::int from encores e where e.class_id = ${classes.id} and e.canceled_at is null)`;
+
+export type AdminClassFilters = { status?: AdminClassStatus | null; instructorId?: number | null; regionId?: number | null; q?: string | null; hiddenOnly?: boolean };
+
+export type AdminClassListRow = {
+  id: number;
+  title: string;
+  startsAt: Date;
+  instructorName: string;
+  regionName: string;
+  songTitle: string;
+  isHidden: boolean;
+  isPublic: boolean;
+  status: AdminClassStatus;
+  bookingClicks: number;
+  encoreCount: number;
+};
+
+export function parseAdminClassFilters(params: URLSearchParams): AdminClassFilters {
+  const status = params.get("status");
+  const instructor = Number(params.get("instructor"));
+  const region = Number(params.get("region"));
+  return {
+    status: status && (ADMIN_CLASS_STATUSES as readonly string[]).includes(status) ? (status as AdminClassStatus) : null,
+    instructorId: Number.isInteger(instructor) && instructor > 0 ? instructor : null,
+    regionId: Number.isInteger(region) && region > 0 ? region : null,
+    q: (params.get("q") ?? "").trim().slice(0, 50) || null,
+    hiddenOnly: params.get("hidden") === "1",
+  };
+}
+
+// 전체 클래스 (지난 것 포함), 시작 최근순. 검색어는 클래스 이름·대표 곡·아티스트
+export async function listClassesForAdmin(filters: AdminClassFilters = {}, limit = 200): Promise<AdminClassListRow[]> {
+  // LIKE 와일드카드는 뺀다. 빼고 나서 비면 검색어가 없는 것
+  const stripped = filters.q?.replace(/[%_]/g, "").trim() ?? "";
+  const like = stripped ? `%${stripped}%` : null;
+  return getDb()
+    .select({
+      id: classes.id,
+      title: classes.title,
+      startsAt: classes.startsAt,
+      instructorName: instructorProfiles.displayName,
+      regionName: regions.shortName,
+      songTitle: songs.title,
+      isHidden: classes.isHidden,
+      isPublic: isPublicSql,
+      status: displayStatus,
+      bookingClicks: bookingClicksSql,
+      encoreCount: encoreCountSql,
+    })
+    .from(classes)
+    .innerJoin(instructorProfiles, eq(instructorProfiles.id, classes.instructorId))
+    .innerJoin(regions, eq(regions.id, classes.regionId))
+    .innerJoin(classSongs, and(eq(classSongs.classId, classes.id), eq(classSongs.position, 1)))
+    .innerJoin(songs, eq(songs.id, classSongs.songId))
+    .innerJoin(artists, eq(artists.id, songs.artistId))
+    .where(
+      and(
+        filters.status ? sql`${displayStatus} = ${filters.status}` : undefined,
+        filters.instructorId ? eq(classes.instructorId, filters.instructorId) : undefined,
+        filters.regionId ? eq(classes.regionId, filters.regionId) : undefined,
+        like ? or(ilike(classes.title, like), ilike(songs.title, like), ilike(artists.name, like)) : undefined,
+        filters.hiddenOnly ? eq(classes.isHidden, true) : undefined,
+      ),
+    )
+    .orderBy(desc(classes.startsAt), desc(classes.id))
+    .limit(limit);
+}
+
+export type AdminClassDetail = EncoreSource & {
+  id: number;
+  date: string;
+  isHidden: boolean;
+  isPublic: boolean;
+  status: AdminClassStatus;
+  rawStatus: AdminClassStatus;
+  createdByAdmin: boolean;
+  instructorName: string;
+  instagramHandle: string;
+  cancelReason: string | null;
+  bookingClicks: number;
+  encoreCount: number;
+  hasEncore: boolean;
+};
+
+export async function getClassForAdmin(classId: number): Promise<AdminClassDetail | null> {
+  const src = await getEncoreSource(classId);
+  if (!src) return null;
+  const [row] = await getDb()
+    .select({
+      date: sql<string>`to_char(${classes.startsAt} at time zone 'Asia/Seoul', 'YYYY-MM-DD')`,
+      isHidden: classes.isHidden,
+      isPublic: isPublicSql,
+      status: displayStatus,
+      rawStatus: classes.status,
+      createdByAdmin: classes.createdByAdmin,
+      instructorName: instructorProfiles.displayName,
+      instagramHandle: instructorProfiles.instagramHandle,
+      cancelReason: classes.cancelReason,
+      bookingClicks: bookingClicksSql,
+      encoreCount: encoreCountSql,
+      hasEncore: sql<boolean>`exists (select 1 from ${encoreRounds} where ${encoreRounds.classId} = ${classes.id})`,
+    })
+    .from(classes)
+    .innerJoin(instructorProfiles, eq(instructorProfiles.id, classes.instructorId))
+    .where(eq(classes.id, classId))
+    .limit(1);
+  if (!row) return null;
+  return { ...src, ...row, id: src.classId };
+}
+
+// 숨김: 신고·오류. 상태는 건드리지 않고 수강생 화면에서만 빠진다 (publiclyVisible)
+export async function setClassHidden(classId: number, hidden: boolean): Promise<void> {
+  const [updated] = await getDb().update(classes).set({ isHidden: hidden, updatedAt: sql`now()` }).where(eq(classes.id, classId)).returning({ id: classes.id });
+  if (!updated) throw new AdminInputError("없는 클래스예요");
+}
+
+export const bookingUrlInput = classInput.shape.bookingUrl;
+
+// 예약 링크 수정: 유형은 주소로 다시 정한다. 일시·장소가 아니라 "변경됨"은 남기지 않는다
+export async function updateBookingUrl(classId: number, url: string): Promise<{ bookingType: (typeof bookingType.enumValues)[number] }> {
+  const parsed = bookingUrlInput.safeParse(url);
+  if (!parsed.success) throw new AdminInputError(parsed.error.issues[0]?.message ?? "예약 링크를 확인해 주세요");
+  const type = guessBookingType(parsed.data);
+  const [updated] = await getDb()
+    .update(classes)
+    .set({ bookingUrl: parsed.data, bookingType: type, updatedAt: sql`now()` })
+    .where(eq(classes.id, classId))
+    .returning({ id: classes.id });
+  if (!updated) throw new AdminInputError("없는 클래스예요");
+  return { bookingType: type };
+}
+
+// 강제 종료: 시작 전이라도 끝난 클래스로. 되돌리지 않는다
+export async function endClass(classId: number): Promise<void> {
+  const [updated] = await getDb()
+    .update(classes)
+    .set({ status: "ended", updatedAt: sql`now()` })
+    .where(and(eq(classes.id, classId), inArray(classes.status, ["open", "closing_soon", "closed"]), gt(classes.endsAt, sql`now()`)))
+    .returning({ id: classes.id });
+  if (!updated) throw new AdminInputError("이미 끝났거나 취소한 클래스예요");
+}
+
+export const ADMIN_CANCEL_REASONS = { instructor_request: "강사 요청", error: "등록 오류", other: "기타" } as const;
+export const adminCancelReason = z.enum(["instructor_request", "error", "other"]);
+
+// 운영자 취소: 종료·취소 아닌 클래스만. 되돌리지 않는다
+export async function cancelClassByAdmin(classId: number, reason: z.infer<typeof adminCancelReason>): Promise<void> {
+  const [updated] = await getDb()
+    .update(classes)
+    .set({ status: "canceled", cancelReason: `운영자 · ${ADMIN_CANCEL_REASONS[reason]}`, updatedAt: sql`now()` })
+    .where(and(eq(classes.id, classId), inArray(classes.status, ["open", "closing_soon", "closed"]), gt(classes.endsAt, sql`now()`)))
+    .returning({ id: classes.id });
+  if (!updated) throw new AdminInputError("이미 끝났거나 취소한 클래스예요");
 }
