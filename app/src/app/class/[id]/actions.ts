@@ -4,6 +4,7 @@ import { refresh } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { hasConsented } from "@/server/consent";
 import { cancelEncore, EncoreError, encoreInput, saveEncore } from "@/server/encores";
+import { FavoriteError, setFavorite } from "@/server/favorites";
 import { ensureProfile } from "@/server/profiles";
 
 // isNew: 첫 앵콜(응원봉을 흔들지), delivered: 이 앵콜로 기준에 닿아 강사님께 전달됐는지 (서버 계산)
@@ -54,3 +55,24 @@ export async function cancelEncoreAction(classId: number): Promise<EncoreActionS
   refresh();
   return { ok: true };
 }
+
+// 찜 켜기/끄기 (F-22, specs/favorites). 로그인·동의·클래스 공개 여부를 서버에서 다시 본다
+export type FavoriteActionState = { ok: boolean; error?: string; consentRequired?: boolean };
+
+export async function setFavoriteAction(classId: number, on: boolean): Promise<FavoriteActionState> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, error: "로그인이 필요해요" };
+  if (!validId(classId)) return { ok: false, error: "없는 클래스예요" };
+  try {
+    await ensureProfile(user.id, user.metadata);
+    if (!(await hasConsented(user.id))) return { ok: false, consentRequired: true, error: "약관 동의가 필요해요" };
+    await setFavorite(user.id, classId, on);
+  } catch (e) {
+    if (e instanceof FavoriteError) return { ok: false, error: e.message };
+    console.error("[setFavoriteAction]", e);
+    return { ok: false, error: "저장하지 못했어요. 잠시 후 다시 시도해 주세요" };
+  }
+  refresh();
+  return { ok: true };
+}
+

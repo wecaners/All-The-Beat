@@ -12,6 +12,7 @@ import type { ClassDetail, ClassDisplayStatus } from "@/server/classes";
 import type { EncoreSummary, MyEncore } from "@/server/encores";
 import { CopyAddressButton } from "./copy-address";
 import { EncorePanel } from "./encore-panel";
+import { FavoriteButton } from "./favorite-button";
 
 const STATUS_LABEL: Record<ClassDisplayStatus, { text: string; tone: "lime" | "butter" | "white" }> = {
   open: { text: "모집 중", tone: "lime" },
@@ -29,10 +30,11 @@ const UNAVAILABLE_TEXT: Record<"closed" | "ended" | "canceled", string> = {
 };
 
 export type ClassEncore = { summary: EncoreSummary; loggedIn: boolean; mine: MyEncore | null };
+export type ClassFavorite = { loggedIn: boolean; on: boolean };
 
 // 클래스 상세 화면. 데이터만 받아 그린다 (상태별 화면을 가짜 데이터로도 확인할 수 있게)
-// encore: 마감·종료 클래스일 때만 (F-24)
-export function ClassView({ c, encore }: { c: ClassDetail; encore: ClassEncore | null }) {
+// encore: 마감·종료 클래스일 때만 (F-24). favorite: 로그인 여부와 내 찜 (F-22)
+export function ClassView({ c, encore, favorite }: { c: ClassDetail; encore: ClassEncore | null; favorite: ClassFavorite }) {
   const mainSong = c.songs[0];
 
   return (
@@ -56,24 +58,27 @@ export function ClassView({ c, encore }: { c: ClassDetail; encore: ClassEncore |
       )}
 
       <div className="px-5 pt-6">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <StickerLabel tone={STATUS_LABEL[c.status].tone} tilt={-3}>
-            {STATUS_LABEL[c.status].text}
-          </StickerLabel>
-          <StickerLabel tone="sky" tilt={2}>
-            {LEVEL_LABEL[c.level]}
-          </StickerLabel>
-          {/* 강사가 일시·장소를 바꾼 지 24시간 안 (F-12) */}
-          {c.changedRecently && (
-            <StickerLabel tone="pink" tilt={3}>
-              일시·장소 변경됨
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <StickerLabel tone={STATUS_LABEL[c.status].tone} tilt={-3}>
+              {STATUS_LABEL[c.status].text}
             </StickerLabel>
-          )}
-          {c.encoreOfClassId && (
-            <Link href={`/class/${c.encoreOfClassId}`} className="press inline-block -rotate-2 rounded-full border-2 border-ink bg-lilac px-2.5 py-0.5 text-[11px] font-black leading-tight">
-              앵콜 클래스 · 원래 클래스 보기 ›
-            </Link>
-          )}
+            <StickerLabel tone="sky" tilt={2}>
+              {LEVEL_LABEL[c.level]}
+            </StickerLabel>
+            {/* 강사가 일시·장소를 바꾼 지 24시간 안 (F-12) */}
+            {c.changedRecently && (
+              <StickerLabel tone="pink" tilt={3}>
+                일시·장소 변경됨
+              </StickerLabel>
+            )}
+            {c.encoreOfClassId && (
+              <Link href={`/class/${c.encoreOfClassId}`} className="press inline-block -rotate-2 rounded-full border-2 border-ink bg-lilac px-2.5 py-0.5 text-[11px] font-black leading-tight">
+                앵콜 클래스 · 원래 클래스 보기 ›
+              </Link>
+            )}
+          </div>
+          <FavoriteButton classId={c.id} loggedIn={favorite.loggedIn} initialOn={favorite.on} />
         </div>
         <h1 className="mt-3 font-display text-[32px] leading-[1.15]">{c.title}</h1>
 

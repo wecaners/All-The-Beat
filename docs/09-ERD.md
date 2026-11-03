@@ -342,6 +342,15 @@ erDiagram
 | canceled_at | timestamptz | | NULL이면 유효 |
 | | | **UK(user_id, class_id)** | 다시 앵콜하면 canceled_at을 NULL로 |
 
+**favorites** — 찜 (F-22, 2026-11-03)
+| 컬럼 | 타입 | 제약 | 설명 |
+|---|---|---|---|
+| user_id | uuid | PK, FK → profiles (cascade) | |
+| class_id | bigint | PK, FK → classes (cascade) | |
+| created_at | timestamptz | NN | |
+
+> 빼면 행을 지운다(취소 시각 없음). 몇 명이 찜했는지는 보여주지 않는다.
+
 **encore_rounds** — 클래스별 앵콜 진행 상태 (S-4)
 | 컬럼 | 타입 | 제약 | 설명 |
 |---|---|---|---|
@@ -475,6 +484,7 @@ createClass(...) 후:
 - `0006_media_storage`: Supabase Storage 공개 버킷 `media`(이미지, 2MB). 쓰기·지우기는 `public.is_admin()`(정의자 권한 함수, authenticated만 실행) 정책으로 운영자만. 읽기는 공개 주소
 - `0007_user_visits` (2026-11-03, `specs/admin-metrics`): 새 테이블 `user_visits`(사용자 × KST 날짜 복합 PK, 사용자 삭제 시 같이 삭제). 권한은 `0002`의 기본 권한 회수로 막힌다
 - `0008_instructor_claim` (2026-11-03, `specs/instructor-claim`): `instructor_profiles`에 `claim_user_id`(FK → profiles, 탈퇴 시 NULL, unique)·`claim_requested_at`. 코드는 `verify_code_*`를 같이 쓴다
+- `0009_favorites` (2026-11-03, `specs/favorites`): 새 테이블 `favorites`(사용자 × 클래스 복합 PK, 둘 다 cascade)
 
 ## 9. 열린 질문
 

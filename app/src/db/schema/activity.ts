@@ -105,6 +105,21 @@ export const events = pgTable(
   ],
 ).enableRLS();
 
+// 찜 (F-22). 사용자 × 클래스 = 1행. 빼면 지운다 (취소 시각 없음)
+export const favorites = pgTable(
+  "favorites",
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => profiles.id, { onDelete: "cascade" }),
+    classId: bigint({ mode: "number" })
+      .notNull()
+      .references(() => classes.id, { onDelete: "cascade" }),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.classId] })],
+).enableRLS();
+
 // 로그인 사용자의 접속 날짜 (F-18 재방문). 사용자 × KST 날짜 = 1행. 방문한 주소·IP·기기는 남기지 않는다
 export const userVisits = pgTable(
   "user_visits",

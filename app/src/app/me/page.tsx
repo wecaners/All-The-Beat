@@ -7,7 +7,8 @@ import { TabBar } from "@/components/tab-bar";
 import { stickerButtonClass } from "@/components/sticker-button";
 import { SongRow } from "@/components/song-row";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { formatShortDate } from "@/lib/format";
+import { type FavoriteItem, listMyFavorites } from "@/server/favorites";
+import { formatPrice, formatShortDate, formatTimeRange, LEVEL_LABEL } from "@/lib/format";
 import { getMyClaim, getMyInstructor, type MyClaim, type MyInstructor } from "@/server/instructors";
 import { listMyEncores, listMyRequests, type MyEncoreItem, type MyRequestItem } from "@/server/me";
 import { getProfile } from "@/server/profiles";
@@ -44,12 +45,13 @@ async function MyContent() {
       </>
     );
 
-  const [profile, requests, encores, instructor, claim] = await Promise.all([
+  const [profile, requests, encores, instructor, claim, favorites] = await Promise.all([
     getProfile(user.id),
     listMyRequests(user.id),
     listMyEncores(user.id),
     getMyInstructor(user.id),
     getMyClaim(user.id),
+    listMyFavorites(user.id),
   ]);
 
   return (
@@ -82,6 +84,22 @@ async function MyContent() {
             {encores.map((e) => (
               <li key={e.classId}>
                 <EncoreTicket e={e} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* 찜한 클래스 (F-22, specs/favorites): 다가오는 것 먼저, 마감·끝남·취소는 배지로 */}
+      <section className="mt-9 px-5">
+        <SectionTitle title="찜한 클래스" count={favorites.length} />
+        {favorites.length === 0 ? (
+          <Empty text="아직 찜한 클래스가 없어요. 클래스 상세에서 찜해 두면 여기 모여요." />
+        ) : (
+          <ul className="mt-3 space-y-3">
+            {favorites.map((f, i) => (
+              <li key={f.classId}>
+                <FavoriteTicket f={f} index={i} />
               </li>
             ))}
           </ul>
@@ -124,6 +142,23 @@ function InstructorEntry({ me, claim }: { me: MyInstructor | null; claim: MyClai
       </span>
       <span aria-hidden className="font-display text-[20px]">›</span>
     </Link>
+  );
+}
+
+const FAVORITE_BADGE: Record<FavoriteItem["status"], string | null> = { open: null, closing_soon: "마감 임박", closed: "마감", ended: "끝난 클래스", canceled: "취소" };
+
+function FavoriteTicket({ f, index }: { f: FavoriteItem; index: number }) {
+  return (
+    <ClassTicket
+      href={`/class/${f.classId}`}
+      index={index}
+      title={f.title}
+      startsAt={f.startsAt}
+      meta={`${formatTimeRange(f.startsAt, f.endsAt)} · ${f.regionName}`}
+      detail={`${f.songTitle} · ${f.artistName} · ${formatPrice(f.price)} · ${LEVEL_LABEL[f.level]}`}
+      badge={FAVORITE_BADGE[f.status]}
+      thumbnailUrl={f.videoId ? `https://i.ytimg.com/vi/${f.videoId}/mqdefault.jpg` : null}
+    />
   );
 }
 
