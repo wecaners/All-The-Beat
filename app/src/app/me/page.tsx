@@ -13,6 +13,7 @@ import { listMyEncores, listMyRequests, type MyEncoreItem, type MyRequestItem } 
 import { getProfile } from "@/server/profiles";
 import { signOutAction } from "./actions";
 import { LoginCard } from "./login-card";
+import { WithdrawButton } from "./withdraw-button";
 
 export const metadata: Metadata = { title: "마이 | 올빗", robots: { index: false, follow: false } };
 
@@ -81,9 +82,12 @@ async function MyContent() {
         )}
       </section>
 
-      <form action={signOutAction} className="mt-12 px-5">
-        <button className={stickerButtonClass({ variant: "soft", size: "md", display: false })}>로그아웃</button>
-      </form>
+      <div className="mt-12 grid grid-cols-2 gap-2.5 px-5">
+        <form action={signOutAction}>
+          <button className={stickerButtonClass({ variant: "soft", size: "md", display: false })}>로그아웃</button>
+        </form>
+        <WithdrawButton requestCount={requests.length} encoreCount={encores.length} isInstructor={instructor !== null} isAdmin={profile?.role === "admin"} />
+      </div>
       <LegalLinks />
     </>
   );

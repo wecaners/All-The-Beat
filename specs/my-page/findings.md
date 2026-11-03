@@ -73,6 +73,6 @@ Supabase 로그인 계정 삭제는 서버 전용 관리자 키(`sb_secret_`)가
 
 **결과**:
 
-보류 (사용자 결정 필요)
+2026-11-03 `specs/account-withdrawal`로 구현. 관리자 키 대신 DB 트랜잭션에서 `auth.users`를 지우고, 카카오 연결 끊기는 카카오 어드민 키(`KAKAO_ADMIN_KEY`)로 한다
 
 ## Learnings
