@@ -2,7 +2,17 @@ import { and, asc, count, desc, eq, gt, inArray, isNull, sql } from "drizzle-orm
 import { z } from "zod";
 import { getDb } from "@/db";
 import { artists, classes, classSongs, encoreRounds, events, instructorPlaces, instructorProfiles, regions, requests, songs } from "@/db/schema";
-import { classInput, type ClassInput, createClass, type CreateClassResult, type EncoreSource, getEncoreSource, guessBookingType, guessRegion } from "@/server/admin/classes";
+import {
+  classInput,
+  type ClassInput,
+  createClass,
+  type CreateClassResult,
+  type EncoreSource,
+  getEncoreSource,
+  guessBookingType,
+  guessRegion,
+  resolveTeaser,
+} from "@/server/admin/classes";
 import { type AdminEncoreDetail, listEncoresForAdmin, respondToEncore, setClassClosed } from "@/server/admin/encores";
 import { AdminInputError, kstDateTime, openRequestsForClass } from "@/server/admin/shared";
 import { activeEncoreCount } from "@/server/encores";
@@ -117,6 +127,7 @@ export async function updateMyClass(instructorId: number, classId: number, raw: 
   const startsAt = kstDateTime(input.date, input.startTime);
   const endsAt = kstDateTime(input.date, input.endTime);
   if (startsAt <= new Date()) throw new MyClassError("이미 지난 시간이에요");
+  const teaserVideoId = await resolveTeaser(input.teaserUrl).catch(toMyError);
 
   return getDb()
     .transaction(async (tx) => {
@@ -169,6 +180,7 @@ export async function updateMyClass(instructorId: number, classId: number, raw: 
           bookingUrl: input.bookingUrl,
           bookingType: input.bookingType ?? guessBookingType(input.bookingUrl),
           description: input.description,
+          teaserVideoId,
           updatedAt: sql`now()`,
           ...(scheduleChanged ? { scheduleChangedAt: sql`now()` } : {}),
         })

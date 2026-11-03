@@ -29,3 +29,4 @@
 | [account-withdrawal](account-withdrawal/) | 회원 탈퇴 (F-09, F-10) | 구현 완료, 실제 탈퇴·카카오 연결 끊기는 사용자 확인 대기 |
 | [instructor-claim](instructor-claim/) | 대리 등록 강사의 계정 연결 (F-19) | 구현 완료, 실제 흐름은 사용자 확인 대기 |
 | [teacher-profile](teacher-profile/) | 강사 프로필 페이지 (F-21) | 구현 완료 |
+| [class-teaser](class-teaser/) | 강사 티저 영상 (F-25) | 구현 완료, 실제 폼 입력은 사용자 확인 대기 |

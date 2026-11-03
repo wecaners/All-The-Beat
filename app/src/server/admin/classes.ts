@@ -16,6 +16,7 @@ import {
   regions,
   songs,
 } from "@/db/schema";
+import { resolveVideoId, VideoError } from "@/server/youtube";
 import { openEncoreRound } from "./encores";
 import { AdminInputError, kstDateTime, openRequestsForClass, todayKst, type Tx } from "./shared";
 
@@ -53,12 +54,23 @@ export const classInput = z
     bookingUrl: z.string().trim().url("예약 링크를 확인해 주세요").regex(/^https?:\/\//i, "예약 링크는 http(s) 주소여야 해요"),
     bookingType: z.enum(bookingType.enumValues).nullable(), // null = 주소로 추정
     description: optionalText(1000, "설명은 1,000자까지예요"),
+    teaserUrl: optionalText(300, "티저 영상 링크가 너무 길어요"), // F-25. 저장 전에 영상 ID로 바꾼다
     encoreOfClassId: z.number().int().positive().nullable().default(null), // 앵콜 클래스면 원 클래스 (F-24)
   })
   .refine((v) => v.date >= todayKst(), { message: "오늘 이후 날짜만 등록할 수 있어요", path: ["date"] })
   .refine((v) => v.endTime > v.startTime, { message: "종료 시간이 시작 시간보다 늦어야 해요", path: ["endTime"] })
   .refine((v) => v.placeId || (v.studioName && v.address), { message: "장소를 고르거나 스튜디오 이름과 주소를 넣어 주세요", path: ["studioName"] });
 export type ClassInput = z.infer<typeof classInput>;
+
+// 티저 영상 (F-25, specs/class-teaser): 비면 없음, 아니면 퍼갈 수 있는 YouTube 영상만. 트랜잭션 밖에서 확인한다
+export async function resolveTeaser(url: string | null): Promise<string | null> {
+  try {
+    return await resolveVideoId(url);
+  } catch (e) {
+    if (e instanceof VideoError) throw new AdminInputError(`티저 영상: ${e.message}`);
+    throw e;
+  }
+}
 
 // 예약 링크 주소로 유형 추정 (FR-11)
 export function guessBookingType(url: string): (typeof bookingType.enumValues)[number] {
@@ -112,6 +124,7 @@ export async function createClass(input: ClassInput, origin: { createdByAdmin: b
   const startsAt = kstDateTime(input.date, input.startTime);
   const endsAt = kstDateTime(input.date, input.endTime);
   if (startsAt <= new Date()) throw new AdminInputError("이미 지난 시간이에요");
+  const teaserVideoId = await resolveTeaser(input.teaserUrl);
 
   return getDb().transaction(async (tx) => {
     const [instructor] = await tx
@@ -175,6 +188,7 @@ export async function createClass(input: ClassInput, origin: { createdByAdmin: b
         bookingUrl: input.bookingUrl,
         bookingType: input.bookingType ?? guessBookingType(input.bookingUrl),
         description: input.description,
+        teaserVideoId,
         createdByAdmin: origin.createdByAdmin,
         encoreOfClassId: input.encoreOfClassId,
       })
@@ -238,6 +252,7 @@ export type EncoreSource = {
   bookingUrl: string;
   bookingType: (typeof bookingType.enumValues)[number];
   description: string | null;
+  teaserVideoId: string | null;
   startTime: string;
   endTime: string;
 };
@@ -260,6 +275,7 @@ export async function getEncoreSource(classId: number): Promise<EncoreSource | n
       bookingUrl: classes.bookingUrl,
       bookingType: classes.bookingType,
       description: classes.description,
+      teaserVideoId: classes.teaserVideoId,
       startTime: sql<string>`to_char(${classes.startsAt} at time zone 'Asia/Seoul', 'HH24:MI')`,
       endTime: sql<string>`to_char(${classes.endsAt} at time zone 'Asia/Seoul', 'HH24:MI')`,
     })

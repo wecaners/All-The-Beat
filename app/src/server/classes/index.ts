@@ -93,6 +93,8 @@ export type ClassDetail = {
   capacity: number | null;
   bookingType: (typeof bookingType.enumValues)[number];
   description: string | null;
+  /** 강사 티저 영상 (F-25). 있으면 맨 위에 대표 곡 영상 대신 */
+  teaserVideoId: string | null;
   status: ClassDisplayStatus;
   canBook: boolean;
   /** 사진·소개·포트폴리오는 대리 등록 강사면 사진·영상 게재 동의가 있을 때만 (FR-12) */
@@ -140,6 +142,7 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
       capacity: classes.capacity,
       bookingType: classes.bookingType,
       description: classes.description,
+      teaserVideoId: classes.teaserVideoId,
       status: classes.status,
       ended: classEnded,
       instructorName: instructorProfiles.displayName,
@@ -203,6 +206,7 @@ export async function getPublicClass(rawId: string): Promise<ClassDetail | null>
     capacity: row.capacity,
     bookingType: row.bookingType,
     description: row.description,
+    teaserVideoId: row.teaserVideoId,
     status,
     canBook: canBook(status),
     changedRecently: row.changedRecently,
