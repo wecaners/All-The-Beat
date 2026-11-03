@@ -45,7 +45,8 @@ export async function listInstructorsForAdmin(): Promise<AdminInstructorRow[]> {
       instagramHandle: instructorProfiles.instagramHandle,
       isProxy: instructorProfiles.isProxy,
       consentAt: instructorProfiles.consentAt,
-      classCount: sql<number>`(select count(*)::int from ${classes} where ${classes.instructorId} = ${instructorProfiles.id})`,
+      // 조인 없는 select라 drizzle이 칸에 테이블을 붙이지 않는다("id"가 classes.id로 풀림). 이름을 직접 쓴다
+      classCount: sql<number>`(select count(*)::int from ${classes} c where c.instructor_id = ${instructorProfiles}.id)`,
       status: instructorProfiles.status,
       createdAt: instructorProfiles.createdAt,
     })
