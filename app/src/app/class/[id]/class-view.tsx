@@ -13,6 +13,7 @@ import type { EncoreSummary, MyEncore } from "@/server/encores";
 import { CopyAddressButton } from "./copy-address";
 import { EncorePanel } from "./encore-panel";
 import { FavoriteButton } from "./favorite-button";
+import { StoryShareButton } from "./story-share-button";
 
 const STATUS_LABEL: Record<ClassDisplayStatus, { text: string; tone: "lime" | "butter" | "white" }> = {
   open: { text: "모집 중", tone: "lime" },
@@ -121,6 +122,15 @@ export function ClassView({ c, encore, favorite }: { c: ClassDetail; encore: Cla
             </p>
           </section>
         )}
+
+        {/* 인스타 스토리에 올릴 9:16 이미지 (F-23). 강사가 링크 스티커로 올빗 주소를 걸게 하는 장치 */}
+        <section className="mt-7">
+          <SectionTitle title="공유" zine="Share" />
+          <div className="mt-2.5">
+            <StoryShareButton classId={c.id} title={c.title} />
+            <p className="mt-1.5 text-[12px] font-semibold text-sub">곡·일시·권역이 들어간 스토리 이미지예요. 올린 뒤 링크 스티커에 이 클래스 주소를 붙여 주세요.</p>
+          </div>
+        </section>
 
         <InstructorSection c={c} />
         <PlaceSection c={c} />
