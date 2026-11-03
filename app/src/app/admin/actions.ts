@@ -4,7 +4,7 @@ import { refresh, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import type { z } from "zod";
 import { requireAdmin } from "@/lib/auth/admin";
-import { classInput, createClassByAdmin } from "@/server/admin/classes";
+import { adminCancelReason, cancelClassByAdmin, classInput, createClassByAdmin, endClass, setClassHidden, updateBookingUrl } from "@/server/admin/classes";
 import { respondToEncore, setClassClosed } from "@/server/admin/encores";
 import { approveInstructor, consentInput, createProxyInstructor, instructorInput, issueVerifyCode, recordConsent, rejectInput, rejectInstructor } from "@/server/admin/instructors";
 import { AdminInputError } from "@/server/admin/shared";
@@ -459,5 +459,52 @@ export async function mergeArtistAction(fromId: number, intoId: number): Promise
     return { ok: true, message: `합쳤어요. 곡 ${result.movedSongs}개, 별칭 ${result.movedAliases}개가 옮겨졌어요` };
   } catch (e) {
     return toState(e, "mergeArtist");
+  }
+}
+
+// ── 클래스 관리 (F-17, specs/admin-classes) ─────────────────────────────
+
+export async function setClassHiddenAction(classId: number, hidden: boolean): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    await setClassHidden(classId, hidden);
+    refresh();
+    return { ok: true, message: hidden ? "숨겼어요. 수강생 화면에서 빠져요" : "숨김을 풀었어요" };
+  } catch (e) {
+    return toState(e, "setClassHidden");
+  }
+}
+
+export async function updateBookingUrlAction(_prev: AdminActionState, fd: FormData): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    const { bookingType } = await updateBookingUrl(Number(text(fd, "classId")), text(fd, "bookingUrl"));
+    refresh();
+    return { ok: true, message: `예약 링크를 바꿨어요 (${bookingType})` };
+  } catch (e) {
+    return toState(e, "updateBookingUrl");
+  }
+}
+
+export async function endClassAction(classId: number): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    await endClass(classId);
+    refresh();
+    return { ok: true, message: "끝난 클래스로 바꿨어요" };
+  } catch (e) {
+    return toState(e, "endClass");
+  }
+}
+
+export async function cancelClassByAdminAction(classId: number, reason: string): Promise<AdminActionState> {
+  await requireAdmin();
+  try {
+    const parsed = parse(adminCancelReason, reason);
+    await cancelClassByAdmin(classId, parsed);
+    refresh();
+    return { ok: true, message: "취소했어요" };
+  } catch (e) {
+    return toState(e, "cancelClassByAdmin");
   }
 }

@@ -48,12 +48,28 @@ async function Overview() {
         </Link>
       )}
 
-      <Section title={`다가오는 클래스 ${classes.length}`} action={<Link href="/admin/classes/new" className={linkButtonClass}>+ 클래스</Link>}>
+      <Section
+        title={`다가오는 클래스 ${classes.length}`}
+        action={
+          <span className="flex gap-2">
+            <Link href="/admin/classes" className={linkButtonClass}>
+              전체 보기
+            </Link>
+            <Link href="/admin/classes/new" className={linkButtonClass}>
+              + 클래스
+            </Link>
+          </span>
+        }
+      >
         <Table head={["일시", "클래스", "강사", "권역", "공개", "상태"]} empty={classes.length === 0}>
           {classes.map((c) => (
             <tr key={c.id}>
               <Td>{KST_SHORT.format(c.startsAt)}</Td>
-              <Td>{c.title}</Td>
+              <Td>
+                <Link href={`/admin/classes/${c.id}`} className="underline">
+                  {c.title}
+                </Link>
+              </Td>
               <Td>{c.instructorName}</Td>
               <Td>{c.regionName}</Td>
               <Td>{c.isPublic ? "✅" : "⏸ 동의 전"}</Td>
