@@ -44,6 +44,11 @@ export const instructorProfiles = pgTable(
     verifyCodeExpiresAt: timestamptz(),
     approvedAt: timestamptz(),
     rejectedReason: text(),
+    // 대리 강사 가져오기 신청 (F-19, specs/instructor-claim). 코드는 verifyCode* 칸을 같이 쓴다. 확인되면 userId로 옮기고 비운다
+    claimUserId: uuid()
+      .unique()
+      .references(() => profiles.id, { onDelete: "set null" }),
+    claimRequestedAt: timestamptz(),
     createdAt: createdAt(),
   },
   (t) => [

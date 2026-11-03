@@ -8,7 +8,7 @@ import { stickerButtonClass } from "@/components/sticker-button";
 import { SongRow } from "@/components/song-row";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { formatShortDate } from "@/lib/format";
-import { getMyInstructor, type MyInstructor } from "@/server/instructors";
+import { getMyClaim, getMyInstructor, type MyClaim, type MyInstructor } from "@/server/instructors";
 import { listMyEncores, listMyRequests, type MyEncoreItem, type MyRequestItem } from "@/server/me";
 import { getProfile } from "@/server/profiles";
 import { signOutAction } from "./actions";
@@ -44,13 +44,19 @@ async function MyContent() {
       </>
     );
 
-  const [profile, requests, encores, instructor] = await Promise.all([getProfile(user.id), listMyRequests(user.id), listMyEncores(user.id), getMyInstructor(user.id)]);
+  const [profile, requests, encores, instructor, claim] = await Promise.all([
+    getProfile(user.id),
+    listMyRequests(user.id),
+    listMyEncores(user.id),
+    getMyInstructor(user.id),
+    getMyClaim(user.id),
+  ]);
 
   return (
     <>
       <p className="mt-4 px-5 font-display text-[28px] leading-tight">{profile?.nickname ?? "올빗 친구"}님</p>
       <p className="px-5 text-[13px] font-semibold text-sub">카카오로 로그인했어요</p>
-      <InstructorEntry me={instructor} />
+      <InstructorEntry me={instructor} claim={claim} />
 
       <section className="mt-8 px-5">
         <SectionTitle title="내 추가요" count={requests.length} />
@@ -94,8 +100,12 @@ async function MyContent() {
 }
 
 // 강사 신청 입구 또는 신청 상태 (F-10·F-11, specs/instructor-apply). 승인된 강사는 내 클래스로 (F-12, specs/instructor-classes)
-function InstructorEntry({ me }: { me: MyInstructor | null }) {
-  const text = !me
+// 대리 강사 가져오기 중이면 그 상태 (F-19, specs/instructor-claim)
+function InstructorEntry({ me, claim }: { me: MyInstructor | null; claim: MyClaim | null }) {
+  const claiming = claim !== null && (!me || me.status === "rejected");
+  const text = claiming
+    ? "강사 가져오기 · 인스타 본인 확인 기다리는 중"
+    : !me
     ? null
     : me.status === "pending"
       ? "강사 신청 · 인스타 본인 확인 기다리는 중"
@@ -109,8 +119,8 @@ function InstructorEntry({ me }: { me: MyInstructor | null }) {
   return (
     <Link href={me?.status === "approved" ? "/me/classes" : "/me/teacher/apply"} className="press sticker-edge mx-5 mt-5 flex items-center justify-between gap-3 rounded-2xl bg-butter px-4 py-3">
       <span className="min-w-0">
-        <span className="block font-display text-[17px]">{me ? text : "강사이신가요? 클래스를 올려보세요"}</span>
-        <span className="block text-[12px] font-semibold text-sub">{me?.status === "approved" ? "내 클래스 관리" : me ? "자세히 보기" : "무료 · 예약은 지금 쓰는 그대로"}</span>
+        <span className="block font-display text-[17px]">{text ?? "강사이신가요? 클래스를 올려보세요"}</span>
+        <span className="block text-[12px] font-semibold text-sub">{me?.status === "approved" ? "내 클래스 관리" : me || claiming ? "자세히 보기" : "무료 · 예약은 지금 쓰는 그대로"}</span>
       </span>
       <span aria-hidden className="font-display text-[20px]">›</span>
     </Link>

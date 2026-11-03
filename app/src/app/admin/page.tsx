@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { requireAdmin } from "@/lib/auth/admin";
 import { listUpcomingClassesForAdmin } from "@/server/admin/classes";
 import { countEncoresAwaitingResponse } from "@/server/admin/encores";
-import { listInstructorsForAdmin } from "@/server/admin/instructors";
+import { listInstructorsForAdmin, listPendingClaims } from "@/server/admin/instructors";
 import { getAdminMetrics } from "@/server/admin/metrics";
 
 import { countPendingSongs, listSongsForAdmin } from "@/server/admin/songs";
@@ -40,12 +40,13 @@ async function Metrics() {
 
 async function Overview() {
   await requireAdmin();
-  const [songs, instructors, classes, awaitingEncores, pendingSongs] = await Promise.all([
+  const [songs, instructors, classes, awaitingEncores, pendingSongs, pendingClaims] = await Promise.all([
     listSongsForAdmin(),
     listInstructorsForAdmin(),
     listUpcomingClassesForAdmin(),
     countEncoresAwaitingResponse(),
     countPendingSongs(),
+    listPendingClaims(),
   ]);
 
   return (
@@ -55,6 +56,12 @@ async function Overview() {
           검수 대기 곡 {pendingSongs}곡 — 중복이면 기존 곡으로 합쳐 주세요 ›
         </Link>
       )}
+      {/* 대리 강사 가져오기 신청 (F-19) */}
+      {pendingClaims.map((c) => (
+        <Link key={c.id} href={`/admin/instructors/${c.id}`} className="mt-6 block rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-900">
+          {c.displayName}(@{c.instagramHandle}) 가져오기 신청 — 강사 인스타로 코드를 보내 주세요 ›
+        </Link>
+      ))}
       {awaitingEncores > 0 && (
         <Link href="/admin/encores" className="mt-6 block rounded-lg bg-amber-50 p-3 text-sm font-semibold text-amber-900">
           기준 인원에 닿은 앵콜 {awaitingEncores}건 — 강사님께 전하고 답을 남겨 주세요 ›
@@ -108,7 +115,7 @@ async function Overview() {
                 </Link>
               </Td>
               <Td>@{i.instagramHandle}</Td>
-              <Td>{i.isProxy ? "대리" : INSTRUCTOR_STATUS_TEXT[i.status]}</Td>
+              <Td>{i.isProxy ? (i.hasClaim ? "대리 · ⏳ 가져오기 신청" : "대리") : INSTRUCTOR_STATUS_TEXT[i.status]}</Td>
               <Td>{!i.isProxy ? "직접 가입" : i.consentAt ? "✅" : "⏸ 없음"}</Td>
               <Td>{i.classCount}</Td>
             </tr>

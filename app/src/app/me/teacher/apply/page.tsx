@@ -6,9 +6,10 @@ import { Suspense } from "react";
 import { Logo } from "@/components/logo";
 import { stickerButtonClass } from "@/components/sticker-button";
 import { getCurrentUser } from "@/lib/auth/current-user";
-import { getMyInstructor } from "@/server/instructors";
+import { getMyClaim, getMyInstructor } from "@/server/instructors";
 import { listRegions } from "@/server/regions";
 import { ApplyForm } from "./apply-form";
+import { ClaimStatusView } from "./claim-view";
 import { StatusView } from "./status-view";
 
 export const metadata: Metadata = { title: "강사 신청 | 올빗", robots: { index: false, follow: false } };
@@ -39,7 +40,20 @@ export default function ApplyPage() {
 async function Content() {
   const user = await getCurrentUser();
   if (!user) redirect("/me");
-  const [me, regions] = await Promise.all([getMyInstructor(user.id), getRegions()]);
+  const [me, claim, regions] = await Promise.all([getMyInstructor(user.id), getMyClaim(user.id), getRegions()]);
+
+  // 대리 강사 가져오기 중이면 그 진행 상태 (F-19)
+  if (claim && (!me || me.status === "rejected")) {
+    return (
+      <div className="px-5">
+        <h1 className="mt-4 font-display text-[28px] leading-tight">
+          {claim.displayName} <span className="mark-lime">가져오기</span>
+        </h1>
+        <p className="mt-1 text-[13px] font-semibold text-sub">지금 어디까지 왔는지 보여드려요</p>
+        <ClaimStatusView claim={claim} />
+      </div>
+    );
+  }
 
   // 없거나 반려됐으면 폼, 아니면 상태
   if (!me || me.status === "rejected") {
