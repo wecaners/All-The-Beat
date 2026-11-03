@@ -49,6 +49,7 @@
 | `PhotoStrip` | 작은 사진 목록 + 크게 보기(`<dialog>`, 넘기기·닫기·Esc·뒤로 가기) |
 | `Lightstick` | 응원봉 스티커(앵콜). `glow`면 머리 뒤가 빛난다 |
 | `Celebration`, `Toast` | 감정 순간 오버레이, 짧은 안내 |
+| `LegalDoc` | 약관·개인정보처리방침 문서 틀(`Section`, `List`, 빈칸 `Blank`) |
 | `motion.ts` | `play`, `confetti`, `buzz`, `reducedMotion`, `stagger` |
 
 ## 움직임

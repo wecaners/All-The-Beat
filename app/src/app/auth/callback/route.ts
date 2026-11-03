@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { safeNextPath } from "@/lib/safe-next";
 import { createClient } from "@/lib/supabase/server";
+import { consentPath } from "@/lib/consent-path";
+import { hasConsented } from "@/server/consent";
 import { upsertProfileOnLogin } from "@/server/profiles";
 
 // 카카오 → Supabase Auth → 여기로 돌아온다. 인가 코드를 세션으로 바꾸고 원래 화면으로 보낸다 (08 문서 2.2)
@@ -24,6 +26,11 @@ export async function GET(request: Request) {
       // 프로필 없이 로그인만 된 상태를 남기지 않는다
       await supabase.auth.signOut();
       return redirectToError(url.origin, { reason: "profile_failed", detail: "잠시 후 다시 로그인해 주세요", next });
+    }
+
+    // 첫 로그인(약관 미동의)이면 원래 화면 대신 동의 화면으로. 동의하면 거기서 next로 간다 (08 문서 2.2, specs/terms-consent)
+    if (!(await hasConsented(data.user.id))) {
+      return NextResponse.redirect(new URL(consentPath(next), url.origin));
     }
 
     return NextResponse.redirect(new URL(next, url.origin));

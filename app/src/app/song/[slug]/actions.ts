@@ -2,11 +2,13 @@
 
 import { refresh } from "next/cache";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { hasConsented } from "@/server/consent";
 import { ensureProfile } from "@/server/profiles";
 import { cancelRequest, RequestError, requestInput, saveRequest } from "@/server/requests";
 
 // isNew: 첫 추가요(완료 순간을 보여줄지), position: 몇 번째로 기다리는지 (서버 계산)
-export type RequestActionState = { ok: boolean; error?: string; isNew?: boolean; position?: number };
+// consentRequired: 약관 동의 전이라 저장하지 않았다. 화면이 동의 화면으로 보낸다 (specs/terms-consent FR-5)
+export type RequestActionState = { ok: boolean; error?: string; consentRequired?: boolean; isNew?: boolean; position?: number };
 
 // 서버 액션은 화면 밖에서도 POST로 호출될 수 있다. 로그인·입력은 여기서 다시 검사한다
 export async function saveRequestAction(
@@ -30,6 +32,7 @@ export async function saveRequestAction(
   let saved: Awaited<ReturnType<typeof saveRequest>>;
   try {
     await ensureProfile(user.id, user.metadata);
+    if (!(await hasConsented(user.id))) return { ok: false, consentRequired: true, error: "약관 동의가 필요해요" };
     saved = await saveRequest(user.id, songId, parsed.data);
   } catch (e) {
     if (e instanceof RequestError) return { ok: false, error: e.message };

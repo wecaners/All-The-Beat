@@ -32,7 +32,13 @@ export default function MyPage() {
 // 로그인 상태와 내 요청은 요청마다 다르다 (getCurrentUser가 connection() 뒤에 읽는다)
 async function MyContent() {
   const user = await getCurrentUser();
-  if (!user) return <LoginCard />;
+  if (!user)
+    return (
+      <>
+        <LoginCard />
+        <LegalLinks />
+      </>
+    );
 
   const [profile, requests, encores] = await Promise.all([getProfile(user.id), listMyRequests(user.id), listMyEncores(user.id)]);
 
@@ -74,7 +80,22 @@ async function MyContent() {
       <form action={signOutAction} className="mt-12 px-5">
         <button className={stickerButtonClass({ variant: "soft", size: "md", display: false })}>로그아웃</button>
       </form>
+      <LegalLinks />
     </>
+  );
+}
+
+// 약관 보기 (F-10). 로그인 전·후 모두 보인다
+function LegalLinks() {
+  return (
+    <p className="mt-6 flex justify-center gap-4 px-5 text-[12px] font-bold text-sub">
+      <Link href="/terms" className="underline underline-offset-2">
+        이용약관
+      </Link>
+      <Link href="/privacy" className="underline underline-offset-2">
+        개인정보처리방침
+      </Link>
+    </p>
   );
 }
 
