@@ -32,7 +32,8 @@ export type AdminEncoreDetail = AdminEncoreRow & {
 };
 
 // 응답이 필요한 앵콜(전달됨·검토 중)과 모으는 중인 앵콜
-export async function listEncoresForAdmin(): Promise<{ needsResponse: AdminEncoreDetail[]; collecting: AdminEncoreRow[] }> {
+// instructorId를 주면 그 강사의 앵콜만 (강사의 내 클래스, specs/instructor-classes)
+export async function listEncoresForAdmin(instructorId?: number): Promise<{ needsResponse: AdminEncoreDetail[]; collecting: AdminEncoreRow[] }> {
   const db = getDb();
   const rows: AdminEncoreRow[] = await db
     .select({
@@ -53,7 +54,7 @@ export async function listEncoresForAdmin(): Promise<{ needsResponse: AdminEncor
     .from(encoreRounds)
     .innerJoin(classes, eq(classes.id, encoreRounds.classId))
     .innerJoin(instructorProfiles, eq(instructorProfiles.id, classes.instructorId))
-    .where(inArray(encoreRounds.status, ["collecting", "delivered", "reviewing"]))
+    .where(and(inArray(encoreRounds.status, ["collecting", "delivered", "reviewing"]), instructorId ? eq(classes.instructorId, instructorId) : undefined))
     .orderBy(desc(encoreRounds.reachedAt), desc(classes.startsAt));
 
   const needs = rows.filter((r) => r.status === "delivered" || r.status === "reviewing");

@@ -89,7 +89,7 @@ async function MyContent() {
   );
 }
 
-// 강사 신청 입구 또는 신청 상태 (F-10·F-11, specs/instructor-apply). 내 클래스(F-12)는 아직 없어 승인됐다는 것까지만
+// 강사 신청 입구 또는 신청 상태 (F-10·F-11, specs/instructor-apply). 승인된 강사는 내 클래스로 (F-12, specs/instructor-classes)
 function InstructorEntry({ me }: { me: MyInstructor | null }) {
   const text = !me
     ? null
@@ -103,10 +103,10 @@ function InstructorEntry({ me }: { me: MyInstructor | null }) {
             ? "강사 신청 · 이번엔 승인이 어려웠어요"
             : "강사 계정이 정지됐어요";
   return (
-    <Link href="/me/teacher/apply" className="press sticker-edge mx-5 mt-5 flex items-center justify-between gap-3 rounded-2xl bg-butter px-4 py-3">
+    <Link href={me?.status === "approved" ? "/me/classes" : "/me/teacher/apply"} className="press sticker-edge mx-5 mt-5 flex items-center justify-between gap-3 rounded-2xl bg-butter px-4 py-3">
       <span className="min-w-0">
         <span className="block font-display text-[17px]">{me ? text : "강사이신가요? 클래스를 올려보세요"}</span>
-        <span className="block text-[12px] font-semibold text-sub">{me ? "자세히 보기" : "무료 · 예약은 지금 쓰는 그대로"}</span>
+        <span className="block text-[12px] font-semibold text-sub">{me?.status === "approved" ? "내 클래스 관리" : me ? "자세히 보기" : "무료 · 예약은 지금 쓰는 그대로"}</span>
       </span>
       <span aria-hidden className="font-display text-[20px]">›</span>
     </Link>

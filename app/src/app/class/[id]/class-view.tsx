@@ -57,6 +57,12 @@ export function ClassView({ c, encore }: { c: ClassDetail; encore: ClassEncore |
           <StickerLabel tone="sky" tilt={2}>
             {LEVEL_LABEL[c.level]}
           </StickerLabel>
+          {/* 강사가 일시·장소를 바꾼 지 24시간 안 (F-12) */}
+          {c.changedRecently && (
+            <StickerLabel tone="pink" tilt={3}>
+              일시·장소 변경됨
+            </StickerLabel>
+          )}
           {c.encoreOfClassId && (
             <Link href={`/class/${c.encoreOfClassId}`} className="press inline-block -rotate-2 rounded-full border-2 border-ink bg-lilac px-2.5 py-0.5 text-[11px] font-black leading-tight">
               앵콜 클래스 · 원래 클래스 보기 ›

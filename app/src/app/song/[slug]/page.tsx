@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { cacheLife, cacheTag } from "next/cache";
 import { notFound, permanentRedirect } from "next/navigation";
 import { connection } from "next/server";
@@ -6,11 +7,13 @@ import { Suspense } from "react";
 import { ClassTicket } from "@/components/class-ticket";
 import { Logo } from "@/components/logo";
 import { stagger } from "@/components/motion";
+import { stickerButtonClass } from "@/components/sticker-button";
 import { StickerLabel } from "@/components/sticker-label";
 import { Tape } from "@/components/tape";
 import { Twinkle } from "@/components/twinkle";
 import { VideoCard } from "@/components/video-card";
 import { getCurrentUser } from "@/lib/auth/current-user";
+import { getApprovedInstructorId } from "@/server/instructors/classes";
 import { formatPrice, formatTimeRange, LEVEL_LABEL, VIDEO_TYPE_ZINE } from "@/lib/format";
 import { listUpcomingClassesForSong } from "@/server/classes";
 import { listRegions } from "@/server/regions";
@@ -128,13 +131,21 @@ function SongHeader({ song }: { song: SongDetail }) {
 // 로그인 상태·내 추가요는 요청마다 다르다 → Suspense 안에서 매번 읽는다
 async function RequestSection({ song }: { song: SongDetail }) {
   const user = await getCurrentUser();
-  const [summary, myRequest, regions] = await Promise.all([
+  const [summary, myRequest, regions, instructorId] = await Promise.all([
     getRequestSummary(song.id),
     user ? getMyRequest(user.id, song.id) : Promise.resolve(null),
     getRegions(),
+    user ? getApprovedInstructorId(user.id) : Promise.resolve(null),
   ]);
 
   return (
+    <>
+      {/* 승인된 강사에게만: 수요를 보고 바로 연다 (플로우 5, specs/instructor-classes FR-11) */}
+      {instructorId && (
+        <Link href={`/me/classes/new?song=${encodeURIComponent(song.slug)}`} className={`mt-7 ${stickerButtonClass({ variant: "ink", size: "md" })}`}>
+          이 곡으로 클래스 열기
+        </Link>
+      )}
     <RequestPanel
       songId={song.id}
       songTitle={song.title}
@@ -143,6 +154,7 @@ async function RequestSection({ song }: { song: SongDetail }) {
       myRequest={myRequest}
       regions={regions}
     />
+    </>
   );
 }
 

@@ -98,8 +98,16 @@ export async function listPlacesForInstructor(instructorId: number): Promise<Adm
     .orderBy(sql`${instructorPlaces.lastUsedAt} desc nulls last`, desc(instructorPlaces.id));
 }
 
+export type CreateClassResult = { id: number; isPublic: boolean; openedRequests: number; isEncore: boolean };
+
 // 클래스 대리 등록 (F-15). 공개 조건을 만족하면 그 자리에서 추가요를 연다 (FR-14)
-export async function createClassByAdmin(input: ClassInput): Promise<{ id: number; isPublic: boolean; openedRequests: number; isEncore: boolean }> {
+export async function createClassByAdmin(input: ClassInput): Promise<CreateClassResult> {
+  return createClass(input, { createdByAdmin: true });
+}
+
+// 클래스 등록의 공통 규칙. 운영자 대리 등록과 강사 직접 등록(F-12, specs/instructor-classes)이 같이 쓴다.
+// 강사 쪽은 instructorId를 자기 것으로 고정해서 부른다
+export async function createClass(input: ClassInput, origin: { createdByAdmin: boolean }): Promise<CreateClassResult> {
   const startsAt = kstDateTime(input.date, input.startTime);
   const endsAt = kstDateTime(input.date, input.endTime);
   if (startsAt <= new Date()) throw new AdminInputError("이미 지난 시간이에요");
@@ -166,7 +174,7 @@ export async function createClassByAdmin(input: ClassInput): Promise<{ id: numbe
         bookingUrl: input.bookingUrl,
         bookingType: input.bookingType ?? guessBookingType(input.bookingUrl),
         description: input.description,
-        createdByAdmin: true,
+        createdByAdmin: origin.createdByAdmin,
         encoreOfClassId: input.encoreOfClassId,
       })
       .returning({ id: classes.id });
