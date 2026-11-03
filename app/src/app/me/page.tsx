@@ -8,6 +8,7 @@ import { stickerButtonClass } from "@/components/sticker-button";
 import { SongRow } from "@/components/song-row";
 import { getCurrentUser } from "@/lib/auth/current-user";
 import { formatShortDate } from "@/lib/format";
+import { getMyInstructor, type MyInstructor } from "@/server/instructors";
 import { listMyEncores, listMyRequests, type MyEncoreItem, type MyRequestItem } from "@/server/me";
 import { getProfile } from "@/server/profiles";
 import { signOutAction } from "./actions";
@@ -42,12 +43,13 @@ async function MyContent() {
       </>
     );
 
-  const [profile, requests, encores] = await Promise.all([getProfile(user.id), listMyRequests(user.id), listMyEncores(user.id)]);
+  const [profile, requests, encores, instructor] = await Promise.all([getProfile(user.id), listMyRequests(user.id), listMyEncores(user.id), getMyInstructor(user.id)]);
 
   return (
     <>
       <p className="mt-4 px-5 font-display text-[28px] leading-tight">{profile?.nickname ?? "올빗 친구"}님</p>
       <p className="px-5 text-[13px] font-semibold text-sub">카카오로 로그인했어요</p>
+      <InstructorEntry me={instructor} />
 
       <section className="mt-8 px-5">
         <SectionTitle title="내 추가요" count={requests.length} />
@@ -84,6 +86,30 @@ async function MyContent() {
       </form>
       <LegalLinks />
     </>
+  );
+}
+
+// 강사 신청 입구 또는 신청 상태 (F-10·F-11, specs/instructor-apply). 내 클래스(F-12)는 아직 없어 승인됐다는 것까지만
+function InstructorEntry({ me }: { me: MyInstructor | null }) {
+  const text = !me
+    ? null
+    : me.status === "pending"
+      ? "강사 신청 · 인스타 본인 확인 기다리는 중"
+      : me.status === "verified"
+        ? "강사 신청 · 확인됐어요, 운영자 승인 기다리는 중"
+        : me.status === "approved"
+          ? "강사로 승인됐어요"
+          : me.status === "rejected"
+            ? "강사 신청 · 이번엔 승인이 어려웠어요"
+            : "강사 계정이 정지됐어요";
+  return (
+    <Link href="/me/teacher/apply" className="press sticker-edge mx-5 mt-5 flex items-center justify-between gap-3 rounded-2xl bg-butter px-4 py-3">
+      <span className="min-w-0">
+        <span className="block font-display text-[17px]">{me ? text : "강사이신가요? 클래스를 올려보세요"}</span>
+        <span className="block text-[12px] font-semibold text-sub">{me ? "자세히 보기" : "무료 · 예약은 지금 쓰는 그대로"}</span>
+      </span>
+      <span aria-hidden className="font-display text-[20px]">›</span>
+    </Link>
   );
 }
 

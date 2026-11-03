@@ -7,6 +7,8 @@ import { getInstructorMediaForAdmin, listStudiosForAdmin } from "@/server/admin/
 import { listRegions } from "@/server/regions";
 import { todayKst } from "@/server/admin/shared";
 import { linkButtonClass, Section } from "../../ui";
+import { approveInstructorAction } from "../../actions";
+import { ApproveButton, IssueCodeButton, RejectForm } from "../apply-forms";
 import { ConsentForm } from "../instructor-forms";
 import { InstructorMediaForm } from "../profile-forms";
 import { StudioCard, StudioPicker } from "../studio-forms";
@@ -14,6 +16,7 @@ import { StudioCard, StudioPicker } from "../studio-forms";
 type Props = { params: Promise<{ id: string }> };
 
 const KST_DATE = new Intl.DateTimeFormat("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric" });
+const APPLY_STATUS_TEXT = { pending: "승인 대기", verified: "확인됨 · 승인 대기", approved: "승인", rejected: "반려", suspended: "정지" } as const;
 
 export default function InstructorPage({ params }: Props) {
   return (
@@ -61,6 +64,52 @@ async function Instructor({ params }: Props) {
           </dd>
         </dl>
       </Section>
+
+      {!instructor.isProxy && (
+        <Section title="강사 신청 (F-14)">
+          <dl className="grid grid-cols-[6rem_1fr] gap-y-1 text-sm">
+            <dt className="text-zinc-500">상태</dt>
+            <dd>{APPLY_STATUS_TEXT[instructor.status]}</dd>
+            <dt className="text-zinc-500">신청일</dt>
+            <dd>{KST_DATE.format(instructor.createdAt)}</dd>
+            <dt className="text-zinc-500">소개</dt>
+            <dd>{instructor.bio ?? "—"}</dd>
+            {instructor.status === "pending" && (
+              <>
+                <dt className="text-zinc-500">인증 코드</dt>
+                <dd>{instructor.codeValid ? "발급됨 (24시간 안)" : "없음 또는 만료"}</dd>
+              </>
+            )}
+            {instructor.status === "approved" && instructor.approvedAt && (
+              <>
+                <dt className="text-zinc-500">승인일</dt>
+                <dd>{KST_DATE.format(instructor.approvedAt)}</dd>
+              </>
+            )}
+            {instructor.status === "rejected" && (
+              <>
+                <dt className="text-zinc-500">반려 사유</dt>
+                <dd>{instructor.rejectedReason}</dd>
+              </>
+            )}
+          </dl>
+          {instructor.status === "pending" && (
+            <div className="mt-4">
+              <p className="mb-2 text-sm text-zinc-500">코드를 발급해 강사 인스타(@{instructor.instagramHandle})로 DM을 보내 주세요. 강사가 마이에서 넣으면 &quot;확인됨&quot;이 돼요.</p>
+              <IssueCodeButton instructorId={instructor.id} hasValidCode={instructor.codeValid} />
+            </div>
+          )}
+          {(instructor.status === "pending" || instructor.status === "verified") && (
+            <div className="mt-6 space-y-4 border-t border-zinc-200 pt-4">
+              <div>
+                <p className="mb-2 text-sm text-zinc-500">{instructor.status === "verified" ? "본인 확인이 끝났어요." : "아직 확인 전이에요. DM으로 이미 확인했다면 바로 승인해도 돼요."}</p>
+                <ApproveButton instructorId={instructor.id} run={approveInstructorAction} />
+              </div>
+              <RejectForm instructorId={instructor.id} />
+            </div>
+          )}
+        </Section>
+      )}
 
       {instructor.isProxy && (
         <Section title="게재 동의 기록">

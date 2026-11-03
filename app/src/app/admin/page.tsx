@@ -4,6 +4,9 @@ import { requireAdmin } from "@/lib/auth/admin";
 import { listUpcomingClassesForAdmin } from "@/server/admin/classes";
 import { countEncoresAwaitingResponse } from "@/server/admin/encores";
 import { listInstructorsForAdmin } from "@/server/admin/instructors";
+
+// 직접 신청한 강사의 상태 (F-14). 대기·확인됨은 승인을 기다리는 것
+const INSTRUCTOR_STATUS_TEXT = { pending: "⏳ 승인 대기", verified: "⏳ 확인됨 · 승인 대기", approved: "승인", rejected: "반려", suspended: "정지" } as const;
 import { listSongsForAdmin } from "@/server/admin/songs";
 import { ActionButton } from "./action-button";
 import { setClassClosedAction } from "./actions";
@@ -60,7 +63,7 @@ async function Overview() {
       </Section>
 
       <Section title={`강사 ${instructors.length}`} action={<Link href="/admin/instructors/new" className={linkButtonClass}>+ 강사</Link>}>
-        <Table head={["활동명", "인스타", "게재 동의", "클래스"]} empty={instructors.length === 0}>
+        <Table head={["활동명", "인스타", "상태", "게재 동의", "클래스"]} empty={instructors.length === 0}>
           {instructors.map((i) => (
             <tr key={i.id}>
               <Td>
@@ -69,6 +72,7 @@ async function Overview() {
                 </Link>
               </Td>
               <Td>@{i.instagramHandle}</Td>
+              <Td>{i.isProxy ? "대리" : INSTRUCTOR_STATUS_TEXT[i.status]}</Td>
               <Td>{!i.isProxy ? "직접 가입" : i.consentAt ? "✅" : "⏸ 없음"}</Td>
               <Td>{i.classCount}</Td>
             </tr>
