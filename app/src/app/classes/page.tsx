@@ -93,14 +93,32 @@ function Filters({ query, regions, search }: { query: ClassListQuery; regions: R
   const custom = query.date && !(DATE_PRESETS as readonly string[]).includes(query.date) ? query.date : null;
   return (
     <div className="mt-3">
-      {query.q && (
-        <p className="px-5 text-[13px] font-semibold text-sub">
-          <b className="text-ink">“{query.q}”</b> 클래스 ·{" "}
-          <Link href={href({ q: "" })} className="underline underline-offset-2">
-            검색어 지우기
+      {/* 검색 입구 (04 IA: 목록 상단 → U-02). 누르면 지금 검색어를 담아 검색 화면으로, 지우기는 칸 안의 버튼 */}
+      <div className="relative mx-5 mb-1.5">
+        <Link
+          href={query.q ? `/search?q=${encodeURIComponent(query.q)}` : "/search"}
+          aria-label={query.q ? `검색어 ${query.q} 바꾸기` : "곡이나 아티스트 검색"}
+          className={`press sticker-edge flex items-center gap-2.5 rounded-full bg-card py-3 pl-5 text-[16px] font-bold ${query.q ? "pr-14 text-ink" : "pr-5 text-sub"}`}
+        >
+          <svg aria-hidden width="18" height="18" viewBox="0 0 24 24" className="flex-none text-ink">
+            <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="2.4" />
+            <path d="M15.5 15.5 L21 21" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
+          </svg>
+          <span className="min-w-0 truncate">{query.q || "추고 싶은 곡이나 아티스트"}</span>
+        </Link>
+        {query.q && (
+          <Link
+            href={href({ q: "" })}
+            scroll={false}
+            aria-label="검색어 지우기"
+            className="press absolute top-1/2 right-2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border-2 border-ink bg-paper shadow-sticker-sm"
+          >
+            <svg aria-hidden width="14" height="14" viewBox="0 0 24 24">
+              <path d="M5 5 L19 19 M19 5 L5 19" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" />
+            </svg>
           </Link>
-        </p>
-      )}
+        )}
+      </div>
       <nav aria-label="날짜" className={row}>
         {DATE_PRESETS.map((d) => (
           <Link key={d} href={href({ date: query.date === d ? null : d })} scroll={false} aria-pressed={query.date === d} className={chip(query.date === d)}>
@@ -173,6 +191,7 @@ async function Empty({ query }: { query: ClassListQuery }) {
 function ListSkeleton() {
   return (
     <div className="animate-pulse px-5 pt-3">
+      <div className="mb-4 h-12 w-full rounded-full border-2 border-ink/20 bg-card" />
       <div className="flex gap-2">
         <div className="h-9 w-14 rounded-full border-2 border-ink/20 bg-card" />
         <div className="h-9 w-20 rounded-full border-2 border-ink/20 bg-card" />
