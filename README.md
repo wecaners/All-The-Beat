@@ -2,30 +2,28 @@
 
 **지금 뜨는 K-pop 곡의 원데이 댄스 클래스를 곡으로 찾고, 없으면 "추가요!"로 열어 달라고 요청하는 모바일 웹**
 
-| | |
-| --- | --- |
-| 서비스 | https://all-the-beat.vercel.app |
-| 기간 | 2026.10.26 ~ 진행 중 |
-| 역할 | 개인 프로젝트 — 설계·디자인·풀스택 개발·배포 1인 (커밋 72개 전부 본인) |
-| 스택 | Next.js 16 (App Router) · TypeScript · Supabase (Postgres · Auth · Storage) · Drizzle ORM · Tailwind CSS · Vercel · Claude Code |
-
-| 기능 | 화면 | DB 테이블 | 설계 문서 | 커밋 |
-| --- | --- | --- | --- | --- |
-| 21개, 기능마다 [스펙 6종](specs/) | 28개 (수강생·강사·운영자) | [18개](docs/09-ERD.md) | [10종](#문서) | 72개 |
+서비스 https://all-the-beat.vercel.app · [기획서](docs/01-기획서_One-pager.md) · [설계 문서](#문서) · [실행 방법](docs/DEVELOPMENT.md)
 
 | 홈 | 곡 상세 · 추가요 | 클래스 목록 | 클래스 상세 |
 | --- | --- | --- | --- |
 | <img src="docs/portfolio/1-home.png" width="200"> | <img src="docs/portfolio/2-song.png" width="200"> | <img src="docs/portfolio/3-classes.png" width="200"> | <img src="docs/portfolio/4-class.png" width="200"> |
 
+<sup>화면의 클래스·강사는 샘플 데이터입니다.</sup>
+
+| | |
+| --- | --- |
+| 기간 | 2026.10.26 ~ 진행 중 — 첫 커밋부터 9일 만에 MVP 배포 |
+| 역할 | 개인 프로젝트. 리서치 → 기획 → 명세 → 와이어프레임 → ERD → 디자인 → 구현 → 배포를 혼자 |
+| 규모 | 기능 스펙 [24건](specs/)(각 6종 문서) · 화면 29개(수강생·강사·운영자) · PR 29개 · 커밋 82개 |
+| 스택 | Next.js 16 (App Router) · TypeScript · Supabase (Postgres · Auth · Storage) · Drizzle ORM · Tailwind CSS · Vercel · Claude Code |
+
 ## 어떤 문제를 푸나
 
-개인 댄스 강사의 원데이 클래스는 인스타 스토리로 공지되고 DM으로 접수됩니다. 수강생은 **어떤 곡의 클래스가 이번 주 어디서 열리는지** 한눈에 볼 곳이 없고, 원하는 곡은 댓글로 "이거 해 주세요"라고 적을 수밖에 없습니다. 강사는 어떤 곡을 열어야 사람이 올지 감으로 정합니다.
+개인 댄스 강사의 원데이 클래스는 인스타 스토리로 공지되고 DM으로 접수된다. 수강생은 **어떤 곡의 클래스가 이번 주 어디서 열리는지** 한눈에 볼 곳이 없고, 원하는 곡은 댓글로 "이거 해 주세요"라고 적을 수밖에 없다. 강사는 어떤 곡을 열어야 사람이 올지 감으로 정한다.
 
 1. **곡으로 찾는다** — 곡·아티스트로 검색하면 이번 주 서울의 클래스가 날짜·지역순으로 나온다
 2. **요청하면 열린다** — 원하는 곡에 "추가요!"를 누르면 같은 곡 요청이 합산되고, 강사는 "이 곡 37명, 홍대권 20명"을 보고 클래스를 연다. 마감된 클래스는 "앵콜!"로 재오픈 요청
-3. **강사는 하던 대로** — 예약·결제는 강사가 쓰던 네이버 예약·오픈채팅 링크로 보낸다
-
-자세한 내용은 [기획서](docs/01-기획서_One-pager.md).
+3. **강사는 하던 대로** — 예약·결제는 강사가 쓰던 네이버 예약·오픈채팅 링크로 보낸다. 인스타를 대체하지 않고 노출 채널을 하나 더 준다
 
 ## 주요 결정과 이유
 
@@ -33,7 +31,7 @@
 MVP의 서버 일은 폼 저장·목록 조회·집계·하루 1회 배치뿐이라 별도 서버는 일만 두 배로 만든다. Next.js 풀스택 + Supabase로 정하고, 비즈니스 규칙은 `app/src/server/`에 Next.js를 import하지 않는 순수 TypeScript로만 두었다. 서버 액션과 Route Handler는 그 함수를 부르기만 한다. 네이티브 앱이나 결제가 붙으면 이 폴더만 별도 서비스로 옮기면 된다.
 
 **ORM은 Drizzle.**
-ERD가 부분 인덱스 4개, CHECK 제약, RLS 정책, `pg_trgm` 검색 인덱스를 쓴다. Prisma는 이 중 일부를 마이그레이션 SQL에 손으로 넣어야 해서 스키마가 두 군데로 갈라진다. Drizzle은 TypeScript 스키마 한 곳에 전부 담긴다.
+ERD가 부분 인덱스, CHECK 제약, RLS 정책, `pg_trgm` 검색 인덱스를 쓴다. Prisma는 이 중 일부를 마이그레이션 SQL에 손으로 넣어야 해서 스키마가 두 군데로 갈라진다. Drizzle은 TypeScript 스키마 한 곳에 전부 담긴다.
 
 **DB는 서버만 만진다.** ([08 아키텍처](docs/08-시스템아키텍처.md) 3절)
 모든 테이블에 RLS를 켜고 브라우저용 정책은 하나도 두지 않았다. 공개 키가 새도 DB에 직접 접근할 수 없다. 권한 검사는 `src/server`의 각 함수가 먼저 하고, 이미지는 서버 액션이 운영자 세션으로만 올리며 저장소 정책도 운영자만 허용한다.
@@ -47,23 +45,35 @@ ERD가 부분 인덱스 4개, CHECK 제약, RLS 정책, `pg_trgm` 검색 인덱�
 **디자인은 시안 4라운드로 정했다.** ([design/](design/README.md))
 다크·네온 / 스티커 키치 / 흑백 팬진 세 방향을 HTML로 비교해 "덕질 스크랩북"으로 정했다. 곡은 기울어진 포토카드, 클래스는 절취선 티켓. 3D 에셋 시안도 만들었지만 평면 스티커 언어와 어울리지 않아 버렸다.
 
-## AI와 함께 개발하는 방식
+## AI와 함께 9일 만에 만든 방법
 
-Claude Code를 동업자로 두고, AI가 맥락을 잃거나 범위를 넘지 않도록 규칙부터 만들었다. 자세한 구조는 아래 [AI와 함께 개발하는 규칙](#ai와-함께-개발하는-규칙-fbpw).
+Claude Code를 동업자로 두되, AI가 맥락을 잃거나 범위를 넘지 않도록 **규칙을 먼저 만들고 코드를 나중에 썼다.** 속도는 규칙에서 나왔다.
 
-- **규칙 파일** — [`AGENTS.md`](AGENTS.md)가 출발점. 최우선 원칙·제품·기술 스택·코딩·디자인 다섯 파일로 나눠 세션마다 자동으로 읽힌다
-- **기능마다 스펙 6종** — README(왜) → spec(요구사항·성공 기준) → plan(구현 단계)을 한 파일씩 쓰고 리뷰한 뒤 넘어간다. 구현 중에는 tasks·findings·progress로 진행과 결정을 남긴다. 21개 기능 모두 6종이 있다
+- **규칙 파일** — [`AGENTS.md`](AGENTS.md)가 출발점. 최우선 원칙·제품·기술 스택·코딩·디자인 다섯 파일로 나눠 세션마다 자동으로 읽힌다 ([_agent/rules/](_agent/rules/))
+- **기능마다 스펙 6종** — README(왜) → spec(요구사항·성공 기준) → plan(구현 단계)을 한 파일씩 쓰고 리뷰한 뒤 넘어간다. 구현 중에는 tasks·findings·progress로 진행과 결정을 남긴다. [specs/](specs/)의 24개 기능 모두 6종이 있다
 - **되돌릴 수 없는 일 앞에서 멈춘다** — 운영 DB 쓰기, `git push`, 배포 설정, 유료 전환은 AI가 실행 직전에 반드시 확인받는다
 - **틀린 것은 기록으로 남긴다** — 첫 추가요인데 완료 화면이 안 뜨던 순번 0 버그, 없는 페이지가 404가 아닌 200으로 나가던 문제(Suspense 안의 `notFound`) 같은 것을 기능별 `findings.md`에 원인·결정과 함께 적는다
-- **세션 인수인계** — `_agent/handoff.md`에 지금 상태·남은 일·조심할 것만 적어 다음 세션이 바로 이어 간다
+- **세션 인수인계** — [`_agent/handoff.md`](_agent/handoff.md)에 지금 상태·남은 일·조심할 것만 적어 다음 세션이 바로 이어 간다
+- **검증은 아직 수동** — 머지 전 게이트는 `pnpm check`(타입 검사·린트·빌드)와 스펙의 성공 기준을 손으로 확인하는 것까지다. 자동화 테스트는 없다. 아래 「다음 단계」의 첫 항목
 
 ## 다음 단계
 
-- 운영 DB 분리와 정식 출시, 도메인 연결
 - 핵심 흐름(로그인 → 추가요, 클래스 → 예약 링크) 자동화 테스트
-- 수강생·강사 인터뷰로 기획서의 가설 검증
+- 운영 DB 분리와 정식 출시, 도메인 연결
+- 수강생·강사 인터뷰로 기획서의 가설 검증 (02 인터뷰 질문지 작성 포함)
 
----
+## 저장소 구조
+
+| 폴더 | 내용 |
+|---|---|
+| [app/](app/) | Next.js 앱. 비즈니스 규칙은 `src/server/`, DB 스키마는 `src/db/schema/` |
+| [specs/](specs/) | 기능 단위 스펙 24건 (README·spec·plan·tasks·findings·progress) |
+| [docs/](docs/) | 리서치 → 기획 → 명세 → IA → 플로우 → 아키텍처 → ERD 설계 문서 (아래 표) |
+| [design/](design/) | 디자인 시안 4라운드와 최종 방향 |
+| [wireframes/](wireframes/) | HTML 와이어프레임 보드·프로토타입 |
+| [_agent/](_agent/) | AI 에이전트 규칙·스킬·인수인계 |
+
+실행·DB·다이어그램 생성 방법은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## 문서
 
@@ -77,70 +87,6 @@ Claude Code를 동업자로 두고, AI가 맥락을 잃거나 범위를 넘지 �
 | [06 음원 API 조사](docs/06-음원API_이미지조사.md) | 앨범 커버·곡 정보 API 비교, 이미지 사용 조건 |
 | [07 기술 스택](docs/07-기술스택.md) | Next.js 풀스택 + Supabase, 무료 티어 제약, 먼저 할 기술 검증 |
 | [08 시스템 아키텍처](docs/08-시스템아키텍처.md) | 구성도, 핵심 요청 흐름 5개, 보안·환경·배치 |
-| [09 ERD](docs/09-ERD.md) | 테이블 16개 정의, 관계도, 인덱스, 주요 쿼리 |
+| [09 ERD](docs/09-ERD.md) | 테이블 정의, 관계도, 인덱스, 주요 쿼리 |
 | [기술 검증 T-1](docs/spike-01-인앱로그인검증.md) | 인앱 브라우저 카카오 로그인: 계정 세팅 가이드, 테스트 표 |
 | [서비스명](docs/naming-서비스명_브레인스토밍.md) | 네이밍 과정, 도메인·상표 확인 |
-
-02 인터뷰 질문지는 나중에 작성.
-
-## AI와 함께 개발하는 규칙 (FBPW)
-
-[AGENTS.md](AGENTS.md)(= `CLAUDE.md`)가 출발점이다. 세션마다 자동으로 읽힌다.
-
-| 위치 | 내용 |
-|---|---|
-| [_agent/rules/](_agent/rules/) | 최우선 원칙, 제품 원칙, 기술 스택, `app/` 코딩 규칙 |
-| [_agent/skills/](_agent/skills/) | `fbpw-plan`(기능 스펙), `verify`(검사), `git-commit`, `create-pr` |
-| [specs/](specs/) | 기능 단위 스펙 (README·spec·plan·tasks·findings·progress) |
-
-`.claude/rules`, `.claude/skills`는 `_agent/` 아래를 가리키는 링크다.
-
-## 앱 (`app/`)
-
-Next.js 16 + Supabase. 곡 상세(`/song/[slug]`)와 추가요, 운영 화면(`/admin`: 곡·강사·클래스 대리 등록), 로그인 검증 페이지(`/spike/song`)가 있다.
-
-```bash
-cd app
-cp .env.local.example .env.local   # 값 채우기 (docs/spike-01 1절)
-pnpm install
-pnpm dev --port 3100
-pnpm check         # 타입 검사 + 린트 + 빌드
-```
-
-DB (Drizzle, 스키마는 `app/src/db/schema/`)
-
-```bash
-pnpm db:check      # 접속 확인
-pnpm db:generate   # 스키마 코드 → 마이그레이션 SQL
-pnpm db:migrate    # dev DB에 적용
-pnpm db:seed:dev   # dev DB에 샘플 곡 넣기 (A2O LITE - NEON → /song/a2o-lite-neon)
-pnpm db:studio     # DB 내용 보기
-pnpm admin:grant <닉네임>   # 운영자 지정 (--revoke로 해제). 운영 화면은 /admin
-```
-
-## 와이어프레임
-
-[wireframes/index.html](wireframes/index.html)을 브라우저로 연다. 위쪽에서 **보드**(모든 화면과 설명을 나란히)와 **프로토타입**(화면 하나씩 눌러보기)을 바꿀 수 있다.
-
-| 화면 | 상태 |
-|---|---|
-| U-01 홈 | ✅ |
-| U-02 검색 (입력 전 / 자동완성 / 결과 없음) | ✅ |
-| U-03 클래스 목록 (기본 / 필터 결과 없음) | ✅ |
-| U-04 곡 상세 (클래스 있음 / 없음) | ✅ |
-| U-05 클래스 상세 (모집중 / 마감·앵콜 모으는 중 / 강사 검토 중) | ✅ |
-| U-06 추가요 랭킹 (수강생 / 강사) | ✅ |
-| U-08 로그인 시트, U-09 마이 (비로그인 / 로그인) | ✅ |
-| U-10 앵콜 시트 | ✅ |
-| T-01 강사 신청 (입력 / 인증·승인 대기) | ✅ |
-| T-02 클래스 등록 (새 클래스 / 앵콜 클래스) | ✅ |
-| T-03 내 클래스 (목록 / 앵콜 상세·응답) | ✅ |
-| 운영자 화면 (A-xx) | 와이어프레임 없이 개발 때 바로 |
-
-## 다이어그램 보기
-
-IA·유저 플로우·아키텍처·ERD의 Mermaid 다이어그램은 [docs/diagrams.html](docs/diagrams.html)을 브라우저로 열면 그림으로 볼 수 있다. 문서를 고친 뒤에는 다시 생성한다.
-
-```bash
-python3 scripts/build_diagrams.py
-```
